@@ -1,5 +1,5 @@
-template.o: \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/template.c \
+main_game.o: \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/main_game.c \
  /opt/devkitpro/libtonc/include/tonc.h \
  /opt/devkitpro/libtonc/include/tonc_types.h \
  /opt/devkitpro/libtonc/include/tonc_memmap.h \
@@ -15,8 +15,8 @@ template.o: \
  /opt/devkitpro/libtonc/include/tonc_video.h \
  /opt/devkitpro/libtonc/include/tonc_nocash.h \
  /opt/devkitpro/libtonc/include/tonc_text.h \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/whale.h \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/backgroundSky.h
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../common.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h
 /opt/devkitpro/libtonc/include/tonc.h:
 /opt/devkitpro/libtonc/include/tonc_types.h:
 /opt/devkitpro/libtonc/include/tonc_memmap.h:
@@ -32,5 +32,5 @@ template.o: \
 /opt/devkitpro/libtonc/include/tonc_video.h:
 /opt/devkitpro/libtonc/include/tonc_nocash.h:
 /opt/devkitpro/libtonc/include/tonc_text.h:
-/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/whale.h:
-/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/backgroundSky.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../common.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h:

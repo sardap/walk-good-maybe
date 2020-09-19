@@ -22,7 +22,7 @@ LIBTONC := $(DEVKITPRO)/tonclib $(DEVKITPRO)/libtonc
 #---------------------------------------------------------------------------------
 TARGET      :=  bin/ecs
 BUILD       :=  build
-SOURCES     :=  source source/graphics
+SOURCES     :=  source source/scenes source/assets
 DATA        :=  
 INCLUDES    :=  $(DEVKITPRO)/libtonc/include
 

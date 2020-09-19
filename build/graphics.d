@@ -1,6 +1,6 @@
 graphics.o: \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/graphics.c \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/graphics.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics.c \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics.h \
  /opt/devkitpro/libtonc/include/tonc.h \
  /opt/devkitpro/libtonc/include/tonc_types.h \
  /opt/devkitpro/libtonc/include/tonc_memmap.h \
@@ -16,9 +16,9 @@ graphics.o: \
  /opt/devkitpro/libtonc/include/tonc_video.h \
  /opt/devkitpro/libtonc/include/tonc_nocash.h \
  /opt/devkitpro/libtonc/include/tonc_text.h \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/backgroundSky.h \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/whale.h
-/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/graphics.h:
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/common.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/assets/whale.h
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics.h:
 /opt/devkitpro/libtonc/include/tonc.h:
 /opt/devkitpro/libtonc/include/tonc_types.h:
 /opt/devkitpro/libtonc/include/tonc_memmap.h:
@@ -34,5 +34,5 @@ graphics.o: \
 /opt/devkitpro/libtonc/include/tonc_video.h:
 /opt/devkitpro/libtonc/include/tonc_nocash.h:
 /opt/devkitpro/libtonc/include/tonc_text.h:
-/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/backgroundSky.h:
-/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/whale.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/common.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/assets/whale.h:

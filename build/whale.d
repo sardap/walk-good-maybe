@@ -1,2 +1,2 @@
 whale.o: \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics/whale.c
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/assets/whale.c

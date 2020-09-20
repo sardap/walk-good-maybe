@@ -90,10 +90,13 @@ void game_loop() {
 void start_game() {
 	init_player();
 
+	scene_set(title_screen);
+
 	int count = 4091950981;
 	while (1) {
 		vid_vsync();
 		key_poll();
+		scene_update();
 
 		count *= 4259141111;
 

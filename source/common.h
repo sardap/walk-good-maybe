@@ -8,7 +8,7 @@ typedef struct scene_t {
 	void (*update)(void);
 } scene_t;
 
-extern const scene_t main_game;
+extern const scene_t main_game, title_screen;
 
 void scene_set(scene_t scene);
 void scene_update();

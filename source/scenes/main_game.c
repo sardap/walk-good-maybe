@@ -3,7 +3,7 @@
 #include "../common.h"
 #include "../assets/backgroundSky.h"
 
-const int bkgsb = 30;
+static const int bkgsb = 30;
 
 static u16 _bkg_x;
 
@@ -39,12 +39,12 @@ static void show(void) {
 	REG_BG0CNT = BG_CBB(0) | BG_SBB(30) | BG_4BPP | BG_REG_32x32;
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0;
 
-	// Load palette
-	dma3_cpy(pal_bg_mem, backgroundSkyPal, backgroundSkyPalLen);
-	// Load tiles into CBB 0
-	dma3_cpy(&tile_mem[0][0], backgroundSkyTiles, backgroundSkyTilesLen);
+	// // Load palette
+	// dma3_cpy(pal_bg_mem, backgroundSkyPal, backgroundSkyPalLen);
+	// // Load tiles into CBB 0
+	// dma3_cpy(&tile_mem[0][0], backgroundSkyTiles, backgroundSkyTilesLen);
 
-	dma3_fill(&se_mem[bkgsb], 0x0, sb_size);
+	dma3_fill(&se_mem[bkgsb], 0x7, sb_size);
 	
 	for(int i = 0; i < gba_rand_range(3, 5); i++) {
 		int j = 0;

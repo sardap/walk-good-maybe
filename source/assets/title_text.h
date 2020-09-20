@@ -1,9 +1,9 @@
 
-//{{BLOCK(backgroundSky)
+//{{BLOCK(title_text)
 
 //======================================================================
 //
-//	backgroundSky, 256x256@8, 
+//	title_text, 256x256@8, 
 //	Transparent color : FF,00,F7
 //	+ regular map (in SBBs), not compressed, 32x32 
 //	External tile file: (null).
@@ -15,12 +15,12 @@
 //
 //======================================================================
 
-#ifndef GRIT_BACKGROUNDSKY_H
-#define GRIT_BACKGROUNDSKY_H
+#ifndef GRIT_TITLE_TEXT_H
+#define GRIT_TITLE_TEXT_H
 
-#define backgroundSkyMapLen 2048
-extern const unsigned short backgroundSkyMap[1024];
+#define title_textMapLen 2048
+extern const unsigned short title_textMap[1024];
 
-#endif // GRIT_BACKGROUNDSKY_H
+#endif // GRIT_TITLE_TEXT_H
 
-//}}BLOCK(backgroundSky)
+//}}BLOCK(title_text)

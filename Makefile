@@ -22,6 +22,7 @@ LIBTONC := $(DEVKITPRO)/tonclib $(DEVKITPRO)/libtonc
 #---------------------------------------------------------------------------------
 TARGET      :=  bin/ecs
 BUILD       :=  build
+ASSETS 		:=	assets assets/title_screen assets/whale
 SOURCES     :=  source source/scenes source/assets
 DATA        :=  
 INCLUDES    :=  $(DEVKITPRO)/libtonc/include
@@ -43,6 +44,11 @@ CXXFLAGS    :=  $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS :=  $(ARCH)
 LDFLAGS  =   -g $(ARCH) -Wl,-Map,$(notdir $@).map
+
+#---------------------------------------------------------------------------------
+# Create assets
+#---------------------------------------------------------------------------------
+PNGS		:=	$(foreach dir,$(ASSETS),$(notdir $(wildcard $(dir)/*.png)))
 
 #---------------------------------------------------------------------------------
 # path to tools - this can be deleted if you set the path to the toolchain in windows
@@ -161,3 +167,8 @@ soundbank.bin soundbank.h : $(AUDIOFILES)
 #---------------------------------------------------------------------------------------
 endif
 #---------------------------------------------------------------------------------------
+
+.PHONY: assets
+
+assets:
+	@./make_assets.sh

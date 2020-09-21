@@ -1,36 +1,8 @@
 #include <tonc.h>
+
 #include "common.h"
 #include "graphics.h"
-
-typedef enum facing_t {
-	FACING_LEFT, FACING_RIGHT
-} facing_t;
-
-typedef struct player_t {
-	int x;
-	int y;
-	int tid;
-	int pb;
-	facing_t facing;
-} player_t;
-
-OBJ_ATTR obj_buffer[128];
-OBJ_AFFINE *obj_aff_buffer= (OBJ_AFFINE*)obj_buffer;
-
-player_t player;
-
-void sprite_init() {
-	init_graphics();
-	oam_init(obj_buffer, 128);
-}
-
-void init_player() {
-	player.x = (240/2)-32;
-	player.y = 130;
-	player.tid = 0;
-	player.pb = 0;
-	player.facing = FACING_RIGHT;
-}
+#include "ent.h"
 
 void game_loop() {
 
@@ -67,47 +39,28 @@ void game_loop() {
 		// }
 
 		// move up/down
-		player.y += 2*key_tri_vert();
+		// player.y += 2*key_tri_vert();
 
-		// increment/decrement starting tile with R/L
-		player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
+		// // increment/decrement starting tile with R/L
+		// player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
 
-		// make it glow (via palette swapping)
-		player.pb = key_is_down(KEY_SELECT) ? 1 : 0;
+		// // make it glow (via palette swapping)
+		// player.pb = key_is_down(KEY_SELECT) ? 1 : 0;
 
-		// toggle mapping mode
-		if(key_hit(KEY_START))
-			REG_DISPCNT ^= DCNT_OBJ_1D;
+		// // toggle mapping mode
+		// if(key_hit(KEY_START))
+		// 	REG_DISPCNT ^= DCNT_OBJ_1D;
 
-		// Hey look, it's one of them build macros!
-		// metr->attr2 = ATTR2_BUILD(player.tid, player.pb, 0);
-		// obj_set_pos(metr, player.x, player.y);
+		// // Hey look, it's one of them build macros!
+		// // metr->attr2 = ATTR2_BUILD(player.tid, player.pb, 0);
+		// // obj_set_pos(metr, player.x, player.y);
 
-		oam_copy(oam_mem, obj_buffer, 1);	// only need to update one
+		// oam_copy(oam_mem, obj_buffer, 1);	// only need to update one
 	}
 }
 
 void start_game() {
-	init_player();
-
 	scene_set(title_screen);
-
-	int count = 4091950981;
-	while (1) {
-		vid_vsync();
-		key_poll();
-		scene_update();
-
-		count *= 4259141111;
-
-		if(key_hit(KEY_A)) {
-			break;
-		}
-	}
-	
-	init_seed(count);
-
-	scene_set(main_game);
 
 	game_loop();
 }

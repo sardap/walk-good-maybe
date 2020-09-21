@@ -16,7 +16,11 @@ main_game.o: \
  /opt/devkitpro/libtonc/include/tonc_nocash.h \
  /opt/devkitpro/libtonc/include/tonc_text.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../common.h \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../ent.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../player.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/title_text.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/titleScreenShared.h
 /opt/devkitpro/libtonc/include/tonc.h:
 /opt/devkitpro/libtonc/include/tonc_types.h:
 /opt/devkitpro/libtonc/include/tonc_memmap.h:
@@ -33,4 +37,8 @@ main_game.o: \
 /opt/devkitpro/libtonc/include/tonc_nocash.h:
 /opt/devkitpro/libtonc/include/tonc_text.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../common.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../ent.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../player.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/title_text.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/titleScreenShared.h:

@@ -25,18 +25,18 @@ SPRITE_64x64="$SPRITE_8x8 -Mw 8 -Mh 8"
 
 grit $ASSETS/whale/whale.png $SPRITE_32x32
 
-TITLE_SCREEN_OPTIONS=""
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -ftc"					# Create C file
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -gT ff00f7" 			# RGB 24 BIT
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -gB8"					# Bit depth 8
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -gu16" 					# use short
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -m"						# Export map
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -mR8"					# Create Map
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -mLs"					# Map 16 Bit
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -pS" 					# Share pallet
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -gS"					# Share tiles
-TITLE_SCREEN_OPTIONS="$TITLE_SCREEN_OPTIONS -O titleScreenShared"	# Shared pallet name
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 
 grit \
 	$ASSETS/title_screen/title_text.png \
-	$ASSETS/title_screen/backgroundSky.png $TITLE_SCREEN_OPTIONS
+	$ASSETS/background/backgroundSky.png $BG_OPTIONS

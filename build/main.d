@@ -16,7 +16,8 @@ main.o: \
  /opt/devkitpro/libtonc/include/tonc_nocash.h \
  /opt/devkitpro/libtonc/include/tonc_text.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/common.h \
- /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics.h
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/ent.h
 /opt/devkitpro/libtonc/include/tonc.h:
 /opt/devkitpro/libtonc/include/tonc_types.h:
 /opt/devkitpro/libtonc/include/tonc_memmap.h:
@@ -34,3 +35,4 @@ main.o: \
 /opt/devkitpro/libtonc/include/tonc_text.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/common.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/graphics.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/ent.h:

@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"*.bf": "plaintext",
+		"cstdlib": "c",
+		"algorithm": "c"
+	}
+}

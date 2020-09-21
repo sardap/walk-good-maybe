@@ -6,6 +6,7 @@ static const int sb_size = sizeof(SCREENBLOCK);
 typedef struct scene_t {
 	void (*show)(void);
 	void (*update)(void);
+	void (*hide)(void);
 } scene_t;
 
 extern const scene_t main_game, title_screen;

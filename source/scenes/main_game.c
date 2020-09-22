@@ -24,7 +24,6 @@ static const int shared_cloud_tile_start = 72;
 static FIXED _bg_pos_x;
 static FIXED _bg_pos_y;
 static int _next_cloud_spawn;
-static FIXED _scroll_speed;
 
 static FIXED wrap_x(FIXED x) {
 	if(x > bg_x_pix) {
@@ -92,7 +91,7 @@ static void show(void) {
 	dma3_cpy(&tile_mem[shared_cb], titleScreenSharedTiles, titleScreenSharedTilesLen);
 
 	//Fill cloud layer
-	for(int i = 0; i < sb_size; i++) {
+	for(int i = 0; i < SB_SIZE; i++) {
 		se_mem[background_sb][i] = shared_cloud_tile_start;
 	}
 
@@ -108,19 +107,19 @@ static void show(void) {
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG2;
 
 	_next_cloud_spawn = 0;
-	_scroll_speed = (int)(0.25f * FIX_SCALE);
+	_scroll_x = (int)(0.25f * FIX_SCALE);
 	
 	init_player();
 }
 
 static void update(void) {
-	_bg_pos_x += _scroll_speed;
+	_bg_pos_x += _scroll_x;
 
 	wrap_bkg();
 
 	REG_BG0HOFS = fx2int(_bg_pos_x);
 
-	_next_cloud_spawn -= _scroll_speed;
+	_next_cloud_spawn -= _scroll_x;
 
 	if(_next_cloud_spawn < 0) {
 		spawn_cloud();
@@ -134,7 +133,7 @@ static void update(void) {
 
 	update_player();
 
-	_scroll_speed += 0.001f * FIX_SCALE;
+	_scroll_x += 0.001f * FIX_SCALE;
 }
 
 static void hide(void) {

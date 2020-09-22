@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 static int _frame_count;
+int _scroll_x;
 
 static void nothing(void) {}
 

@@ -1,7 +1,8 @@
 #ifndef COMMON_H
 #include <tonc.h>
 
-static const int sb_size = sizeof(SCREENBLOCK);
+#define SB_SIZE sizeof(SCREENBLOCK)
+static const int GRAVITY = (int)(1.0f * (FIX_SHIFT));
 
 typedef struct scene_t {
 	void (*show)(void);
@@ -10,6 +11,8 @@ typedef struct scene_t {
 } scene_t;
 
 extern const scene_t main_game, title_screen;
+
+extern FIXED _scroll_x;
 
 void scene_set(scene_t scene);
 void scene_update();

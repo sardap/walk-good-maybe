@@ -1,14 +1,15 @@
 #include "player.h"
 
 #include <tonc.h>
+#include "common.h"
 #include "ent.h"
 
 static const int SPEED = (int)(2.0f * (FIX_SCALE));
+static const int JUMP_POWER = (int)(1.2f * (FIX_SCALE));
 static const int GROUND_Y = (int)(120.0f * (FIX_SCALE));
 
 ent_t _player = {};
 static OBJ_ATTR* _player_obj = &_obj_buffer[0];
-// static OBJ_AFFINE *_obj_aff_buffer = (OBJ_AFFINE*)_obj_buffer;
 
 void init_player() {
 	oam_init(_obj_buffer, 128);
@@ -26,25 +27,29 @@ void init_player() {
 
 void update_player() {
 	if(_player.facing == FACING_RIGHT && key_hit(KEY_LEFT)) {
-		_player.vx = -SPEED;
 		_player.facing = FACING_LEFT;
 		_player_obj->attr1 ^= ATTR1_HFLIP;
 	} else if(_player.facing == FACING_LEFT && key_hit(KEY_RIGHT)) {
-		_player.vx = SPEED;
 		_player.facing = FACING_RIGHT;
 		_player_obj->attr1 ^= ATTR1_HFLIP;
+	}
+
+	if(key_held(KEY_LEFT)) {
+		_player.vx = -SPEED;
+	} else if(key_held(KEY_RIGHT)) {
+		_player.vx = SPEED;
 	}
 	
 	switch (_player.move_state)
 	{
 	case MOVEMENT_GROUNDED:
 		if(key_hit(KEY_A)) {
-			_player.vy = -SPEED;
+			_player.vy = -JUMP_POWER;
 			_player.move_state = MOVEMENT_AIR;
 		}
 		break;
 	case MOVEMENT_AIR:
-		_player.vy += (int)(1.0f * (FIX_SHIFT));
+		_player.vy += GRAVITY;
 		if(_player.y >= GROUND_Y) {
 			_player.y = GROUND_Y;
 			_player.vy = 0;
@@ -55,6 +60,8 @@ void update_player() {
 
 	_player.x += _player.vx;
 	_player.y += _player.vy;
+
+	_player.vx = 0;
 
 	// increment/decrement starting tile with R/L
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);

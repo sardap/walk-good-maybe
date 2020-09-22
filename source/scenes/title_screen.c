@@ -25,7 +25,7 @@ static void show(void) {
 	dma3_cpy(&se_mem[foreground_sb], title_textMap, title_textMapLen);
 
 	//Fill cloud layer
-	for(int i = 0; i < sb_size; i++) {
+	for(int i = 0; i < SB_SIZE; i++) {
 		se_mem[cloud_sb][i] = 72;
 	}
 

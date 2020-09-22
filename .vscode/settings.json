@@ -3,5 +3,6 @@
 		"*.bf": "plaintext",
 		"cstdlib": "c",
 		"algorithm": "c"
-	}
+	},
+	"C_Cpp.errorSquiggles": "Disabled"
 }

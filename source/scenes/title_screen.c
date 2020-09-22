@@ -9,7 +9,7 @@
 
 static const int shared_cb = 0;      // tile gfx
 
-static const int background_sb = 30; // entries
+static const int cloud_sb = 30; // entries
 static const int foreground_sb = 29;
 
 static const int shared_cloud_tile_start = 72;
@@ -26,12 +26,12 @@ static void show(void) {
 
 	//Fill cloud layer
 	for(int i = 0; i < sb_size; i++) {
-		se_mem[background_sb][i] = 72;
+		se_mem[cloud_sb][i] = 72;
 	}
 
 	init_seed(652374291);
 	place_n_clouds(
-		shared_cloud_tile_start, background_sb, 
+		shared_cloud_tile_start, cloud_sb, 32,
 		gba_rand_range(3, 5)
 	);
 
@@ -41,7 +41,7 @@ static void show(void) {
 	REG_BG0VOFS = 0;
 
 	// Set bkg reg
-	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(background_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
+	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(cloud_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(foreground_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1;

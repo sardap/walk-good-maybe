@@ -18,6 +18,7 @@ main_game.o: \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../common.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../ent.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../player.h \
+ /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../graphics.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/title_text.h \
  /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/titleScreenShared.h
@@ -39,6 +40,7 @@ main_game.o: \
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../common.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../ent.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../player.h:
+/mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../graphics.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/backgroundSky.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/title_text.h:
 /mnt/c/Users/pfsar/OneDrive/Documents/GitHub/ecs-gba/source/scenes/../assets/titleScreenShared.h:

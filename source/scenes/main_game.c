@@ -48,16 +48,54 @@ static void wrap_bkg() {
 	_bg_pos_x = wrap_x(_bg_pos_x);
 }
 
+static void wrap_x_sb(int *x, int *sb) {
+	if(*x >= 32) {
+		*sb = *sb + 1;
+		*x -= 32;
+	} else {
+		*sb = *sb;
+	}
+}
+
+static inline void spawn_col(int sb, int x, int y, int tile) {
+	for(int i = y; y < 32; y++) {
+		se_plot(se_mem[sb], x, y, tile);
+	}
+}
+
+static void spawn_building_0() {
+	int x_base = offset_x_bg(32);
+	int x;
+	int y = BUILDING_Y_TILE_SPAWN;
+	int sb = cloud_sb;
+	wrap_x_sb(&x_base, &sb);
+
+	int width = gba_rand_range(5, 10);
+
+	//LEFT SECTION
+	se_plot(se_mem[sb], x_base, y, BUILDING_0_ROOF_LEFT);
+	spawn_col(sb, x_base, y + 1, BUILDING_0_ROOF_LEFT);
+
+	//MIDDLE SECTION
+	for(int i = 1; i < width; i++) {
+		x = x_base + i;
+		wrap_x_sb(&x, &sb);
+		se_plot(se_mem[sb], x, y, BUILDING_0_MIDDLE_ROOF);
+		spawn_col(sb, x, y + 1, BUILDING_0_MIDDLE_BOT);
+	}
+
+	//RIGHT SECTION
+	wrap_x_sb(&x, &sb);
+	se_plot(se_mem[sb], x, y, BUILDING_0_ROOF_RIGHT);
+	spawn_col(sb, x, y + 1, BUILDING_0_ROOF_RIGHT);
+}
+
 static void spawn_cloud() {
 	int x = offset_x_bg(32);
 	int y = gba_rand_range(0, 10);
-	int sb;
-	if(x >= 32) {
-		sb = cloud_sb + 1;
-		x -= 32;
-	} else {
-		sb = cloud_sb;
-	}
+	int sb = cloud_sb;
+	wrap_x_sb(&x, &sb);
+
 	se_plot(se_mem[sb], x + 0, y, shared_cloud_tile_start + 1);
 	se_plot(se_mem[sb], x + 1, y, shared_cloud_tile_start + 2);
 	se_plot(se_mem[sb], x + 2, y, shared_cloud_tile_start + 3);
@@ -71,13 +109,8 @@ static void spawn_cloud() {
 
 static void clear_offscreen() {
 	int x = offset_x_bg(-1);
-	int sb;
-	if(x >= 32) {
-		sb = cloud_sb + 1;
-		x -= 32;
-	} else {
-		sb = cloud_sb;
-	}
+	int sb = cloud_sb;
+	wrap_x_sb(&x, &sb);
 
 	for(int y = 0; y < 32; y++) {
 		se_plot(se_mem[sb], x, y, 0);
@@ -112,7 +145,23 @@ static void show(void) {
 	init_player();
 }
 
+static bool check_game_over() {
+#ifdef DEBUG
+	return false;
+#elif
+	return fx2int(_player.x) < 0;
+#endif
+}
+
 static void update(void) {
+	if(check_game_over()) {
+		for(int i = 0; i < SB_SIZE; i++) {
+			se_mem[background_sb][i] = 0x0;
+		}
+		scene_set(title_screen);
+		return;
+	}
+
 	_bg_pos_x += _scroll_x;
 
 	wrap_bkg();
@@ -129,6 +178,11 @@ static void update(void) {
 		) * FIX_SCALE;
 	}
 
+	if(key_hit(KEY_A)) {
+		se_plot(se_mem[background_sb], 0, 0, shared_cloud_tile_start + 1);
+		spawn_building_0();
+	}
+
 	clear_offscreen();
 
 	update_player();
@@ -137,7 +191,9 @@ static void update(void) {
 }
 
 static void hide(void) {
-	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D;
+	REG_DISPCNT = 0;
+	dma3_fill(se_mem[cloud_sb], 0x0, SB_SIZE);
+	dma3_fill(se_mem[cloud_sb+1], 0x0, SB_SIZE);
 }
 
 const scene_t main_game = {

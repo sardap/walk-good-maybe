@@ -44,7 +44,7 @@ static void show(void) {
 	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(cloud_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(foreground_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 
-	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1;
+	REG_DISPCNT =  DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1;
 }
 
 static void update(void) {

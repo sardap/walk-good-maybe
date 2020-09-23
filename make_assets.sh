@@ -40,4 +40,4 @@ BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/backgroundSky.png \
-	$ASSETS/background/NewTilemap.png $BG_OPTIONS
+	$ASSETS/background/build_tile_set.png $BG_OPTIONS

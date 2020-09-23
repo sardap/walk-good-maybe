@@ -15,7 +15,7 @@ void init_player() {
 	oam_init(_obj_buffer, 128);
 
 	_player.x = 20 << FIX_SHIFT;
-	_player.y = 120 << FIX_SHIFT;
+	_player.y = BUILDING_Y_SPAWN << FIX_SHIFT;
 	_player.tid = 0;
 	_player.facing = FACING_RIGHT;
 
@@ -39,7 +39,18 @@ void update_player() {
 	} else if(key_held(KEY_RIGHT)) {
 		_player.vx = SPEED;
 	}
-	
+
+	_player.vx += -_scroll_x;
+
+	//Push player backwards in wind
+	if(_player.facing == FACING_LEFT) {
+		_player.vx += -_scroll_x;
+	}
+
+	if(fx2int(_player.x) > 190) {
+		_player.vx += -SPEED;
+	}
+
 	switch (_player.move_state)
 	{
 	case MOVEMENT_GROUNDED:

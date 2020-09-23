@@ -1,12 +1,16 @@
 #ifndef GRAPHICS_H
 #include <tonc.h>
 
-typedef struct graphics_into_t {
-	int bg_width;
-} graphics_into_t;
+#define BUILDINGS_OFFSET 81
 
+#define BUILDING_0_ROOF_RIGHT BUILDINGS_OFFSET
+#define BUILDING_0_MIDDLE_RIGHT BUILDING_0_ROOF_RIGHT
 
-graphics_into_t get_graphics_into();
+#define BUILDING_0_ROOF_LEFT BUILDING_0_ROOF_RIGHT
+#define BUILDING_0_LEFT_BOT BUILDING_0_ROOF_RIGHT
+
+#define BUILDING_0_MIDDLE_ROOF BUILDING_0_ROOF_RIGHT
+#define BUILDING_0_MIDDLE_BOT BUILDINGS_OFFSET + 1
 
 void init_graphics();
 

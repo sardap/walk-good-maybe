@@ -20,6 +20,7 @@ typedef struct ent_t {
 	FIXED x, y;
 	FIXED vx, vy;
 	int tid;
+	int w, h;
 
 	union  {
 		struct {

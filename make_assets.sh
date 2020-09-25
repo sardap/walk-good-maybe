@@ -24,6 +24,8 @@ SPRITE_32x64="$SPRITE_8x8 -Mw 4 -Mh 8"
 SPRITE_64x64="$SPRITE_8x8 -Mw 8 -Mh 8"
 
 grit $ASSETS/whale/whale.png $SPRITE_32x32
+grit $ASSETS/whale/whale_small.png $SPRITE_16x16
+
 
 BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
@@ -40,4 +42,5 @@ BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/backgroundSky.png \
+	$ASSETS/background/background_size_test.png \
 	$ASSETS/background/build_tile_set.png $BG_OPTIONS

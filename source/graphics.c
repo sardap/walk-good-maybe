@@ -4,14 +4,14 @@
 #include <string.h>
 
 #include "common.h"
-#include "assets/whale.h"
+#include "assets/whale_small.h"
 
 
 void load_player_tile() {
 	// Places the glyphs of a 4bpp boxed metroid sprite 
 	//   into LOW obj memory (cbb == 4)
-	dma3_cpy(&tile_mem[4][0], whaleTiles, whaleTilesLen);
-	dma3_cpy(pal_obj_mem, whalePal, whalePalLen);
+	dma3_cpy(&tile_mem[4][0], whale_smallTiles, whale_smallTilesLen);
+	dma3_cpy(pal_obj_mem, whale_smallPal, whale_smallPalLen);
 }
 
 void init_graphics() {

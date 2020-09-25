@@ -14,13 +14,16 @@ static OBJ_ATTR* _player_obj = &_obj_buffer[0];
 void init_player() {
 	oam_init(_obj_buffer, 128);
 
-	_player.x = 20 << FIX_SHIFT;
-	_player.y = BUILDING_Y_SPAWN << FIX_SHIFT;
 	_player.tid = 0;
 	_player.facing = FACING_RIGHT;
+	_player.w = 16;
+	_player.h = 16;
+
+	_player.x = 20 << FIX_SHIFT;
+	_player.y = GROUND_Y;
 
 	obj_set_attr(_player_obj, 
-		ATTR0_SQUARE, ATTR1_SIZE_32,
+		ATTR0_SQUARE, ATTR1_SIZE_16x16,
 		ATTR2_PALBANK(0) | _player.tid
 	);
 }
@@ -47,7 +50,7 @@ void update_player() {
 		_player.vx += -_scroll_x;
 	}
 
-	if(fx2int(_player.x) > 190) {
+	if(fx2int(_player.x) > 220) {
 		_player.vx += -SPEED;
 	}
 

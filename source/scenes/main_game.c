@@ -27,7 +27,6 @@ static u16 _level[LEVEL_SIZE];
 static FIXED _bg_pos_x;
 // static FIXED _bg_pos_y;
 static int _next_cloud_spawn;
-static int _test_x;
 
 static FIXED wrap_x(FIXED x) {
 	if(x > bg_x_pix) {
@@ -61,59 +60,74 @@ static void wrap_x_sb(int *x, int *sb) {
 	}
 }
 
-static inline void spawn_col(int sb, int x, int y, int tile) {
-	for(; y < 32; y++) {
-		se_plot(se_mem[sb], x, y, tile);
-	}
-}
-
 static u16 at_level(int x, int y) {
+#ifdef DEBUG
+	if(x > LEVEL_WIDTH) {
+		dma3_fill(se_mem[background_sb], x, SB_SIZE);
+		return -1;
+	}
+	if(y > LEVEL_HEIGHT) {
+		dma3_fill(se_mem[background_sb], y, SB_SIZE);
+		return -1;
+	}
+#endif
 	return _level[LEVEL_HEIGHT * x + y];
 }
 
 static void set_level_at(int x, int y, u16 val) {
+#ifdef DEBUG
+	if(x > LEVEL_WIDTH) {
+		dma3_fill(se_mem[background_sb], x, SB_SIZE);
+		return;
+	}
+	if(y > LEVEL_HEIGHT) {
+		dma3_fill(se_mem[background_sb], y, SB_SIZE);
+		return;
+	}
+#endif
 	_level[LEVEL_HEIGHT * x + y] = val;
 }
 
-static void spawn_building_0() {
-	int x_base = (_bg_pos_x >> FIX_SHIFT) / 8 + 32;
-	if(x_base > 64) {
-		x_base = x_base - 64;
+static inline void set_col(int x, int y, u16 tile) {
+	for(; y < LEVEL_HEIGHT; y++) {
+		set_level_at(x, y, tile);
 	}
+}
+
+static int level_wrap_x(int x) {
+	if(x >= LEVEL_WIDTH) {
+		return x - 64;
+	}
+
+	if(x < 0) {
+		return x + 64;
+	}
+
+	return x;
+}
+
+static void spawn_building_0() {
+	int x_base = level_wrap_x((fx2int(_bg_pos_x) / 8) + 32);
 	int x;
 	int y = BUILDING_Y_TILE_SPAWN;
-	int sb = building_sb;
+	se_mem[background_sb][0] = x_base;
 	
-	se_mem[background_sb][0] = sizeof(SCR_ENTRY);
-
-	// wrap_x_sb(&x_base, &sb);
+	//LEFT SECTION
+	set_level_at(x_base, y, BUILDING_0_ROOF_LEFT);
+	set_col(x_base, y + 1, BUILDING_0_ROOF_LEFT);
 
 	int width = gba_rand_range(5, 10);
-
-	// Update level info
-	 
-
-	//LEFT SECTION
-	// se_plot(se_mem[sb], x_base, y, BUILDING_0_ROOF_LEFT);
-	set_level_at(y, x_base, BUILDING_0_ROOF_LEFT);
-	// _level[LEVEL_WIDTH * 0 + x_base] = BUILDING_0_ROOF_LEFT;
-	// spawn_col(sb, x_base, y + 1, BUILDING_0_ROOF_LEFT);
-
-	return;
 	//MIDDLE SECTION
 	for(int i = 1; i < width; i++) {
-		x = x_base + i;
-		wrap_x_sb(&x, &sb);
-		// se_plot(se_mem[sb], x, y, BUILDING_0_MIDDLE_ROOF);
-		_level[LEVEL_WIDTH * y + x] = BUILDING_0_MIDDLE_ROOF;
-		// spawn_col(sb, x, y + 1, BUILDING_0_MIDDLE_BOT);
+		x = level_wrap_x(x_base + i);
+		set_level_at(x, y, BUILDING_0_MIDDLE_ROOF);
+		set_col(x, y + 1, BUILDING_0_MIDDLE_BOT);
 	}
 
 	//RIGHT SECTION
-	wrap_x_sb(&x, &sb);
-	// se_plot(se_mem[sb], x, y, BUILDING_0_ROOF_RIGHT);
-	_level[LEVEL_WIDTH * y + x] = BUILDING_0_MIDDLE_ROOF;
-	// spawn_col(sb, x, y + 1, BUILDING_0_ROOF_RIGHT);
+	x = level_wrap_x(x_base + width);
+	set_level_at(x, y, BUILDING_0_MIDDLE_ROOF);
+	set_col(x, y, BUILDING_0_ROOF_RIGHT);
 }
 
 static void spawn_cloud() {
@@ -143,13 +157,8 @@ static void clear_offscreen(int sb) {
 }
 
 static void clear_offscreen_level() {
-	int x = fx2int(_bg_pos_x) / 8 - 1;
-	if(x < 0){
-		return;
-	}
-	for(int y = 0; y < LEVEL_HEIGHT; y++) {
-		set_level_at(x, y, 0);
-	}
+	int x = level_wrap_x((fx2int(_bg_pos_x) / 8) - 3);
+	set_col(x, 0, 0);
 }
 
 static void spawn_buildings() {
@@ -175,11 +184,11 @@ static void show(void) {
 		se_mem[background_sb][i] = shared_cloud_tile_start;
 	}
 
-	for(int x = 0; x < LEVEL_WIDTH; x++) {
-		for(int y = 0; y < LEVEL_HEIGHT; y++) {
-			set_level_at(x, y, (u16)x);
-		}
-	}
+	// for(int x = 0; x < LEVEL_WIDTH; x++) {
+	// 	for(int y = 0; y < LEVEL_HEIGHT; y++) {
+	// 		set_level_at(x, y, (u16)x);
+	// 	}
+	// }
 
 	// dma3_fill(&se_mem[cloud_sb], SB_SIZE, 0x0);
 	// dma3_fill(&se_mem[background_sb], SB_SIZE, 0x0);
@@ -198,7 +207,6 @@ static void show(void) {
 
 	_next_cloud_spawn = 0;
 	_scroll_x = (int)(0.25f * FIX_SCALE);
-	_test_x = 0;
 	
 	init_player();
 }
@@ -239,14 +247,13 @@ static void update(void) {
 	}
 
 	if(key_hit(KEY_B)) {
-		_test_x++;
-		// spawn_building_0();
+		spawn_building_0();
 	}
 
 	for(int x = 0; x < LEVEL_WIDTH; x++) {
 		for(int y = 0; y < LEVEL_HEIGHT; y++) {
-			if(x > 32) {
-				se_plot(se_mem[building_sb+1], x-32, y, at_level(x, y));
+			if(x > 30) {
+				se_plot(se_mem[building_sb+1], x-30, y, at_level(x, y));
 			} else {
 				se_plot(se_mem[building_sb], x, y, at_level(x, y));
 			}

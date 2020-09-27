@@ -10,8 +10,8 @@
 
 static const int bg_x = 64;
 static const FIXED bg_x_pix = (int)(bg_x * 8 * (FIX_SCALE));
-// static const int bg_y = 32;
 
+static const int BUILDINGS_SPAWN_WIDTH = 24;
 static const FIXED CLOUD_WIDTH = (int)((4 * 8) * (FIX_SCALE));
 
 static const int shared_cb = 0;
@@ -23,10 +23,10 @@ static const int background_sb = 30; // entries
 static const int shared_cloud_tile_start = 72;
 
 static u16 _level[LEVEL_SIZE];
-// static int _level_start;
 static FIXED _bg_pos_x;
-// static FIXED _bg_pos_y;
-static int _next_cloud_spawn;
+static FIXED _next_cloud_spawn;
+static FIXED _next_building_spawn;
+static int _temp;
 
 static FIXED wrap_x(FIXED x) {
 	if(x > bg_x_pix) {
@@ -96,21 +96,20 @@ static inline void set_col(int x, int y, u16 tile) {
 
 static int level_wrap_x(int x) {
 	if(x >= LEVEL_WIDTH) {
-		return x - 64;
+		return x - LEVEL_WIDTH;
 	}
 
 	if(x < 0) {
-		return x + 64;
+		return x + LEVEL_WIDTH;
 	}
 
 	return x;
 }
 
-static void spawn_building_0() {
-	int x_base = level_wrap_x((fx2int(_bg_pos_x) / 8) + 32);
+static int spawn_building_0(int start_x) {
+	int x_base = start_x;
 	int x;
 	int y = BUILDING_Y_TILE_SPAWN;
-	se_mem[background_sb][0] = x_base;
 	
 	//LEFT SECTION
 	set_level_at(x_base, y, BUILDING_0_ROOF_LEFT);
@@ -128,6 +127,8 @@ static void spawn_building_0() {
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_0_MIDDLE_ROOF);
 	set_col(x, y, BUILDING_0_ROOF_RIGHT);
+
+	return width;
 }
 
 static void spawn_cloud() {
@@ -157,20 +158,20 @@ static void clear_offscreen(int sb) {
 }
 
 static void clear_offscreen_level() {
-	int x = level_wrap_x((fx2int(_bg_pos_x) / 8) - 3);
+	int x = level_wrap_x((fx2int(_bg_pos_x) / TILE_WIDTH) - 3);
 	set_col(x, 0, 0);
 }
 
 static void spawn_buildings() {
-	// int x_start = offset_x_bg(31);
-	// int x;
-	// int y = BUILDING_Y_TILE_SPAWN;
-	// int sb = cloud_sb;
-
-	// for(int i = 0; i < MAX_JUMP_WIDTH_TILES; i++) {
-	// 	x = x_start + i;
-	// 	wrap_x_sb(&x, &sb);
-	// }
+	int start_x = level_wrap_x((fx2int(_bg_pos_x) / TILE_WIDTH) + 32);
+	int width = 0;
+	for(int i = 0; i < BUILDINGS_SPAWN_WIDTH; i += width) {
+		width = spawn_building_0(start_x);
+		width += gba_rand_range(1, MAX_JUMP_WIDTH_TILES);
+		start_x = level_wrap_x(start_x + width);
+	}
+	_next_building_spawn = (int)((BUILDINGS_SPAWN_WIDTH * 8) * (FIX_SCALE));;
+	se_mem[background_sb][0] = fx2int(_next_building_spawn);
 }
 
 static void show(void) {
@@ -206,7 +207,11 @@ static void show(void) {
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
 	_next_cloud_spawn = 0;
+	_next_building_spawn = 0;
+
 	_scroll_x = (int)(0.25f * FIX_SCALE);
+
+	_temp = 29;
 	
 	init_player();
 }
@@ -229,7 +234,6 @@ static void update(void) {
 	}
 
 	_bg_pos_x += _scroll_x;
-	// _level_start = fx2int(_bg_pos_x) / 8;
 
 	wrap_bkg();
 
@@ -237,6 +241,7 @@ static void update(void) {
 	REG_BG1HOFS = fx2int(_bg_pos_x);
 
 	_next_cloud_spawn -= _scroll_x;
+	_next_building_spawn -= _scroll_x;
 
 	if(_next_cloud_spawn < 0) {
 		spawn_cloud();
@@ -246,24 +251,25 @@ static void update(void) {
 		) * FIX_SCALE;
 	}
 
+	if(_next_building_spawn < 0) {
+		spawn_buildings();
+	}
+
 	if(key_hit(KEY_B)) {
-		spawn_building_0();
 	}
 
 	for(int x = 0; x < LEVEL_WIDTH; x++) {
 		for(int y = 0; y < LEVEL_HEIGHT; y++) {
-			if(x > 30) {
-				se_plot(se_mem[building_sb+1], x-30, y, at_level(x, y));
-			} else {
+			if(x < 32) {
 				se_plot(se_mem[building_sb], x, y, at_level(x, y));
+			} else {
+				se_plot(se_mem[building_sb+1], x-32, y, at_level(x, y));
 			}
 		}
 	}
 
 	clear_offscreen(cloud_sb);
 	clear_offscreen_level();
-
-	spawn_buildings();
 
 	update_player();
 

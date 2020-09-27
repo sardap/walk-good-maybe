@@ -4,6 +4,8 @@
 #define DEBUG 1
 
 #define SB_SIZE sizeof(SCREENBLOCK)
+#define TILE_WIDTH 8
+
 #define BUILDING_Y_SPAWN 136
 #define BUILDING_Y_TILE_SPAWN BUILDING_Y_SPAWN / 8
 #define MAX_JUMP_WIDTH_TILES 5
@@ -37,7 +39,7 @@ void init_seed(int seed);
 int gba_rand();
 
 inline int gba_rand_range(int min, int max) {
-	return (gba_rand() % (min - max + 1)) + min;
+	return (gba_rand() % (max - min + 1)) + min;
 }
 
 #endif

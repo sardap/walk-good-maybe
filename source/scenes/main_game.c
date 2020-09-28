@@ -4,6 +4,7 @@
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
+#include "../level.h"
 #include "../assets/backgroundSky.h"
 #include "../assets/title_text.h"
 #include "../assets/titleScreenShared.h"
@@ -11,7 +12,6 @@
 static const int bg_x = 64;
 static const FIXED bg_x_pix = (int)(bg_x * 8 * (FIX_SCALE));
 
-static const int BUILDINGS_SPAWN_WIDTH = 24;
 static const FIXED CLOUD_WIDTH = (int)((4 * 8) * (FIX_SCALE));
 
 static const int shared_cb = 0;
@@ -22,7 +22,6 @@ static const int background_sb = 30; // entries
 
 static const int shared_cloud_tile_start = 72;
 
-static u16 _level[LEVEL_SIZE];
 static FIXED _bg_pos_x;
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
@@ -36,10 +35,6 @@ static FIXED wrap_x(FIXED x) {
 	}
 
 	return x;
-}
-
-static inline int get_sb(int x) {
-	return 0;
 }
 
 static inline int offset_x_bg(int n) {
@@ -60,73 +55,27 @@ static void wrap_x_sb(int *x, int *sb) {
 	}
 }
 
-static u16 at_level(int x, int y) {
-#ifdef DEBUG
-	if(x > LEVEL_WIDTH) {
-		dma3_fill(se_mem[background_sb], x, SB_SIZE);
-		return -1;
-	}
-	if(y > LEVEL_HEIGHT) {
-		dma3_fill(se_mem[background_sb], y, SB_SIZE);
-		return -1;
-	}
-#endif
-	return _level[LEVEL_HEIGHT * x + y];
-}
-
-static void set_level_at(int x, int y, u16 val) {
-#ifdef DEBUG
-	if(x > LEVEL_WIDTH) {
-		dma3_fill(se_mem[background_sb], x, SB_SIZE);
-		return;
-	}
-	if(y > LEVEL_HEIGHT) {
-		dma3_fill(se_mem[background_sb], y, SB_SIZE);
-		return;
-	}
-#endif
-	_level[LEVEL_HEIGHT * x + y] = val;
-}
-
-static inline void set_col(int x, int y, u16 tile) {
-	for(; y < LEVEL_HEIGHT; y++) {
-		set_level_at(x, y, tile);
-	}
-}
-
-static int level_wrap_x(int x) {
-	if(x >= LEVEL_WIDTH) {
-		return x - LEVEL_WIDTH;
-	}
-
-	if(x < 0) {
-		return x + LEVEL_WIDTH;
-	}
-
-	return x;
-}
-
 static int spawn_building_0(int start_x) {
 	int x_base = start_x;
 	int x;
-	int y = BUILDING_Y_TILE_SPAWN;
+	int y = gba_rand_range(BUILDING_Y_TILE_SPAWN - 3, BUILDING_Y_TILE_SPAWN);
 	
 	//LEFT SECTION
 	set_level_at(x_base, y, BUILDING_0_LEFT_ROOF);
-	set_col(x_base, y + 1, BUILDING_0_LEFT_ROOF);
+	set_level_col(x_base, y + 1, BUILDING_0_LEFT_ROOF);
 
 	int width = gba_rand_range(5, 10);
 	//MIDDLE SECTION
 	for(int i = 1; i < width; i++) {
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_0_MIDDLE_ROOF);
-		set_col(x, y + 1, BUILDING_0_MIDDLE_BOT);
+		set_level_col(x, y + 1, BUILDING_0_MIDDLE_BOT);
 	}
 
 	//RIGHT SECTION
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_0_MIDDLE_ROOF);
-	set_col(x, y, BUILDING_0_RIGHT_ROOF);
+	set_level_col(x, y, BUILDING_0_RIGHT_ROOF);
 
 	return width;
 }
@@ -138,22 +87,40 @@ static int spawn_building_1(int start_x) {
 	
 	//LEFT SECTION
 	set_level_at(x_base, y, BUILDING_1_LEFT_ROOF);
-	set_col(x_base, y + 1, BUILDING_1_LEFT_BOT);
+	set_level_col(x_base, y + 1, BUILDING_1_LEFT_BOT);
 
 	int width = gba_rand_range(3, 7);
 	//MIDDLE SECTION
 	for(int i = 1; i < width; i++) {
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_1_MIDDLE_ROOF);
-		set_col(x, y + 1, BUILDING_1_MIDDLE_BOT);
+		set_level_col(x, y + 1, BUILDING_1_MIDDLE_BOT);
 	}
 
 	//RIGHT SECTION
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_1_RIGHT_ROOF);
-	set_col(x, y + 1, BUILDING_1_RIGHT_BOT);
+	set_level_col(x, y + 1, BUILDING_1_RIGHT_BOT);
 
 	return width;
+}
+
+static void spawn_buildings() {
+	int start_x = _building_spawn_x;
+
+	int width;
+	if(gba_rand() % 2 == 0){
+		width = spawn_building_1(start_x);
+	} else {
+		width = spawn_building_0(start_x);
+	}
+
+	width += gba_rand_range(2, MAX_JUMP_WIDTH_TILES);
+
+	_building_spawn_x = level_wrap_x(start_x + width);
+
+	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
+	se_mem[background_sb][0] = fx2int(_next_building_spawn);
 }
 
 static void spawn_cloud() {
@@ -184,35 +151,7 @@ static void clear_offscreen(int sb) {
 
 static void clear_offscreen_level() {
 	int x = level_wrap_x((fx2int(_bg_pos_x) / TILE_WIDTH) - 3);
-	set_col(x, 0, 0);
-}
-
-static bool col_cleared(int x) {
-	for(int y = BUILDING_Y_TILE_SPAWN; y < 32; y++) {
-		if(at_level(x, y)) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-static void spawn_buildings() {
-	int start_x = _building_spawn_x;
-
-	int width;
-	if(gba_rand() % 2 == 0){
-		width = spawn_building_1(start_x);
-	} else {
-		width = spawn_building_0(start_x);
-	}
-
-	width += gba_rand_range(2, MAX_JUMP_WIDTH_TILES);
-
-	_building_spawn_x = level_wrap_x(start_x + width);
-
-	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
-	se_mem[background_sb][0] = fx2int(_next_building_spawn);
+	set_level_col(x, 0, 0);
 }
 
 static void show(void) {
@@ -225,15 +164,6 @@ static void show(void) {
 	for(int i = 0; i < SB_SIZE; i++) {
 		se_mem[background_sb][i] = shared_cloud_tile_start;
 	}
-
-	// for(int x = 0; x < LEVEL_WIDTH; x++) {
-	// 	for(int y = 0; y < LEVEL_HEIGHT; y++) {
-	// 		set_level_at(x, y, (u16)x);
-	// 	}
-	// }
-
-	// dma3_fill(&se_mem[cloud_sb], SB_SIZE, 0x0);
-	// dma3_fill(&se_mem[background_sb], SB_SIZE, 0x0);
 
 	// Set RegX scroll to 0
 	REG_BG0HOFS = 0;
@@ -252,7 +182,11 @@ static void show(void) {
 
 	_scroll_x = (int)(0.25f * FIX_SCALE);
 
-	_building_spawn_x = 32;
+	_building_spawn_x = 0;
+
+	while(_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5) {
+		spawn_buildings();
+	}
 	
 	init_player();
 }

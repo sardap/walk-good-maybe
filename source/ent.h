@@ -34,4 +34,6 @@ typedef struct ent_t {
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 
+int find_level_collisions(ent_t *e);
+
 #endif

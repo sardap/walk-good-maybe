@@ -8,6 +8,7 @@
 #include "../assets/backgroundSky.h"
 #include "../assets/title_text.h"
 #include "../assets/titleScreenShared.h"
+#include "../debug.h"
 
 static const int bg_x = 64;
 static const FIXED bg_x_pix = (int)(bg_x * 8 * (FIX_SCALE));
@@ -16,13 +17,10 @@ static const FIXED CLOUD_WIDTH = (int)((4 * 8) * (FIX_SCALE));
 
 static const int shared_cb = 0;
 
+static const int background_sb = 30; // entries
 static const int cloud_sb = 24; // entries
 static const int building_sb = 26; // entries
-static const int background_sb = 30; // entries
 
-static const int shared_cloud_tile_start = 72;
-
-static FIXED _bg_pos_x;
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
@@ -129,15 +127,15 @@ static void spawn_cloud() {
 	int sb = cloud_sb;
 	wrap_x_sb(&x, &sb);
 
-	se_plot(se_mem[sb], x + 0, y, shared_cloud_tile_start + 1);
-	se_plot(se_mem[sb], x + 1, y, shared_cloud_tile_start + 2);
-	se_plot(se_mem[sb], x + 2, y, shared_cloud_tile_start + 3);
-	se_plot(se_mem[sb], x + 3, y, shared_cloud_tile_start + 4);
+	se_plot(se_mem[sb], x + 0, y, SKY_OFFSET + 1);
+	se_plot(se_mem[sb], x + 1, y, SKY_OFFSET + 2);
+	se_plot(se_mem[sb], x + 2, y, SKY_OFFSET + 3);
+	se_plot(se_mem[sb], x + 3, y, SKY_OFFSET + 4);
 
-	se_plot(se_mem[sb], x + 0, y + 1, shared_cloud_tile_start + 5);
-	se_plot(se_mem[sb], x + 1, y + 1, shared_cloud_tile_start + 6);
-	se_plot(se_mem[sb], x + 2, y + 1, shared_cloud_tile_start + 7);
-	se_plot(se_mem[sb], x + 3, y + 1, shared_cloud_tile_start + 8);
+	se_plot(se_mem[sb], x + 0, y + 1, SKY_OFFSET + 5);
+	se_plot(se_mem[sb], x + 1, y + 1, SKY_OFFSET + 6);
+	se_plot(se_mem[sb], x + 2, y + 1, SKY_OFFSET + 7);
+	se_plot(se_mem[sb], x + 3, y + 1, SKY_OFFSET + 8);
 }
 
 static void clear_offscreen(int sb) {
@@ -162,8 +160,11 @@ static void show(void) {
 
 	//Fill cloud layer
 	for(int i = 0; i < SB_SIZE; i++) {
-		se_mem[background_sb][i] = shared_cloud_tile_start;
+		se_mem[background_sb][i] = SKY_OFFSET;
 	}
+
+	dma3_fill(se_mem[cloud_sb], 	0, SB_SIZE);
+	dma3_fill(se_mem[cloud_sb + 1], 0, SB_SIZE);
 
 	// Set RegX scroll to 0
 	REG_BG0HOFS = 0;
@@ -171,16 +172,16 @@ static void show(void) {
 	REG_BG0VOFS = 0;
 
 	// Set bkg reg
-	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(cloud_sb) | BG_CBB(shared_cb) | BG_REG_64x32;
+	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(background_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(building_sb) | BG_CBB(shared_cb) | BG_REG_64x32;
-	REG_BG2CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(background_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
+	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(cloud_sb) | BG_CBB(shared_cb) | BG_REG_64x32;
 
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
 	_next_cloud_spawn = 0;
 	_next_building_spawn = 0;
 
-	_scroll_x = (int)(0.25f * FIX_SCALE);
+	_scroll_x = 0;//(int)(0.25f * FIX_SCALE);
 
 	_building_spawn_x = 0;
 
@@ -212,8 +213,8 @@ static void update(void) {
 
 	wrap_bkg();
 
-	REG_BG0HOFS = fx2int(_bg_pos_x);
 	REG_BG1HOFS = fx2int(_bg_pos_x);
+	REG_BG2HOFS = fx2int(_bg_pos_x);
 
 	_next_cloud_spawn -= _scroll_x;
 	_next_building_spawn -= _scroll_x;
@@ -231,7 +232,8 @@ static void update(void) {
 	}
 
 	if(key_hit(KEY_B)) {
-		_scroll_x += (int)(0.25f * FIX_SCALE);
+		// _scroll_x += (int)(0.25f * FIX_SCALE);
+		write_to_log(LOG_LEVEL_INFO, "test\0");
 	}
 
 	for(int x = 0; x < LEVEL_WIDTH; x++) {

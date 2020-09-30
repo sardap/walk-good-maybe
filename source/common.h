@@ -1,19 +1,17 @@
 #ifndef COMMON_H
-#include <tonc.h>
+#define COMMON_H
 
-#define DEBUG 1
+#include <tonc.h>
 
 #define SB_SIZE sizeof(SCREENBLOCK)
 #define TILE_WIDTH 8
+#define TILE_HEIGHT TILE_WIDTH
 
 #define BUILDING_Y_SPAWN 136
 #define BUILDING_Y_TILE_SPAWN BUILDING_Y_SPAWN / 8
 #define MAX_JUMP_WIDTH_TILES 5
 
-#define CELL_EMPTY 	0
-#define CELL_GROUND 1
-
-static const int GRAVITY = (int)(1.5f * (FIX_SHIFT));
+#define GRAVITY (int)(1.5f * (FIX_SHIFT))
 
 typedef struct scene_t {
 	void (*show)(void);

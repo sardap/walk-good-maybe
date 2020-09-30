@@ -63,15 +63,15 @@ void update_player() {
 		}
 		break;
 	case MOVEMENT_AIR:
-		_player.vy += GRAVITY;
-		if(_player.y >= GROUND_Y) {
-			_player.y = GROUND_Y;
-			_player.vy = 0;
-			_player.move_state = MOVEMENT_GROUNDED;
-		}
+		// if(_player.y >= GROUND_Y) {
+		// 	_player.y = GROUND_Y;
+		// 	_player.vy = 0;
+		// 	_player.move_state = MOVEMENT_GROUNDED;
+		// }
 		break;
 	}
 
+	apply_gravity(&_player);
 	_player.x += _player.vx;
 	_player.y += _player.vy;
 

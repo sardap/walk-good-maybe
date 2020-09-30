@@ -1,4 +1,7 @@
 #ifndef ENT_H
+#define ENT_H
+
+#include "level.h"
 
 #include <tonc.h>
 
@@ -34,6 +37,18 @@ typedef struct ent_t {
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 
-int find_level_collisions(ent_t *e);
+FIXED translate_x(ent_t *e);
+FIXED translate_y(ent_t *e);
+
+inline int level_collision_at(ent_t *e, FIXED vx, FIXED vy) {
+	return level_collision_rect(
+		(translate_x(e) + vx) * FIX_SCALE, 
+		(translate_y(e) + vy) * FIX_SCALE,
+		e->w, 
+		e->h
+	);
+}
+
+void apply_gravity(ent_t *e);
 
 #endif

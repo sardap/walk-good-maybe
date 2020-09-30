@@ -1,5 +1,6 @@
 #include <tonc.h>
 
+#include "debug.h"
 #include "common.h"
 #include "graphics.h"
 #include "ent.h"
@@ -27,6 +28,10 @@ void start_game() {
 
 int main()
 {
+#ifdef DEBUG
+	init_debug();
+#endif
+
 	init_graphics();
 
 	start_game();

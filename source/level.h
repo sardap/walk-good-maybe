@@ -1,4 +1,5 @@
 #ifndef LEVEL_H
+#define LEVEL_H
 
 #include <tonc.h>
 
@@ -6,7 +7,11 @@
 #define LEVEL_HEIGHT 32
 #define LEVEL_WIDTH 64
 
+#define LEVEL_COL_EMPTY 	0
+#define LEVEL_COL_GROUND 	1
+
 extern u16 _level[LEVEL_SIZE];
+extern FIXED _bg_pos_x;
 
 inline u16 at_level(int x, int y) {
 	return _level[LEVEL_HEIGHT * x + y];
@@ -31,5 +36,9 @@ inline int level_wrap_x(int x) {
 bool col_cleared(int x);
 
 void set_level_col(int x, int y, u16 tile);
+
+int level_collision_rect(int x, int y, int w, int h);
+
+int tile_to_collision(u16 tile);
 
 #endif

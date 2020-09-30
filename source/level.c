@@ -1,5 +1,9 @@
 #include "level.h"
 
+#include "graphics.h"
+#include "common.h"
+#include "debug.h"
+
 u16 _level[LEVEL_SIZE] = {};
 
 void set_level_col(int x, int y, u16 tile) {
@@ -16,4 +20,29 @@ bool col_cleared(int x) {
 	}
 
 	return true;
+}
+
+int tile_to_collision(u16 tile) {
+	if(tile < BUILDINGS_OFFSET) {
+		return LEVEL_COL_EMPTY;
+	}
+
+	return LEVEL_COL_GROUND;
+}
+
+int level_collision_rect(int x, int y, int w, int h) {
+	int tile_left = x / TILE_WIDTH;
+	int tile_right = tile_left + w / TILE_WIDTH - 1;
+	int tile_top = y / TILE_WIDTH;
+	int tile_bot = tile_top + h / TILE_WIDTH - 1;
+
+	int res = 0;
+
+	for(int i = tile_left; i <= tile_right; i++) {
+		for(int j = tile_top; j <= tile_bot; j++) {
+			res |= tile_to_collision(at_level(level_wrap_x(i), j));
+		}
+	}
+
+	return res;
 }

@@ -1,5 +1,9 @@
 #ifndef GRAPHICS_H
+#define GRAPHICS_H
+
 #include <tonc.h>
+
+#define SKY_OFFSET 72
 
 #define BUILDINGS_OFFSET 81
 

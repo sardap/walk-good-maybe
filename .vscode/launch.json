@@ -5,10 +5,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "game boy launch",
+			"name": "game boy launch", 
 			"type":"clr",
 			"request": "launch",
-			"program": "C:\\Users\\pfsar\\OneDrive\\GBADev\\mGBA-0.8.1-win64\\mGBA.exe",
+			"program": "mGBA.exe",
 			"args": [
 				"${workspaceFolder}\\bin\\ecs.gba"
 			]

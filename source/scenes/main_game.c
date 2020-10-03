@@ -113,7 +113,7 @@ static void spawn_buildings() {
 		width = spawn_building_0(start_x);
 	}
 
-	width += gba_rand_range(2, MAX_JUMP_WIDTH_TILES);
+	width += gba_rand_range(3, MAX_JUMP_WIDTH_TILES);
 
 	_building_spawn_x = level_wrap_x(start_x + width);
 
@@ -232,8 +232,11 @@ static void update(void) {
 	}
 
 	if(key_hit(KEY_B)) {
-		// _scroll_x += (int)(0.25f * FIX_SCALE);
-		write_to_log(LOG_LEVEL_INFO, "test\0");
+		if(_scroll_x == 0) {
+			_scroll_x = (int)(0.25f * FIX_SCALE);
+		} else {
+			_scroll_x = 0;
+		}
 	}
 
 	for(int x = 0; x < LEVEL_WIDTH; x++) {

@@ -3,7 +3,7 @@
 
 #include "level.h"
 
-#include <tonc.h>
+#include <tonc_types.h>
 
 #ifdef ISMAIN
 	#define def
@@ -40,15 +40,32 @@ def ent_t _player;
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);
 
-inline int level_collision_at(ent_t *e, FIXED vx, FIXED vy) {
+inline int ent_level_collision(ent_t *e) {
 	return level_collision_rect(
-		(translate_x(e) + vx) * FIX_SCALE, 
-		(translate_y(e) + vy) * FIX_SCALE,
+		translate_x(e) / FIX_SCALE,
+		translate_y(e) / FIX_SCALE,
+		e->w,
+		e->h
+	);
+}
+
+inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy) {
+	return level_collision_rect(
+		(translate_x(e) + vx) / FIX_SCALE, 
+		(translate_y(e) + vy) / FIX_SCALE,
 		e->w, 
 		e->h
 	);
 }
 
-void apply_gravity(ent_t *e);
+void push_up_from_ground(ent_t *e);
+
+bool did_hit_x(ent_t *e, FIXED dx);
+bool ent_move_x(ent_t *e, FIXED dx);
+
+bool did_hit_y(ent_t *e, FIXED dy);
+bool ent_move_y(ent_t *e, FIXED dy);
+
+bool apply_gravity(ent_t *e);
 
 #endif

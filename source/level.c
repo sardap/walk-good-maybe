@@ -32,9 +32,9 @@ int tile_to_collision(u16 tile) {
 
 int level_collision_rect(int x, int y, int w, int h) {
 	int tile_left = x / TILE_WIDTH;
-	int tile_right = tile_left + w / TILE_WIDTH - 1;
+	int tile_right = tile_left + w / TILE_WIDTH;
 	int tile_top = y / TILE_WIDTH;
-	int tile_bot = tile_top + h / TILE_WIDTH - 1;
+	int tile_bot = tile_top + h / TILE_WIDTH;
 
 	int res = 0;
 

@@ -2,7 +2,8 @@
 	"files.associations": {
 		"*.bf": "plaintext",
 		"cstdlib": "c",
-		"algorithm": "c"
+		"algorithm": "c",
+		"sstream": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled"
 }

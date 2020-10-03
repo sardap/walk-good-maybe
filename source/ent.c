@@ -3,6 +3,7 @@
 #include <tonc.h>
 #include "common.h"
 #include "level.h"
+#include "debug.h"
 
 OBJ_ATTR _obj_buffer[128] = {};
 FIXED _bg_pos_x = 0;
@@ -19,17 +20,82 @@ static inline FIXED level_to_screen(int l) {
 	return int2fx(l * TILE_WIDTH + l % TILE_WIDTH);
 }
 
-void apply_gravity(ent_t *e) {
-	// FIXED level_x = translate_x(e);
-	// FIXED level_y = translate_y(e);
+// STOLEN from https://github.com/exelotl/goodboy-advance
+bool did_hit_x(ent_t *e, FIXED dx) {
+	int flags = ent_level_collision_at(e, dx, 0);
+	return flags & (LEVEL_COL_GROUND);
+}
 
-	int flags = level_collision_at(e, 0, GRAVITY);
+// STOLEN from https://github.com/exelotl/goodboy-advance
+bool ent_move_x(ent_t *e, FIXED dx) {
+	if(did_hit_x(e, dx)) {
+		int sign = dx >= 0 ? 1 : -1;
+		while(fx2int(dx) != 0 && !did_hit_x(e, sign)) {
+			e->x += sign;
+			dx -= sign;
+		}
+		
+		//NOT STOLEN MY OWN SHIT CODE
+		//Failed to push out
+		if(did_hit_x(e, 0)) {
+			int start = (translate_x(e) / FIX_SCALE) / TILE_WIDTH;
+			int y = (translate_y(e) / FIX_SCALE) / TILE_WIDTH;
+
+			//Failed to push out but will only check all tiles	
+			for(int i = 0; i < 32; i++) {
+				//Left
+				if(!tile_to_collision(at_level(level_wrap_x(start - i), y))) {
+					while(did_hit_x(e, 0)) {
+						e->x--;
+					}
+					break;
+				}
+
+				//Right
+				if(!tile_to_collision(at_level(level_wrap_x(start + i), y))) {
+					while(did_hit_x(e, 0)) {
+						e->x++;
+					}
+					break;
+				}
+			}
+		}
+		return true;
+	}
+
+	e->x += e->vx;
+	return false;
+}
+
+// STOLEN from https://github.com/exelotl/goodboy-advance
+bool did_hit_y(ent_t *e, FIXED dy) {
+	int flags = ent_level_collision_at(e, 0, dy);
+	return flags & (LEVEL_COL_GROUND);
+}
+
+// STOLEN from https://github.com/exelotl/goodboy-advance
+bool ent_move_y(ent_t *e, FIXED dy) {
+	if(did_hit_y(e, dy)) {
+		int sign = dy >= 0 ? 1 : -1;
+		while(fx2int(dy) != 0 && !did_hit_y(e, sign)) {
+			e->y += sign;
+			dy -= sign;
+		}
+		return true;
+	}
+
+	e->y += e->vy;
+	return false;
+}
+
+bool apply_gravity(ent_t *e) {
+	int flags = ent_level_collision_at(e, 0, GRAVITY);
 	
-	se_mem[30][1] = flags;
+	if(flags & (LEVEL_COL_GROUND)) {
+		_player.vy = 0;
+		return true;
+	}
 
-	// if(flags & (LEVEL_COL_GROUND)) {
-	// 	_player.vy = 0;
-	// } else {
-	// 	_player.vy += GRAVITY;
-	// }
+	_player.vy += GRAVITY;
+	return false;
 }

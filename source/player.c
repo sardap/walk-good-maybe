@@ -3,10 +3,10 @@
 #include <tonc.h>
 #include "common.h"
 #include "ent.h"
+#include "debug.h"
 
 static const int SPEED = (int)(2.0f * (FIX_SCALE));
 static const int JUMP_POWER = (int)(1.2f * (FIX_SCALE));
-static const int GROUND_Y = (int)(120.0f * (FIX_SCALE));
 
 ent_t _player = {};
 static OBJ_ATTR* _player_obj = &_obj_buffer[0];
@@ -20,7 +20,7 @@ void init_player() {
 	_player.h = 16;
 
 	_player.x = 20 << FIX_SHIFT;
-	_player.y = GROUND_Y;
+	_player.y = PLAYER_SPAWN_Y;
 
 	obj_set_attr(_player_obj, 
 		ATTR0_SQUARE, ATTR1_SIZE_16x16,
@@ -43,15 +43,26 @@ void update_player() {
 		_player.vx = SPEED;
 	}
 
-	_player.vx += -_scroll_x;
-
-	//Push player backwards in wind
-	if(_player.facing == FACING_LEFT) {
-		_player.vx += -_scroll_x;
-	}
-
 	if(fx2int(_player.x) > 220) {
 		_player.vx += -SPEED;
+	}
+
+#ifdef DEBUG
+	// char str[50];
+	// sprintf(str, "X: %d, VX: %f", fx2int(_player.x), fx2float(_player.vx));
+	// write_to_log(LOG_LEVEL_INFO, str);
+#endif
+
+	// _player.x += _player.vx;
+	_player.vx += -_scroll_x;
+	ent_move_x(&_player, _player.vx);
+	_player.vx = 0;
+	bool hit_y = ent_move_y(&_player, _player.vy);
+
+	if(!hit_y) {
+		if(_player.vy < TERMINAL_VY) {
+			_player.vy += GRAVITY;
+		}
 	}
 
 	switch (_player.move_state)
@@ -63,19 +74,15 @@ void update_player() {
 		}
 		break;
 	case MOVEMENT_AIR:
-		// if(_player.y >= GROUND_Y) {
-		// 	_player.y = GROUND_Y;
-		// 	_player.vy = 0;
-		// 	_player.move_state = MOVEMENT_GROUNDED;
-		// }
+		if(hit_y) {
+			_player.move_state = MOVEMENT_GROUNDED;
+		}
 		break;
 	}
 
-	apply_gravity(&_player);
-	_player.x += _player.vx;
-	_player.y += _player.vy;
-
-	_player.vx = 0;
+	if(_player.y > 160 * FIX_SCALE) {
+		_player.y = PLAYER_SPAWN_Y;
+	}
 
 	// increment/decrement starting tile with R/L
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);

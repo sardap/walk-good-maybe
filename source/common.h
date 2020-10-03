@@ -9,9 +9,10 @@
 
 #define BUILDING_Y_SPAWN 136
 #define BUILDING_Y_TILE_SPAWN BUILDING_Y_SPAWN / 8
-#define MAX_JUMP_WIDTH_TILES 5
+#define MAX_JUMP_WIDTH_TILES 6
 
 #define GRAVITY (int)(1.5f * (FIX_SHIFT))
+#define TERMINAL_VY GRAVITY * 20
 
 typedef struct scene_t {
 	void (*show)(void);

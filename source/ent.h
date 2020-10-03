@@ -12,7 +12,7 @@
 #endif
 
 typedef enum movement_state_t {
-	MOVEMENT_GROUNDED, MOVEMENT_AIR,
+	MOVEMENT_GROUNDED, MOVEMENT_JUMPING, MOVEMENT_AIR,
 } movement_state_t;
 
 typedef enum facing_t {
@@ -24,6 +24,7 @@ typedef struct ent_t {
 	FIXED vx, vy;
 	int tid;
 	int w, h;
+	int att_idx;
 
 	union  {
 		struct {
@@ -36,6 +37,10 @@ typedef struct ent_t {
 
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
+
+inline OBJ_ATTR* get_ent_att(ent_t *e) {
+	return &_obj_buffer[e->att_idx];
+}
 
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);

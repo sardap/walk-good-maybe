@@ -256,7 +256,7 @@ static void update(void) {
 
 	update_player();
 
-	if(frame_count() % X_SCROLL_RATE == 0) {
+	if(frame_count() % X_SCROLL_RATE == 0 && _scroll_x > 0) {
 		_scroll_x += X_SCROLL_GAIN;
 		//This is better than checking if it's greater prior to adding
 		//Because it handles the edge case where the gain will put it much

@@ -4,8 +4,42 @@
 #include <string.h>
 
 #include "common.h"
+#include "debug.h"
+
+static int _sprite_tile_allc[SPRITE_TILE_ALLC_SIZE];
 
 void init_graphics() {
+	for(int i = 0; i < SPRITE_TILE_ALLC_SIZE; i++) {
+		_sprite_tile_allc[i] = 0;
+	}
+}
+
+int allocate_tile_idx(int size) {
+	for(int i = 0; i < SPRITE_TILE_ALLC_SIZE;) {
+		bool found = true;
+		int j;
+		for(j = i; j - i < size && j < SPRITE_TILE_ALLC_SIZE; j++) {
+			if(_sprite_tile_allc[j] > 0) {
+				found = false;
+				break;
+			}
+		}
+		if(found) {
+			for(int j = 0; j < size; j++) {
+				_sprite_tile_allc[i + j] = 1;
+			}
+			return i;
+		}
+		i += size;
+	}
+
+	return 0;
+}
+
+void free_tile_idx(int idx, int size) {
+	for(int i = idx; i < idx + size; i++) {
+		_sprite_tile_allc[i] = 0;
+	}
 }
 
 static inline int calc_address(int width, int x, int y) {

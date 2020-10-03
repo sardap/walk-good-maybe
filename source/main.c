@@ -14,15 +14,11 @@ void game_loop() {
 		common_step();
 
 		scene_update();
-
-		continue;
-
 	}
 }
 
 void start_game() {
 	scene_set(title_screen);
-
 	game_loop();
 }
 
@@ -31,6 +27,7 @@ int main()
 #ifdef DEBUG
 	init_debug();
 #endif
+	oam_init(_obj_buffer, 128);
 
 	init_graphics();
 

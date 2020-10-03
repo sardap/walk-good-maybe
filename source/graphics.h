@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include <tonc.h>
+#include <tonc_types.h>
 
 #define SKY_OFFSET 72
 
@@ -29,8 +29,12 @@
 #define BUILDING_1_MIDDLE_ROOF BUILDING_1_OFFSET + 1
 #define BUILDING_1_MIDDLE_BOT BUILDING_1_OFFSET + 3
 
+#define SPRITE_TILE_ALLC_SIZE 64
 
 void init_graphics();
+
+int allocate_tile_idx(int size);
+void free_tile_idx(int idx, int size);
 
 bool valid_cloud_address(int tile_offset, int sb, int width, int x, int y);
 

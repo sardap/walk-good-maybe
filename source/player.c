@@ -4,6 +4,7 @@
 #include "common.h"
 #include "ent.h"
 #include "debug.h"
+#include "graphics.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -14,24 +15,26 @@ static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
 static const FIXED JUMP_POWER = (int)(1.2f * (FIX_SCALE));
 
 static int _jump_countdown;
+static int _tile_start_idx;
 
 ent_t _player = {};
 
 void load_player_tile() {
-	// Places the glyphs of a 4bpp boxed metroid sprite 
-	//   into LOW obj memory (cbb == 4)
-	dma3_cpy(&tile_mem[4][0], whale_smallTiles, whale_smallTilesLen);
+	_tile_start_idx = allocate_tile_idx(4);
+	char str[50];
+	sprintf(str, "t:%d", _tile_start_idx);
+	write_to_log(LOG_LEVEL_INFO, str);
+
+	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 }
 
 void init_player() {
-	oam_init(_obj_buffer, 128);
-
 	load_player_tile();
 
 	_player.att_idx = 0;
 
-	_player.tid = 0;
+	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
 	_player.w = 16;
 	_player.h = 16;
@@ -99,13 +102,13 @@ void update_player() {
 		break;
 	case MOVEMENT_JUMPING:
 		if(_jump_countdown == PLAYER_JUMP_TIME) {
-			dma3_cpy(&tile_mem[4][0], whale_small_jump_0Tiles, whale_small_jump_0TilesLen);
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_0Tiles, whale_small_jump_0TilesLen);
 		} else if(_jump_countdown == PLAYER_JUMP_TIME / 2) {
-			dma3_cpy(&tile_mem[4][0], whale_small_jump_1Tiles, whale_small_jump_1TilesLen);
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_1Tiles, whale_small_jump_1TilesLen);
 		} else if(_jump_countdown <= 0) {
 			_player.vy = -JUMP_POWER;
 			_player.move_state = MOVEMENT_AIR;
-			dma3_cpy(&tile_mem[4][0], whale_smallTiles, whale_smallTilesLen);
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
 		_jump_countdown-- ;
 		char str[50];

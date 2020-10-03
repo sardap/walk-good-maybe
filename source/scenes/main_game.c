@@ -24,6 +24,7 @@ static const int building_sb = 26; // entries
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
+static int _tmp;
 
 static FIXED wrap_x(FIXED x) {
 	if(x > bg_x_pix) {
@@ -113,7 +114,7 @@ static void spawn_buildings() {
 		width = spawn_building_0(start_x);
 	}
 
-	width += gba_rand_range(3, MAX_JUMP_WIDTH_TILES);
+	width += gba_rand_range(MIN_JUMP_WIDTH_TILES, MAX_JUMP_WIDTH_TILES);
 
 	_building_spawn_x = level_wrap_x(start_x + width);
 
@@ -181,7 +182,7 @@ static void show(void) {
 	_next_cloud_spawn = 0;
 	_next_building_spawn = 0;
 
-	_scroll_x = 0;//(int)(0.25f * FIX_SCALE);
+	_scroll_x = (int)(0.25f * FIX_SCALE);
 
 	_building_spawn_x = 0;
 
@@ -233,8 +234,9 @@ static void update(void) {
 
 	if(key_hit(KEY_B)) {
 		if(_scroll_x == 0) {
-			_scroll_x = (int)(0.25f * FIX_SCALE);
+			_scroll_x = _tmp;
 		} else {
+			_tmp = _scroll_x;
 			_scroll_x = 0;
 		}
 	}
@@ -254,7 +256,15 @@ static void update(void) {
 
 	update_player();
 
-	_scroll_x += 0.001f * FIX_SCALE;
+	if(frame_count() % X_SCROLL_RATE == 0) {
+		_scroll_x += X_SCROLL_GAIN;
+		//This is better than checking if it's greater prior to adding
+		//Because it handles the edge case where the gain will put it much
+		//over the limit
+		if(_scroll_x > X_SCROLL_MAX) {
+			_scroll_x = X_SCROLL_MAX;
+		}
+	}
 }
 
 static void hide(void) {

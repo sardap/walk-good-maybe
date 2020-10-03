@@ -42,7 +42,6 @@ void scene_update() {
 		current_scene.show();
 	}
 	current_scene.update();
-	_frame_count++;
 }
 
 

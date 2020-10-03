@@ -5,6 +5,11 @@
 OUTPATH="source/assets"
 ASSETS="../../assets"
 
+
+for i in $(find ./assets/whale -type f -name "*.psd"); do
+    psd $i -c
+done
+
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
 
@@ -25,7 +30,22 @@ SPRITE_64x64="$SPRITE_8x8 -Mw 8 -Mh 8"
 
 grit $ASSETS/whale/whale.png $SPRITE_32x32
 grit $ASSETS/whale/whale_small.png $SPRITE_16x16
+grit $ASSETS/whale/whale_small_jump_0.png $SPRITE_16x16
+grit $ASSETS/whale/whale_small_jump_1.png $SPRITE_16x16
 
+SP_OPTIONS=""
+SP_OPTIONS="$SP_OPTIONS -ftc"
+SP_OPTIONS="$SP_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+SP_OPTIONS="$SP_OPTIONS -gB8"					# Bit depth 8
+SP_OPTIONS="$SP_OPTIONS -gu16" 					# use short
+SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
+SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
+
+grit \
+	$ASSETS/whale/whale.png \
+	$ASSETS/whale/whale_small.png \
+	$ASSETS/whale/whale_small_jump_0.png \
+	$ASSETS/whale/whale_small_jump_1.png $SP_OPTIONS
 
 BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file

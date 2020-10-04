@@ -32,7 +32,7 @@ void load_player_tile() {
 void init_player() {
 	load_player_tile();
 
-	_player.att_idx = 0;
+	_player.att_idx = allocate_att(1);
 
 	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
@@ -46,6 +46,10 @@ void init_player() {
 		ATTR0_SQUARE, ATTR1_SIZE_16x16,
 		ATTR2_PALBANK(0) | _player.tid
 	);
+}
+
+void unload_player() {
+	free_att(1, _player.att_idx);
 }
 
 void update_player() {
@@ -133,5 +137,5 @@ void update_player() {
 
 	// Hey look, it's one of them build macros!
 	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
-	oam_copy(oam_mem, _obj_buffer, 1);	// only need to update one
+	oam_copy(oam_mem, _obj_buffer, _player.att_idx + 1);	// only need to update one
 }

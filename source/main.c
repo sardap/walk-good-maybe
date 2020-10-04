@@ -27,7 +27,8 @@ int main()
 #ifdef DEBUG
 	init_debug();
 #endif
-	oam_init(_obj_buffer, 128);
+	init_obj_atts();
+	allocate_att(5);
 
 	init_graphics();
 

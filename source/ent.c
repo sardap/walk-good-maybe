@@ -8,6 +8,43 @@
 OBJ_ATTR _obj_buffer[128] = {};
 FIXED _bg_pos_x = 0;
 
+static int _allocated_objs[128];
+
+void init_obj_atts() {
+	oam_init(_obj_buffer, 128);
+
+	for(int i = 0; i < 128; i++) {
+		_allocated_objs[i] = 0;
+	}
+}
+
+int allocate_att(int count) {
+	for(int i = 0; i < 128;) {
+		bool found = true;
+		for(int j = i; j - i < count && j < 128; j++) {
+			if(_allocated_objs[j]) {
+				found = false;
+				break;
+			}
+		}
+		if(found) {
+			for(int j = i; j - i < count; j++) {
+				_allocated_objs[j] = 1;
+			}
+			return i;
+		}
+		i += count;
+	}
+
+	return 0;
+}
+
+void free_att(int count, int idx) {
+	for(int i = idx; i < count; i++) {
+		_allocated_objs[i] = 0;
+	}
+}
+
 FIXED translate_x(ent_t *e) {
 	return e->x + _bg_pos_x;
 }

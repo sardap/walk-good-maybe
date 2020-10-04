@@ -38,6 +38,10 @@ typedef struct ent_t {
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 
+void init_obj_atts();
+int allocate_att(int count);
+void free_att(int count, int idx);
+
 inline OBJ_ATTR* get_ent_att(ent_t *e) {
 	return &_obj_buffer[e->att_idx];
 }

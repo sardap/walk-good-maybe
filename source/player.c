@@ -12,7 +12,6 @@
 #include "assets/spriteShared.h"
 
 static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
-static const FIXED JUMP_POWER = (int)(1.2f * (FIX_SCALE));
 
 static int _jump_countdown;
 static int _tile_start_idx;
@@ -36,6 +35,7 @@ void init_player() {
 
 	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
+	_player.jump_power = (int)(2.0f * (FIX_SCALE));;
 	_player.w = 16;
 	_player.h = 16;
 
@@ -50,6 +50,7 @@ void init_player() {
 
 void unload_player() {
 	free_att(1, _player.att_idx);
+	free_tile_idx(_tile_start_idx, 4);
 }
 
 void update_player() {
@@ -77,7 +78,7 @@ void update_player() {
 	switch (_player.move_state)
 	{
 	case MOVEMENT_JUMPING:
-		_player.vx = 0;		
+		_player.vx = 0;
 		break;
 	default:
 		break;
@@ -110,7 +111,7 @@ void update_player() {
 		} else if(_jump_countdown == PLAYER_JUMP_TIME / 2) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_1Tiles, whale_small_jump_1TilesLen);
 		} else if(_jump_countdown <= 0) {
-			_player.vy = -JUMP_POWER;
+			_player.vy = -_player.jump_power;
 			_player.move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}

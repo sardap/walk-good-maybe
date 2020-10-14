@@ -1,9 +1,11 @@
 #include "common.h"
+#include "debug.h"
 
 #include <stdlib.h>
 
 static int _frame_count;
 FIXED _scroll_x;
+FIXED _score;
 
 static void nothing(void) {}
 
@@ -51,4 +53,13 @@ void init_seed(int seed) {
 
 int gba_rand() {
 	return rand();	
+}
+
+void add_score(FIXED x) {
+	_score += x;
+#ifdef DEBUG
+	char str[50];
+	sprintf(str, "score: %d", _score);
+	write_to_log(LOG_LEVEL_INFO, str);
+#endif
 }

@@ -30,6 +30,7 @@ typedef struct scene_t {
 extern const scene_t main_game, title_screen;
 
 extern FIXED _scroll_x;
+extern FIXED _score;
 
 void scene_set(scene_t scene);
 void scene_update();
@@ -42,6 +43,16 @@ int gba_rand();
 
 inline int gba_rand_range(int min, int max) {
 	return (gba_rand() % (max - min + 1)) + min;
+}
+
+void add_score(FIXED x);
+
+inline void set_score(FIXED x) {
+	_score = x;
+}
+
+inline FIXED get_score() {
+	return _score;
 }
 
 #endif

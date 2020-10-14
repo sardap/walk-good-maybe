@@ -9,6 +9,10 @@ for i in $(find ./assets/whale -type f -name "*.psd"); do
     psd $i -c
 done
 
+for i in $(find ./assets/text -type f -name "*.psd"); do
+    psd $i -c
+done
+
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
 
@@ -43,6 +47,7 @@ SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
 SP_OPTIONS="$SP_OPTIONS -Mw 2 -Mh 2"
 
 grit \
+	$ASSETS/text/numbersfont.png \
 	$ASSETS/whale/whale_small.png \
 	$ASSETS/whale/whale_small_jump_0.png \
 	$ASSETS/whale/whale_small_jump_1.png $SP_OPTIONS

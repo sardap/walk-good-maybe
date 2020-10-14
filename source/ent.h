@@ -30,6 +30,7 @@ typedef struct ent_t {
 		struct {
 			movement_state_t move_state;
 			facing_t facing;
+			FIXED jump_power;
 		};
 	};
 	

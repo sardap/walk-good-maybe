@@ -6,4 +6,6 @@ void unload_numbers();
 
 void test_numbers();
 
+void update_number();
+
 #endif

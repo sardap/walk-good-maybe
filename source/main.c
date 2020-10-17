@@ -28,7 +28,6 @@ int main()
 	init_debug();
 #endif
 	init_obj_atts();
-	allocate_att(5);
 
 	init_graphics();
 

@@ -20,10 +20,6 @@ ent_t _player = {};
 
 void load_player_tile() {
 	_tile_start_idx = allocate_tile_idx(4);
-	char str[50];
-	sprintf(str, "t:%d", _tile_start_idx);
-	write_to_log(LOG_LEVEL_INFO, str);
-
 	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 }

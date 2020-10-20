@@ -2,3 +2,6 @@ bin/
 build/
 source/assets
 log/
+
+assets/out.png
+__debug_bin

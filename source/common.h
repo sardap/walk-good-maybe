@@ -21,6 +21,8 @@
 #define X_SCROLL_MAX (FIXED)(3.5f * (FIX_SCALEF))
 #define X_SCROLL_RATE 120
 
+#define SCORE_DIGITS 4
+
 typedef struct scene_t {
 	void (*show)(void);
 	void (*update)(void);
@@ -30,7 +32,6 @@ typedef struct scene_t {
 extern const scene_t main_game, title_screen;
 
 extern FIXED _scroll_x;
-extern FIXED _score;
 
 void scene_set(scene_t scene);
 void scene_update();
@@ -45,14 +46,10 @@ inline int gba_rand_range(int min, int max) {
 	return (gba_rand() % (max - min + 1)) + min;
 }
 
+void init_score();
+void clear_score();
+
 void add_score(FIXED x);
-
-inline void set_score(FIXED x) {
-	_score = x;
-}
-
-inline FIXED get_score() {
-	return _score;
-}
+FIXED get_score();
 
 #endif

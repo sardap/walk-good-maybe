@@ -3,9 +3,6 @@
 
 void load_number_tiles();
 void unload_numbers();
-
-void test_numbers();
-
-void update_number();
+int get_number_tile_start();
 
 #endif

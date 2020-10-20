@@ -19,6 +19,7 @@ static int _building_spawn_x;
 static int _tmp;
 
 static mg_states_t _state;
+static mg_states_t _old_state;
 
 static FIXED wrap_x(FIXED x) {
 	if(x > MG_BG_X_PIX) {
@@ -113,7 +114,6 @@ static void spawn_buildings() {
 	_building_spawn_x = level_wrap_x(start_x + width);
 
 	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
-	se_mem[MG_BACKGROUND_SB][0] = fx2int(_next_building_spawn);
 }
 
 static void spawn_cloud() {
@@ -179,14 +179,14 @@ static void show(void) {
 	_building_spawn_x = 0;
 	_state = MG_S_STARTING;
 
-	set_score(0);
+	load_number_tiles();
+	init_score();
 
 	while(_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5) {
 		spawn_buildings();
 	}
 	
 	init_player();
-	load_number_tiles();
 }
 
 static bool check_game_over() {
@@ -198,7 +198,23 @@ static bool check_game_over() {
 }
 
 static void update(void) {
-	test_numbers();
+	// Pausing!
+	if(_state == MG_S_PAUSED) {
+		write_to_log(LOG_LEVEL_INFO, "PAUSED");
+		if(key_hit(KEY_START)) {
+			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
+			_state = _old_state;
+		}
+		return;
+	}
+
+	if(key_hit(KEY_START)) {
+		write_to_log(LOG_LEVEL_INFO, "PAUSING");
+		_old_state = _state;
+		_state = MG_S_PAUSED;
+		return;
+	}
+
 	if(check_game_over()) {
 		for(int i = 0; i < SB_SIZE; i++) {
 			se_mem[MG_BACKGROUND_SB][i] = 0x0;
@@ -218,7 +234,7 @@ static void update(void) {
 	_next_building_spawn -= _scroll_x;
 
 	if(frame_count() % 60 == 0) {
-		add_score(fx2int(_scroll_x * 100));
+		add_score(fx2int(_scroll_x * 10));
 	}
 
 	if(_next_cloud_spawn < 0) {
@@ -276,6 +292,9 @@ static void update(void) {
 			}
 		}
 		break;
+	case MG_S_PAUSED:
+		//This should never be hit fuck
+		break;
 	}
 }
 
@@ -283,6 +302,8 @@ static void hide(void) {
 	REG_DISPCNT = 0;
 	dma3_fill(se_mem[MG_CLOUD_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_CLOUD_SB+1], 0x0, SB_SIZE);
+
+	clear_score();
 }
 
 const scene_t main_game = {

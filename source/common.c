@@ -1,11 +1,15 @@
 #include "common.h"
-#include "debug.h"
 
 #include <stdlib.h>
+#include <tonc.h>
+
+#include "debug.h"
+#include "numbers.h"
 
 static int _frame_count;
 FIXED _scroll_x;
-FIXED _score;
+static int _score;
+static int _score_att_start;
 
 static void nothing(void) {}
 
@@ -55,11 +59,62 @@ int gba_rand() {
 	return rand();	
 }
 
-void add_score(FIXED x) {
+static void update_score() {
+	int i_score = _score;
+	
+	int digit_count = 0;
+	while(i_score != 0) {
+		digit_count++;
+		i_score /= 10;
+	}
+
+	i_score = _score;
+	for(int i = SCORE_DIGITS - 1; i >= 0; i--) {
+		int offset;
+		if(((SCORE_DIGITS - 1) - i) < digit_count) {
+			offset = (i_score % 10);
+		} else {
+			offset = 0;
+		}
+		
+		obj_set_attr(&_obj_buffer[_score_att_start + i], 
+			ATTR0_SQUARE, ATTR1_SIZE_8x8,
+			ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start() + offset)
+		);
+
+		obj_set_pos(&_obj_buffer[_score_att_start + i], 8 * i, 0);
+
+		i_score /= 10;
+	}
+
+	oam_copy(oam_mem, _obj_buffer, _score_att_start + SCORE_DIGITS);
+}
+
+void init_score() {
+	_score = 0;
+	_score_att_start = allocate_att(SCORE_DIGITS);
+
+	update_score();
+}
+
+void clear_score() {
+	free_att(SCORE_DIGITS, _score_att_start);
+}
+
+void add_score(int x) {
+	if(x == 0) {
+		return;
+	}
+
 	_score += x;
 #ifdef DEBUG
 	char str[50];
 	sprintf(str, "score: %d", _score);
 	write_to_log(LOG_LEVEL_INFO, str);
 #endif
+	update_score();
+}
+
+int get_score() {
+	return _score;
 }

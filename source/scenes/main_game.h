@@ -12,7 +12,7 @@
 #define MG_BG_X_PIX (int)(MG_BG_X * 8 * (FIX_SCALE))
 
 typedef enum mg_states_t {
-	MG_S_STARTING, MG_S_SCROLLING
+	MG_S_STARTING, MG_S_SCROLLING, MG_S_PAUSED
 } mg_states_t;
 
 #endif

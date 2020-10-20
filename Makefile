@@ -115,7 +115,7 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-.PHONY: $(BUILD) clean
+.PHONY: $(BUILD) clean assets
 
 #---------------------------------------------------------------------------------
 $(BUILD):
@@ -124,10 +124,13 @@ $(BUILD):
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
+assets: $(shell find assets/ -type f -name '.psd')
+	@./make_assets.sh
+
+#---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba
-
 
 #---------------------------------------------------------------------------------
 else
@@ -167,8 +170,3 @@ soundbank.bin soundbank.h : $(AUDIOFILES)
 #---------------------------------------------------------------------------------------
 endif
 #---------------------------------------------------------------------------------------
-
-.PHONY: assets
-
-assets:
-	@./make_assets.sh

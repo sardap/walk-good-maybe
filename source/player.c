@@ -73,14 +73,14 @@ void update_player() {
 
 	switch (_player.move_state)
 	{
-	case MOVEMENT_JUMPING:
-		_player.vx = 0;
+	case MOVEMENT_AIR:
+		write_to_log(LOG_LEVEL_INFO, "JUMPING");
+		_player.vx /= 2;
 		break;
 	default:
 		break;
 	}
 
-	// _player.x += _player.vx;
 	_player.vx += -_scroll_x;
 	ent_move_x(&_player, _player.vx);
 	_player.vx = 0;

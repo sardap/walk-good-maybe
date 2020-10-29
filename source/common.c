@@ -87,7 +87,6 @@ static void update_score() {
 		i_score /= 10;
 	}
 
-	oam_copy(oam_mem, _obj_buffer, _score_att_start + SCORE_DIGITS);
 }
 
 void init_score() {

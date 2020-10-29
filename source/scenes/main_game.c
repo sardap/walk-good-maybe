@@ -12,6 +12,7 @@
 #include "../assets/titleScreenShared.h"
 #include "../debug.h"
 #include "../numbers.h"
+#include "../gun.h"
 
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
@@ -187,6 +188,7 @@ static void show(void) {
 	}
 	
 	init_player();
+	load_gun_0_tiles();
 }
 
 static bool check_game_over() {
@@ -200,7 +202,6 @@ static bool check_game_over() {
 static void update(void) {
 	// Pausing!
 	if(_state == MG_S_PAUSED) {
-		write_to_log(LOG_LEVEL_INFO, "PAUSED");
 		if(key_hit(KEY_START)) {
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
 			_state = _old_state;
@@ -249,13 +250,20 @@ static void update(void) {
 		spawn_buildings();
 	}
 
+	// if(key_hit(KEY_B)) {
+	// 	if(_scroll_x == 0) {
+	// 		_scroll_x = _tmp;
+	// 	} else {
+	// 		_tmp = _scroll_x;
+	// 		_scroll_x = 0;
+	// 	}
+	// }
+
 	if(key_hit(KEY_B)) {
-		if(_scroll_x == 0) {
-			_scroll_x = _tmp;
-		} else {
-			_tmp = _scroll_x;
-			_scroll_x = 0;
-		}
+		create_bullet(
+			BULLET_TYPE_GUN_0, _player.x + int2fx(16), _player.y + int2fx(4), 
+			float2fx(2.5f), 0
+		);
 	}
 
 	for(int x = 0; x < LEVEL_WIDTH; x++) {
@@ -272,6 +280,9 @@ static void update(void) {
 	clear_offscreen_level();
 
 	update_player();
+	update_bullets();
+
+	oam_copy(oam_mem, _obj_buffer, att_count());
 
 	switch(_state)
 	{
@@ -304,6 +315,8 @@ static void hide(void) {
 	dma3_fill(se_mem[MG_CLOUD_SB+1], 0x0, SB_SIZE);
 
 	clear_score();
+	unload_gun_0_tiles();
+	unload_player();
 }
 
 const scene_t main_game = {

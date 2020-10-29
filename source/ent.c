@@ -7,6 +7,9 @@
 
 OBJ_ATTR _obj_buffer[128] = {};
 FIXED _bg_pos_x = 0;
+ent_t _bullets[BULLETS_LENGTH];
+static int _att_count;
+static int _free_obj;
 
 static int _allocated_objs[128];
 
@@ -31,6 +34,9 @@ int allocate_att(int count) {
 			for(int j = i; j - i < count; j++) {
 				_allocated_objs[j] = 1;
 			}
+			if(i > _att_count) {
+				_att_count = i + count;
+			}
 			return i;
 		}
 		i += count;
@@ -40,10 +46,26 @@ int allocate_att(int count) {
 }
 
 void free_att(int count, int idx) {
+	obj_set_attr(&_obj_buffer[idx], ATTR0_HIDE, 0, 0);
+
+	if(idx >= _att_count) {
+		_att_count -= count;
+	}
+
 	for(int i = idx; i < count; i++) {
 		_allocated_objs[i] = 0;
 	}
+
+	_free_obj++;
 }
+
+//THIS SHOULD ONLY BE CALLED ONCE A LOOP
+int att_count() {
+	int result = _free_obj + (_att_count + 1);
+	_free_obj = 0;
+	return result;
+}
+
 
 FIXED translate_x(ent_t *e) {
 	return e->x + _bg_pos_x;

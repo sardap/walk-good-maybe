@@ -5,13 +5,6 @@
 OUTPATH="source/assets"
 ASSETS="../../assets"
 
-go run tools/colour-agg/main.go \
-	./assets/out.png \
-	./assets/text/numbersfont.png \
-	./assets/whale/whale_small.png \
-	./assets/whale/whale_small_jump_0.png \
-	./assets/whale/whale_small_jump_1.png 
-
 for i in $(find ./assets/whale -type f -name "*.psd"); do
     psd $i -c
 done
@@ -19,6 +12,18 @@ done
 for i in $(find ./assets/text -type f -name "*.psd"); do
     psd $i -c
 done
+
+for i in $(find ./assets/weapons -type f -name "*.psd"); do
+    psd $i -c
+done
+
+go run tools/colour-agg/main.go \
+	./assets/out.png \
+	./assets/weapons/gun_0_bullet.png \
+	./assets/text/numbersfont.png \
+	./assets/whale/whale_small.png \
+	./assets/whale/whale_small_jump_0.png \
+	./assets/whale/whale_small_jump_1.png 
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -58,6 +63,7 @@ SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
 
 grit \
 	$ASSETS/out.png \
+	$ASSETS/weapons/gun_0_bullet.png \
 	$ASSETS/text/numbersfont.png \
 	$ASSETS/whale/whale_small.png \
 	$ASSETS/whale/whale_small_jump_0.png \

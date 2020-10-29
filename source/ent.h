@@ -11,6 +11,8 @@
 	#define def extern
 #endif
 
+#define BULLETS_LENGTH 10
+
 typedef enum movement_state_t {
 	MOVEMENT_GROUNDED, MOVEMENT_JUMPING, MOVEMENT_AIR,
 } movement_state_t;
@@ -18,6 +20,10 @@ typedef enum movement_state_t {
 typedef enum facing_t {
 	FACING_LEFT, FACING_RIGHT
 } facing_t;
+
+typedef enum {
+	BULLET_TYPE_GUN_0
+} bullet_type_t;
 
 typedef struct ent_t {
 	FIXED x, y;
@@ -32,12 +38,18 @@ typedef struct ent_t {
 			facing_t facing;
 			FIXED jump_power;
 		};
+		struct {
+			bullet_type_t bullet_type;
+			bool active;
+		};
+		
 	};
 	
 } ent_t;
 
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
+def ent_t _bullets[BULLETS_LENGTH];
 
 void init_obj_atts();
 int allocate_att(int count);
@@ -67,6 +79,8 @@ inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy) {
 		e->h
 	);
 }
+
+int att_count();
 
 void push_up_from_ground(ent_t *e);
 

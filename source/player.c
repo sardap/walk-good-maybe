@@ -134,5 +134,4 @@ void update_player() {
 
 	// Hey look, it's one of them build macros!
 	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
-	oam_copy(oam_mem, _obj_buffer, _player.att_idx + 1);	// only need to update one
 }

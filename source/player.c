@@ -16,6 +16,8 @@
 #include "assets/whale_walk_2.h"
 #include "assets/whale_walk_3.h"
 #include "assets/whale_walk_4.h"
+#include "assets/whale_land_0.h"
+#include "assets/whale_land_1.h"
 
 static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
 
@@ -83,8 +85,11 @@ void update_player() {
 	switch (_player.move_state)
 	{
 	case MOVEMENT_AIR:
-		write_to_log(LOG_LEVEL_INFO, "JUMPING");
 		_player.vx /= 2;
+		break;
+	case MOVEMENT_JUMPING:
+	case MOVEMENT_LANDED:
+		_player.vx = 0;
 		break;
 	default:
 		break;
@@ -134,6 +139,7 @@ void update_player() {
 			_player.move_state = MOVEMENT_JUMPING;
 		}
 		break;
+	
 	case MOVEMENT_JUMPING:
 		if(_jump_countdown == PLAYER_JUMP_TIME) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_0Tiles, whale_small_jump_0TilesLen);
@@ -145,14 +151,26 @@ void update_player() {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
 		_jump_countdown-- ;
-		char str[50];
-		sprintf(str, "jc:%d", _jump_countdown);
-		write_to_log(LOG_LEVEL_DEBUG, str);
 		break;
+
 	case MOVEMENT_AIR:
 		if(hit_y) {
+			_player.move_state = MOVEMENT_LANDED;
+			_walk_cycle = PLAYER_LAND_TIME;
+		}
+		break;
+
+	case MOVEMENT_LANDED:
+		_player.vx = 0;
+		if(_walk_cycle == PLAYER_LAND_TIME) {
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_land_0Tiles, whale_land_0TilesLen);
+		} else if (_walk_cycle == PLAYER_LAND_TIME / 2) {
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_land_1Tiles, whale_land_1TilesLen);
+		} else if (_walk_cycle <= 0 ) {
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 			_player.move_state = MOVEMENT_GROUNDED;
 		}
+		_walk_cycle--;
 		break;
 	}
 

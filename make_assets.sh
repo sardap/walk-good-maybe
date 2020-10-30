@@ -27,7 +27,9 @@ go run tools/colour-agg/main.go ./assets/out.png \
 	./assets/whale/whale_walk_1.png \
 	./assets/whale/whale_walk_2.png \
 	./assets/whale/whale_walk_3.png \
-	./assets/whale/whale_walk_4.png
+	./assets/whale/whale_walk_4.png \
+	./assets/whale/whale_land_0.png \
+	./assets/whale/whale_land_1.png 
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -69,6 +71,8 @@ grit \
 	$ASSETS/whale/whale_walk_2.png \
 	$ASSETS/whale/whale_walk_3.png \
 	$ASSETS/whale/whale_walk_4.png \
+	$ASSETS/whale/whale_land_0.png \
+	$ASSETS/whale/whale_land_1.png \
 	$SP_OPTIONS
 
 BG_OPTIONS=""

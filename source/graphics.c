@@ -15,6 +15,7 @@ void init_graphics() {
 }
 
 int allocate_tile_idx(int size) {
+	size = size * 2;
 	for(int i = 0; i < SPRITE_TILE_ALLC_SIZE;) {
 		bool found = true;
 		for(int j = i; j - i < size && j < SPRITE_TILE_ALLC_SIZE; j++) {
@@ -36,6 +37,7 @@ int allocate_tile_idx(int size) {
 }
 
 void free_tile_idx(int idx, int size) {
+	size = size * 2;
 	for(int i = idx; i < idx + size; i++) {
 		_sprite_tile_allc[i] = 0;
 	}

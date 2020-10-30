@@ -14,7 +14,7 @@
 #define BULLETS_LENGTH 10
 
 typedef enum movement_state_t {
-	MOVEMENT_GROUNDED, MOVEMENT_JUMPING, MOVEMENT_AIR,
+	MOVEMENT_GROUNDED, MOVEMENT_JUMPING, MOVEMENT_AIR, MOVEMENT_LANDED
 } movement_state_t;
 
 typedef enum facing_t {

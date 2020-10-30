@@ -78,7 +78,7 @@ static void update_score() {
 		}
 		
 		obj_set_attr(&_obj_buffer[_score_att_start + i], 
-			ATTR0_SQUARE, ATTR1_SIZE_8x8,
+			ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
 			ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start() + offset)
 		);
 

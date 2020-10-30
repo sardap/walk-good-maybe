@@ -6,24 +6,28 @@ OUTPATH="source/assets"
 ASSETS="../../assets"
 
 for i in $(find ./assets/whale -type f -name "*.psd"); do
-    psd $i -c
+	convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
 done
 
 for i in $(find ./assets/text -type f -name "*.psd"); do
-    psd $i -c
+	convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
 done
 
 for i in $(find ./assets/weapons -type f -name "*.psd"); do
-    psd $i -c
+	convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
 done
 
-go run tools/colour-agg/main.go \
-	./assets/out.png \
+go run tools/colour-agg/main.go ./assets/out.png \
 	./assets/weapons/gun_0_bullet.png \
 	./assets/text/numbersfont.png \
 	./assets/whale/whale_small.png \
 	./assets/whale/whale_small_jump_0.png \
-	./assets/whale/whale_small_jump_1.png 
+	./assets/whale/whale_small_jump_1.png \
+	./assets/whale/whale_walk_0.png \
+	./assets/whale/whale_walk_1.png \
+	./assets/whale/whale_walk_2.png \
+	./assets/whale/whale_walk_3.png \
+	./assets/whale/whale_walk_4.png
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -43,19 +47,11 @@ SPRITE_32x32="$SPRITE_8x8 -Mw 4 -Mh 4"
 SPRITE_32x64="$SPRITE_8x8 -Mw 4 -Mh 8"
 SPRITE_64x64="$SPRITE_8x8 -Mw 8 -Mh 8"
 
-# grit \
-# 	$ASSETS/whale/whale_small.png \
-# 	$ASSETS/whale/whale_small_jump_0.png \
-# 	$ASSETS/whale/whale_small_jump_1.png $SPRITE_16x16
-
-# grit \
-# 	$ASSETS/text/numbersfont.png $SPRITE_8x8
-
 SP_OPTIONS=""
 SP_OPTIONS="$SP_OPTIONS -ftc"
 SP_OPTIONS="$SP_OPTIONS -gt"        			# output tiled graphics
 SP_OPTIONS="$SP_OPTIONS -gT ff00f7" 			# RGB 24 BIT
-SP_OPTIONS="$SP_OPTIONS -gB4"       			# output 4bpp graphics
+SP_OPTIONS="$SP_OPTIONS -gB8"       			# output 4bpp graphics
 SP_OPTIONS="$SP_OPTIONS -gu32"       			# output data as byte array
 SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
 SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
@@ -63,11 +59,17 @@ SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
 
 grit \
 	$ASSETS/out.png \
-	$ASSETS/weapons/gun_0_bullet.png \
-	$ASSETS/text/numbersfont.png \
 	$ASSETS/whale/whale_small.png \
+	$ASSETS/text/numbersfont.png \
+	$ASSETS/weapons/gun_0_bullet.png \
 	$ASSETS/whale/whale_small_jump_0.png \
-	$ASSETS/whale/whale_small_jump_1.png $SP_OPTIONS
+	$ASSETS/whale/whale_small_jump_1.png \
+	$ASSETS/whale/whale_walk_0.png \
+	$ASSETS/whale/whale_walk_1.png \
+	$ASSETS/whale/whale_walk_2.png \
+	$ASSETS/whale/whale_walk_3.png \
+	$ASSETS/whale/whale_walk_4.png \
+	$SP_OPTIONS
 
 BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file

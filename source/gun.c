@@ -42,7 +42,7 @@ void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy) {
 	write_to_log(LOG_LEVEL_INFO, str);
 
 	obj_set_attr(&_obj_buffer[bul->att_idx],
-		ATTR0_SQUARE, ATTR1_SIZE_8x8,
+		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
 		ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_gun_0_tile)
 	);
 

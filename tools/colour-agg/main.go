@@ -8,19 +8,19 @@ import (
 	"os"
 )
 
-var (
-	coloursMap map[color.Color]bool = make(map[color.Color]bool)
-)
+func findColours(img image.Image) map[color.Color]bool {
+	result := make(map[color.Color]bool)
 
-func findColours(img image.Image) {
 	for x := 0; x < img.Bounds().Size().X; x++ {
 		for y := 0; y < img.Bounds().Size().Y; y++ {
-			coloursMap[img.At(x, y)] = true
+			result[img.At(x, y)] = true
 		}
 	}
+
+	return result
 }
 
-func createColourFile(outfile string) {
+func createColourFile(outfile string, coloursMap map[color.Color]bool) {
 	newImg := image.NewRGBA(image.Rectangle{
 		image.Point{0, 0}, image.Point{255, 1},
 	})
@@ -36,21 +36,29 @@ func createColourFile(outfile string) {
 
 }
 
-func getAllColours(files []string) {
+func getAllColours(files []string) map[color.Color]bool {
+	result := make(map[color.Color]bool)
+
 	for _, v := range files {
 		file, err := os.Open(v)
 		if err != nil {
 			panic(err)
 		}
+
 		img, _, err := image.Decode(file)
 		if err != nil {
 			panic(err)
 		}
-		findColours(img)
+
+		for k, v := range findColours(img) {
+			result[k] = v
+		}
 	}
+
+	return result
 }
 
 func main() {
-	getAllColours(os.Args[2:])
-	createColourFile(os.Args[1])
+	colours := getAllColours(os.Args[2:])
+	createColourFile(os.Args[1], colours)
 }

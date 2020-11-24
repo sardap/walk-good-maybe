@@ -29,6 +29,8 @@ static int _tile_start_idx;
 
 ent_t _player = {};
 
+const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+
 void load_player_tile() {
 	_tile_start_idx = allocate_tile_idx(4);
 	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
@@ -160,17 +162,20 @@ void update_player() {
 			_player.move_state = MOVEMENT_LANDED;
 			_player_anime_cycle = PLAYER_LAND_TIME;
 		}
-		
-		if(_player_anime_cycle == PLAYER_AIR_CYCLE) {
-			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_air_0Tiles, whale_air_0TilesLen);
-		} else if (_player_anime_cycle == PLAYER_AIR_CYCLE / 3 * 2) {
-			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_air_1Tiles, whale_air_1TilesLen);
-		} else if (_player_anime_cycle <= PLAYER_AIR_CYCLE / 3) {
-			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_air_2Tiles, whale_air_2TilesLen);
+
+		if(_player_anime_cycle % PLAYER_AIR_CYCLE_COUNT == 0) {
+			char str[50];
+			sprintf(str, "AIR: %d", _player_anime_cycle / PLAYER_AIR_CYCLE_COUNT);
+			write_to_log(LOG_LEVEL_INFO, str);
+			dma3_cpy(
+				&tile_mem[4][_tile_start_idx], 
+				air_anime_cycle[_player_anime_cycle / PLAYER_AIR_CYCLE_COUNT], 
+				whale_air_0TilesLen
+			);
 		}
 		
 		_player_anime_cycle--;
-		if(_player_anime_cycle <= 0) {
+		if(_player_anime_cycle < 0) {
 			_player_anime_cycle = PLAYER_AIR_CYCLE;
 		}
 		break;

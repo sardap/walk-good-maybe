@@ -188,6 +188,7 @@ static void show(void) {
 	}
 	
 	init_player();
+	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 }
 

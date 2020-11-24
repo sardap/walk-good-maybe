@@ -5,31 +5,34 @@
 OUTPATH="source/assets"
 ASSETS="../../assets"
 
-for i in $(find ./assets/whale -type f -name "*.psd"); do
-	convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
-done
 
-for i in $(find ./assets/text -type f -name "*.psd"); do
-	convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
-done
+function gen_png {
+	echo "pnging $1"
+	for i in $(find $1 -type f -name "*.psd"); do
+		convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
+	done
+}
 
-for i in $(find ./assets/weapons -type f -name "*.psd"); do
-	convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
-done
+OBJECTS=""
 
-go run tools/colour-agg/main.go ./assets/out.png \
-	./assets/weapons/gun_0_bullet.png \
-	./assets/text/numbersfont.png \
-	./assets/whale/whale_small.png \
-	./assets/whale/whale_small_jump_0.png \
-	./assets/whale/whale_small_jump_1.png \
-	./assets/whale/whale_walk_0.png \
-	./assets/whale/whale_walk_1.png \
-	./assets/whale/whale_walk_2.png \
-	./assets/whale/whale_walk_3.png \
-	./assets/whale/whale_walk_4.png \
-	./assets/whale/whale_land_0.png \
-	./assets/whale/whale_land_1.png 
+function add_objects {
+	for i in $(find $1 -type f -name "*.png"); do
+		OBJECTS="$OBJECTS $PWD/${i%.*}.png "
+	done
+}
+
+gen_png "./assets/background"
+
+gen_png "./assets/whale"
+add_objects "./assets/whale"
+
+gen_png "./assets/text"
+add_objects "./assets/text"
+
+gen_png "./assets/weapons"
+add_objects "./assets/weapons"
+
+go run tools/colour-agg/main.go ./assets/out.png $OBJECTS
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -59,20 +62,10 @@ SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
 SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
 # SP_OPTIONS="$SP_OPTIONS -Mw 2 -Mh 2"			# SPRITE_16x16
 
+echo "Creating object tiles / pal / map"
 grit \
 	$ASSETS/out.png \
-	$ASSETS/whale/whale_small.png \
-	$ASSETS/text/numbersfont.png \
-	$ASSETS/weapons/gun_0_bullet.png \
-	$ASSETS/whale/whale_small_jump_0.png \
-	$ASSETS/whale/whale_small_jump_1.png \
-	$ASSETS/whale/whale_walk_0.png \
-	$ASSETS/whale/whale_walk_1.png \
-	$ASSETS/whale/whale_walk_2.png \
-	$ASSETS/whale/whale_walk_3.png \
-	$ASSETS/whale/whale_walk_4.png \
-	$ASSETS/whale/whale_land_0.png \
-	$ASSETS/whale/whale_land_1.png \
+	$OBJECTS \
 	$SP_OPTIONS
 
 BG_OPTIONS=""
@@ -87,6 +80,7 @@ BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
 BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
 BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 
+echo "Creating background tiles / pal / map"
 grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/backgroundSky.png \

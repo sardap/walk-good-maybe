@@ -18,11 +18,13 @@
 #include "assets/whale_walk_4.h"
 #include "assets/whale_land_0.h"
 #include "assets/whale_land_1.h"
+#include "assets/whale_air_0.h"
+#include "assets/whale_air_1.h"
+#include "assets/whale_air_2.h"
 
 static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
 
-static int _jump_countdown;
-static int _walk_cycle;
+static int _player_anime_cycle;
 static int _tile_start_idx;
 
 ent_t _player = {};
@@ -37,8 +39,7 @@ void init_player() {
 	load_player_tile();
 
 	_player.att_idx = allocate_att(1);
-	_walk_cycle = 0;
-	_jump_countdown = 0;
+	_player_anime_cycle = 0;
 
 	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
@@ -111,66 +112,80 @@ void update_player() {
 	case MOVEMENT_GROUNDED:
 		if(abs(_player.vx) > _scroll_x) {
 			const int walk_cycle_count = 25;
-			if(_walk_cycle <= 0) {
-				_walk_cycle = walk_cycle_count;
+			if(_player_anime_cycle <= 0) {
+				_player_anime_cycle = walk_cycle_count;
 			}
 
-			if(_walk_cycle == walk_cycle_count) {
+			if(_player_anime_cycle == walk_cycle_count) {
 				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_0Tiles, whale_walk_0TilesLen);
-			} else if(_walk_cycle == 20) {
+			} else if(_player_anime_cycle == 20) {
 				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_1Tiles, whale_walk_1TilesLen);
-			} else if(_walk_cycle == 15) {
+			} else if(_player_anime_cycle == 15) {
 				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_2Tiles, whale_walk_2TilesLen);
-			} else if(_walk_cycle == 10) {
+			} else if(_player_anime_cycle == 10) {
 				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_3Tiles, whale_walk_3TilesLen);
-			} else if(_walk_cycle == 5) {
+			} else if(_player_anime_cycle == 5) {
 				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_4Tiles, whale_walk_4TilesLen);
-			} else if(_walk_cycle <= 0) {
+			} else if(_player_anime_cycle <= 0) {
 				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
-				_walk_cycle = walk_cycle_count;
+				_player_anime_cycle = walk_cycle_count;
 			}
 
-			_walk_cycle--;
+			_player_anime_cycle--;
 		} else {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
 		if(key_hit(KEY_A)) {
-			_jump_countdown = PLAYER_JUMP_TIME;
+			_player_anime_cycle = PLAYER_JUMP_TIME;
 			_player.move_state = MOVEMENT_JUMPING;
 		}
 		break;
 	
 	case MOVEMENT_JUMPING:
-		if(_jump_countdown == PLAYER_JUMP_TIME) {
+		if(_player_anime_cycle == PLAYER_JUMP_TIME) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_0Tiles, whale_small_jump_0TilesLen);
-		} else if(_jump_countdown == PLAYER_JUMP_TIME / 2) {
+		} else if(_player_anime_cycle == PLAYER_JUMP_TIME / 2) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_1Tiles, whale_small_jump_1TilesLen);
-		} else if(_jump_countdown <= 0) {
+		} else if(_player_anime_cycle <= 0) {
 			_player.vy = -_player.jump_power;
+			_player_anime_cycle = PLAYER_AIR_CYCLE;
 			_player.move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
-		_jump_countdown-- ;
+		_player_anime_cycle-- ;
 		break;
 
 	case MOVEMENT_AIR:
 		if(hit_y) {
 			_player.move_state = MOVEMENT_LANDED;
-			_walk_cycle = PLAYER_LAND_TIME;
+			_player_anime_cycle = PLAYER_LAND_TIME;
+		}
+		
+		if(_player_anime_cycle == PLAYER_AIR_CYCLE) {
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_air_0Tiles, whale_air_0TilesLen);
+		} else if (_player_anime_cycle == PLAYER_AIR_CYCLE / 3 * 2) {
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_air_1Tiles, whale_air_1TilesLen);
+		} else if (_player_anime_cycle <= PLAYER_AIR_CYCLE / 3) {
+			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_air_2Tiles, whale_air_2TilesLen);
+		}
+		
+		_player_anime_cycle--;
+		if(_player_anime_cycle <= 0) {
+			_player_anime_cycle = PLAYER_AIR_CYCLE;
 		}
 		break;
 
 	case MOVEMENT_LANDED:
 		_player.vx = 0;
-		if(_walk_cycle == PLAYER_LAND_TIME) {
+		if(_player_anime_cycle == PLAYER_LAND_TIME) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_land_0Tiles, whale_land_0TilesLen);
-		} else if (_walk_cycle == PLAYER_LAND_TIME / 2) {
+		} else if (_player_anime_cycle == PLAYER_LAND_TIME / 2) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_land_1Tiles, whale_land_1TilesLen);
-		} else if (_walk_cycle <= 0 ) {
+		} else if (_player_anime_cycle <= 0 ) {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 			_player.move_state = MOVEMENT_GROUNDED;
 		}
-		_walk_cycle--;
+		_player_anime_cycle--;
 		break;
 	}
 

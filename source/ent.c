@@ -1,13 +1,17 @@
 #include "ent.h"
 
 #include <tonc.h>
+
 #include "common.h"
 #include "level.h"
 #include "debug.h"
 
+#include "gun.h"
+#include "enemy.h"
+
 OBJ_ATTR _obj_buffer[128] = {};
 FIXED _bg_pos_x = 0;
-ent_t _bullets[BULLETS_LENGTH];
+ent_t _ents[ENT_COUNT];
 static int _att_count;
 static int _free_obj;
 
@@ -157,4 +161,20 @@ bool apply_gravity(ent_t *e) {
 
 	_player.vy += GRAVITY;
 	return false;
+}
+
+void update_ents() {
+	for(int i = 0; i < ENT_COUNT; i++) {
+		switch (_ents[i].ent_type)
+		{
+		case TYPE_BULLET:
+			update_bullet(&_ents[i]);
+			break;
+		case TYPE_ENEMY:
+			update_enemy(&_ents[i]);
+			break;
+		case TYPE_PLAYER:
+			break;
+		}
+	}
 }

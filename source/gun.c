@@ -19,20 +19,21 @@ void unload_gun_0_tiles() {
 
 void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy) {
 	write_to_log(LOG_LEVEL_INFO, "CREATING BULLET");
-	ent_t *bul = &_bullets[_bullet_top++];
+	ent_t *bul = &_ents[_bullet_top++];
 	bul->bullet_type = type;
 	bul->x = x;
 	bul->y = y;
 	bul->vx = vx;
 	bul->vy = vy;
 	bul->active = true;
+	bul->ent_type = TYPE_BULLET;
 
 	switch (type) {
 	case BULLET_TYPE_GUN_0:
 		break;
 	}
 
-	if(_bullet_top >= BULLETS_LENGTH) {
+	if(_bullet_top >= ENT_COUNT) {
 		_bullet_top = 0;
 	}
 
@@ -49,22 +50,49 @@ void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy) {
 	obj_set_pos(&_obj_buffer[bul->att_idx], fx2int(bul->x), fx2int(bul->y));
 }
 
-void update_bullets() {
-	for(int i = 0; i < BULLETS_LENGTH; i++) {
-		if(!_bullets[i].active) {
-			continue;
-		}
-
-		ent_move_x(&_bullets[i], _bullets[i].vx - _scroll_x);
-		ent_move_y(&_bullets[i], _bullets[i].vy);
-
-		if(fx2int(_bullets[i].x) > SCREEN_WIDTH) {
-			free_att(1, _bullets[i].att_idx);
-			_bullets[i].active = false;
-			continue;
-		}
-
-		obj_set_pos(&_obj_buffer[_bullets[i].att_idx], fx2int(_bullets[i].x), fx2int(_bullets[i].y));
+void update_bullet(ent_t *bul) {
+	if(!bul->active) {
+		return;
 	}
 
+	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
+	ent_move_y(bul, bul->vy);
+
+	int col = ent_level_collision_at(bul, 0, 0);
+
+	if(col & (LEVEL_COL_PLAYER)) {
+		
+	}
+
+	if(fx2int(bul->x) > SCREEN_WIDTH || hit_x) {
+		free_att(1, bul->att_idx);
+		bul->active = false;
+		return;
+	}
+
+	obj_set_pos(&_obj_buffer[bul->att_idx], fx2int(bul->x), fx2int(bul->y));
 }
+
+// void update_bullets() {
+// 	for(int i = 0; i < ENTS_LENGTH; i++) {
+// 		if(!_ents[i].active) {
+// 			continue;
+// 		}
+
+// 		bool hit_x = ent_move_x(&_ents[i], _ents[i].vx - _scroll_x);
+// 		ent_move_y(&_ents[i], _ents[i].vy);
+
+// 		int col = ent_level_collision_at(&_ents[i], 0, 0);
+// 		if(col & (LEVEL_COL_PLAYER)) {
+			
+// 		}
+
+// 		if(fx2int(_ents[i].x) > SCREEN_WIDTH || hit_x) {
+// 			free_att(1, _ents[i].att_idx);
+// 			_ents[i].active = false;
+// 			continue;
+// 		}
+
+// 		obj_set_pos(&_obj_buffer[_ents[i].att_idx], fx2int(_ents[i].x), fx2int(_ents[i].y));
+// 	}
+// }

@@ -13,6 +13,7 @@
 #include "../debug.h"
 #include "../numbers.h"
 #include "../gun.h"
+#include "../enemy.h"
 
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
@@ -190,6 +191,10 @@ static void show(void) {
 	init_player();
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
+
+	load_enemy_toast();
+
+	create_toast_enemy(&_ents[5]);
 }
 
 static bool check_game_over() {
@@ -225,6 +230,7 @@ static void update(void) {
 		return;
 	}
 
+	_scroll_x = 0;
 	_bg_pos_x += _scroll_x;
 
 	wrap_bkg();
@@ -251,14 +257,6 @@ static void update(void) {
 		spawn_buildings();
 	}
 
-	// if(key_hit(KEY_B)) {
-	// 	if(_scroll_x == 0) {
-	// 		_scroll_x = _tmp;
-	// 	} else {
-	// 		_tmp = _scroll_x;
-	// 		_scroll_x = 0;
-	// 	}
-	// }
 
 	if(key_hit(KEY_B)) {
 		create_bullet(
@@ -281,7 +279,7 @@ static void update(void) {
 	clear_offscreen_level();
 
 	update_player();
-	update_bullets();
+	update_ents();
 
 	oam_copy(oam_mem, _obj_buffer, att_count());
 

@@ -9,6 +9,7 @@
 
 #define LEVEL_COL_EMPTY 	0
 #define LEVEL_COL_GROUND 	1
+#define LEVEL_COL_PLAYER 	2
 
 extern u16 _level[LEVEL_SIZE];
 extern FIXED _bg_pos_x;

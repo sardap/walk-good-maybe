@@ -32,6 +32,9 @@ add_objects "./assets/text"
 gen_png "./assets/weapons"
 add_objects "./assets/weapons"
 
+gen_png "./assets/enemy"
+add_objects "./assets/enemy"
+
 go run tools/colour-agg/main.go ./assets/out.png $OBJECTS
 
 rm -rf $OUTPATH

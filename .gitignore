@@ -4,6 +4,7 @@ source/assets
 log/
 
 assets/whale/*.png
+assets/enemy/*.png
 
 assets/out.png
 __debug_bin

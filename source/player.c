@@ -6,6 +6,7 @@
 #include "ent.h"
 #include "debug.h"
 #include "graphics.h"
+#include "anime.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -45,12 +46,14 @@ void init_player() {
 
 	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
-	_player.jump_power = (int)(2.0f * (FIX_SCALE));;
+	_player.jump_power = (int)(2.0f * (FIX_SCALE));
 	_player.w = 16;
 	_player.h = 16;
 
 	_player.x = 20 << FIX_SHIFT;
 	_player.y = PLAYER_SPAWN_Y;
+
+	_player.ent_type = TYPE_PLAYER;
 
 	obj_set_attr(&_obj_buffer[_player.att_idx], 
 		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_16x16,
@@ -150,7 +153,7 @@ void update_player() {
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_small_jump_1Tiles, whale_small_jump_1TilesLen);
 		} else if(_player_anime_cycle <= 0) {
 			_player.vy = -_player.jump_power;
-			_player_anime_cycle = PLAYER_AIR_CYCLE;
+			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
 			_player.move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
@@ -163,21 +166,11 @@ void update_player() {
 			_player_anime_cycle = PLAYER_LAND_TIME;
 		}
 
-		if(_player_anime_cycle % PLAYER_AIR_CYCLE_COUNT == 0) {
-			char str[50];
-			sprintf(str, "AIR: %d", _player_anime_cycle / PLAYER_AIR_CYCLE_COUNT);
-			write_to_log(LOG_LEVEL_INFO, str);
-			dma3_cpy(
-				&tile_mem[4][_tile_start_idx], 
-				air_anime_cycle[_player_anime_cycle / PLAYER_AIR_CYCLE_COUNT], 
-				whale_air_0TilesLen
-			);
-		}
-		
-		_player_anime_cycle--;
-		if(_player_anime_cycle < 0) {
-			_player_anime_cycle = PLAYER_AIR_CYCLE;
-		}
+		step_anime(
+			air_anime_cycle, whale_air_0TilesLen, PLAYER_AIR_CYCLE_COUNT,
+			&_player_anime_cycle, _tile_start_idx
+		);
+
 		break;
 
 	case MOVEMENT_LANDED:
@@ -203,7 +196,5 @@ void update_player() {
 	// increment/decrement starting tile with R/L
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
 
-
-	// Hey look, it's one of them build macros!
 	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
 }

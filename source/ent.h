@@ -11,7 +11,11 @@
 	#define def extern
 #endif
 
-#define BULLETS_LENGTH 10
+#define ENT_COUNT 10
+
+typedef enum ent_types_t {
+	TYPE_PLAYER, TYPE_BULLET, TYPE_ENEMY
+} ent_types_t;
 
 typedef enum movement_state_t {
 	MOVEMENT_GROUNDED, MOVEMENT_JUMPING, MOVEMENT_AIR, MOVEMENT_LANDED
@@ -31,25 +35,31 @@ typedef struct ent_t {
 	int tid;
 	int w, h;
 	int att_idx;
-
+	ent_types_t ent_type;
+	//Ent speifc vars
 	union  {
+		//Player
 		struct {
 			movement_state_t move_state;
 			facing_t facing;
 			FIXED jump_power;
 		};
+		//Bullet
 		struct {
 			bullet_type_t bullet_type;
 			bool active;
 		};
-		
+		//Enemy
+		struct {
+			int anime_cycle;
+		};
 	};
 	
 } ent_t;
 
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
-def ent_t _bullets[BULLETS_LENGTH];
+def ent_t _ents[ENT_COUNT];
 
 void init_obj_atts();
 int allocate_att(int count);
@@ -91,5 +101,7 @@ bool did_hit_y(ent_t *e, FIXED dy);
 bool ent_move_y(ent_t *e, FIXED dy);
 
 bool apply_gravity(ent_t *e);
+
+void update_ents();
 
 #endif

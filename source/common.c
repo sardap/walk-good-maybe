@@ -55,6 +55,7 @@ void init_seed(int seed) {
 	srand((unsigned int)seed);
 }
 
+
 int gba_rand() {
 	return rand();	
 }
@@ -79,7 +80,7 @@ static void update_score() {
 		
 		obj_set_attr(&_obj_buffer[_score_att_start + i], 
 			ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
-			ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start() + offset)
+			ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start() + offset * 2)
 		);
 
 		obj_set_pos(&_obj_buffer[_score_att_start + i], 8 * i, 0);

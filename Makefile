@@ -20,12 +20,16 @@ LIBTONC := $(DEVKITPRO)/tonclib $(DEVKITPRO)/libtonc
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET      :=  bin/ecs
-BUILD       :=  build
-ASSETS 		:=	assets assets/title_screen assets/whale
-SOURCES     :=  source source/scenes source/assets
-DATA        :=  
-INCLUDES    :=  $(DEVKITPRO)/libtonc/include
+TARGET      	:=  bin/ecs
+MUSIC_TARGET 	:=  bin/music
+BUILD       	:=  build
+ASSETS 			:=	assets assets/title_screen assets/whale
+SOURCES     	:=  source source/scenes source/assets
+DATA        	:=  
+INCLUDES    	:=  include sourece
+MUSIC    		:=  music
+
+# $(DEVKITPRO)/libtonc/include $(DEVKITPRO)/libgba/include
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -58,18 +62,19 @@ export PATH :=  $(DEVKITARM)/bin:$(PATH)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS    :=  -ltonc
+LIBS    :=  -lmm -ltonc
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS :=  $(LIBTONC)
+LIBDIRS :=  $(LIBTONC) $(LIBGBA)
 
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export MUSIC_OUPUT	:=	$(CURDIR)/$(MUSIC_TARGET)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 			$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
@@ -130,7 +135,7 @@ assets: $(shell find assets/ -type f -name '.psd')
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba
+	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(MUSIC_OUPUT).gba
 
 #---------------------------------------------------------------------------------
 else
@@ -156,6 +161,7 @@ $(OFILES_SOURCES) : $(HFILES)
 soundbank.bin soundbank.h : $(AUDIOFILES)
 #---------------------------------------------------------------------------------
 	@mmutil $^ -osoundbank.bin -hsoundbank.h
+	@mmutil -b $^ -o$(MUSIC_OUPUT).gba
 
 #---------------------------------------------------------------------------------
 # This rule links in binary data with the .bin extension

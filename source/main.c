@@ -1,14 +1,24 @@
 #include <tonc.h>
+#include <maxmod.h>    
 
 #include "debug.h"
 #include "common.h"
 #include "graphics.h"
 #include "ent.h"
+#include "soundbank_bin.h"
 
 void game_loop() {
+	irq_init(NULL);
+	irq_enable(II_VBLANK);
+
+	irq_add(II_VBLANK, mmVBlank);
+    mmInitDefault((mm_addr)soundbank_bin, 8);
+
 	while(1)
 	{
-		vid_vsync();
+		VBlankIntrWait();
+
+		mmFrame();
 		key_poll();
 
 		common_step();

@@ -8,7 +8,7 @@ extern const unsigned int *enemy_toast_idle_cycle[];
 
 void load_enemy_toast();
 
-void create_toast_enemy(ent_t *ent);
+void create_toast_enemy(ent_t *ent, FIXED x, FIXED y);
 
 void update_enemy(ent_t *ent);
 

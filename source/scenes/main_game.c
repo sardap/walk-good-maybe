@@ -2,23 +2,30 @@
 
 #include <tonc.h>
 
+#include <maxmod.h>    
+#include "soundbank.h" 
+#include "soundbank_bin.h"
+
 #include "../common.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
 #include "../level.h"
-#include "../assets/backgroundSky.h"
-#include "../assets/title_text.h"
-#include "../assets/titleScreenShared.h"
 #include "../debug.h"
 #include "../numbers.h"
 #include "../gun.h"
 #include "../enemy.h"
 
+#include "../assets/backgroundSky.h"
+#include "../assets/title_text.h"
+#include "../assets/titleScreenShared.h"
+#include "../assets/backgroundSky.h"
+
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
 static int _tmp;
+static int _bg_0_scroll;
 
 static mg_states_t _state;
 static mg_states_t _old_state;
@@ -116,6 +123,11 @@ static void spawn_buildings() {
 	_building_spawn_x = level_wrap_x(start_x + width);
 
 	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
+
+	int count = gba_rand_range(0, 3);
+	for(int i = 0; i < count; i++) {
+		// create_toast_enemy(&_ents, int2fx(120), int2fx(30));
+	}
 }
 
 static void spawn_cloud() {
@@ -155,11 +167,13 @@ static void show(void) {
 	// Load tiles into MG_SHARED_CB
 	dma3_cpy(&tile_mem[MG_SHARED_CB], titleScreenSharedTiles, titleScreenSharedTilesLen);
 
-	//Fill cloud layer
 	for(int i = 0; i < SB_SIZE; i++) {
 		se_mem[MG_BACKGROUND_SB][i] = SKY_OFFSET;
 	}
 
+	dma3_cpy(se_mem[MG_BACKGROUND_SB], backgroundSkyMap, backgroundSkyMapLen);
+
+	//Fill cloud layer
 	dma3_fill(se_mem[MG_CLOUD_SB], 	0, SB_SIZE);
 	dma3_fill(se_mem[MG_CLOUD_SB + 1], 0, SB_SIZE);
 
@@ -167,6 +181,12 @@ static void show(void) {
 	REG_BG0HOFS = 0;
 	// Set RegY scroll to 0
 	REG_BG0VOFS = 0;
+
+	REG_BG1HOFS = 0;
+	REG_BG1VOFS = 0;
+
+	REG_BG2HOFS = 0;
+	REG_BG2VOFS = 0;
 
 	// Set bkg reg
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_BACKGROUND_SB) 	| BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
@@ -180,21 +200,23 @@ static void show(void) {
 	_scroll_x = 0;
 	_building_spawn_x = 0;
 	_state = MG_S_STARTING;
-
-	load_number_tiles();
-	init_score();
+	_bg_0_scroll = 0;
 
 	while(_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5) {
 		spawn_buildings();
 	}
 	
+	
 	init_player();
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 
-	load_enemy_toast();
+	load_number_tiles();
+	init_score();
+	// load_enemy_toast();
 
-	create_toast_enemy(&_ents[5]);
+	mmSetModuleVolume(1024);
+	mmStart(MOD_INTRO, MM_PLAY_ONCE);
 }
 
 static bool check_game_over() {
@@ -206,6 +228,10 @@ static bool check_game_over() {
 }
 
 static void update(void) {
+	if(!mmActive()) {
+		mmStart(MOD_PD_BACKGROUND_0, MM_PLAY_LOOP);
+	}
+
 	// Pausing!
 	if(_state == MG_S_PAUSED) {
 		if(key_hit(KEY_START)) {
@@ -230,13 +256,15 @@ static void update(void) {
 		return;
 	}
 
-	_scroll_x = 0;
 	_bg_pos_x += _scroll_x;
+	_bg_0_scroll += _scroll_x / 6;
 
 	wrap_bkg();
 
+	REG_BG0HOFS = fx2int(_bg_0_scroll);
 	REG_BG1HOFS = fx2int(_bg_pos_x);
 	REG_BG2HOFS = fx2int(_bg_pos_x);
+
 
 	_next_cloud_spawn -= _scroll_x;
 	_next_building_spawn -= _scroll_x;
@@ -265,6 +293,7 @@ static void update(void) {
 		);
 	}
 
+	//Copy buldings into VRAM
 	for(int x = 0; x < LEVEL_WIDTH; x++) {
 		for(int y = 0; y < LEVEL_HEIGHT; y++) {
 			if(x < 32) {
@@ -286,13 +315,13 @@ static void update(void) {
 	switch(_state)
 	{
 	case MG_S_STARTING:
-		if(did_hit_y(&_player, _player.vy)) {
+		if(key_hit(KEY_RIGHT)) {
 			_scroll_x = (int)(0.25f * FIX_SCALE);
 			_state = MG_S_SCROLLING;
 		}
 		break;
 	case MG_S_SCROLLING:
-		if(frame_count() % X_SCROLL_RATE == 0 && _scroll_x > 0) {
+		if(frame_count() % X_SCROLL_RATE == 0) {
 			_scroll_x += X_SCROLL_GAIN;
 			//This is better than checking if it's greater prior to adding
 			//Because it handles the edge case where the gain will put it much

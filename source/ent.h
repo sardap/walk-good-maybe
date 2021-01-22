@@ -12,6 +12,7 @@
 #endif
 
 #define ENT_COUNT 10
+#define ENEMY_MAX_COUNT 10
 
 typedef enum ent_types_t {
 	TYPE_PLAYER, TYPE_BULLET, TYPE_ENEMY
@@ -60,6 +61,7 @@ typedef struct ent_t {
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 def ent_t _ents[ENT_COUNT];
+def ent_t _enemy[ENEMY_MAX_COUNT];
 
 void init_obj_atts();
 int allocate_att(int count);

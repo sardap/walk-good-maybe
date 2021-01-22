@@ -14,6 +14,15 @@
 			]
 		},
 		{
+			"name": "music test launch", 
+			"type":"clr",
+			"request": "launch",
+			"program": "mGBA.exe",
+			"args": [
+				"${workspaceFolder}\\bin\\music.gba"
+			]
+		},
+		{
 			"name": "Launch Package",
 			"type": "go",
 			"request": "launch",

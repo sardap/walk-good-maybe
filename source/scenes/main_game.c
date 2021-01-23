@@ -20,12 +20,14 @@
 #include "../assets/title_text.h"
 #include "../assets/titleScreenShared.h"
 #include "../assets/backgroundSky.h"
+#include "../assets/fog.h"
 
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
 static int _tmp;
 static int _bg_0_scroll;
+static int _bg_2_scroll;
 
 static mg_states_t _state;
 static mg_states_t _old_state;
@@ -174,38 +176,54 @@ static void show(void) {
 	dma3_cpy(se_mem[MG_BACKGROUND_SB], backgroundSkyMap, backgroundSkyMapLen);
 
 	//Fill cloud layer
-	dma3_fill(se_mem[MG_CLOUD_SB], 	0, SB_SIZE);
-	dma3_fill(se_mem[MG_CLOUD_SB + 1], 0, SB_SIZE);
+	dma3_cpy(se_mem[MG_CLOUD_SB], fogMap, fogMapLen);
+	// dma3_fill(se_mem[MG_CLOUD_SB], 	0, SB_SIZE);
+	// dma3_fill(se_mem[MG_CLOUD_SB + 1], 0, SB_SIZE);
 
-	// Set RegX scroll to 0
-	REG_BG0HOFS = 0;
-	// Set RegY scroll to 0
+	_bg_0_scroll = gba_rand();
+	_bg_2_scroll = gba_rand();
+
+	//Set bg postions
+	REG_BG0HOFS = _bg_0_scroll / 6;
 	REG_BG0VOFS = 0;
 
 	REG_BG1HOFS = 0;
 	REG_BG1VOFS = 0;
 
-	REG_BG2HOFS = 0;
+	REG_BG2HOFS = _bg_2_scroll / 12;
 	REG_BG2VOFS = 0;
 
 	// Set bkg reg
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_BACKGROUND_SB) 	| BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(MG_BUILDING_SB) 		| BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
-	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(MG_CLOUD_SB) 		| BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
+	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(MG_CLOUD_SB) 		| BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
+
+	//Blend reg
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG2,  						// Top layers
+        BLD_BG0, 	// Bottom layers
+        1					// Mode
+	);
+
+	// Update blend weights
+	//Left EVA: Top weight max of 15 (4 bits)
+	//Right EVB: Bottom wieght max of 15 (4 bits)
+	// REG_BLDALPHA = BLDA_BUILD(3, 5);
+	REG_BLDALPHA = BLDA_BUILD(8, 6);
+	REG_BLDY = BLDY_BUILD(0);
+
 
 	_next_cloud_spawn = 0;
 	_next_building_spawn = 0;
 	_scroll_x = 0;
 	_building_spawn_x = 0;
 	_state = MG_S_STARTING;
-	_bg_0_scroll = 0;
 
 	while(_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5) {
 		spawn_buildings();
 	}
-	
 	
 	init_player();
 	_player.move_state = MOVEMENT_AIR;
@@ -215,7 +233,7 @@ static void show(void) {
 	init_score();
 	// load_enemy_toast();
 
-	mmSetModuleVolume(1024);
+	mmSetModuleVolume(600);
 	mmStart(MOD_INTRO, MM_PLAY_ONCE);
 }
 
@@ -257,13 +275,14 @@ static void update(void) {
 	}
 
 	_bg_pos_x += _scroll_x;
-	_bg_0_scroll += _scroll_x / 6;
+	_bg_0_scroll += _scroll_x;
+	_bg_2_scroll += _scroll_x;
 
 	wrap_bkg();
 
-	REG_BG0HOFS = fx2int(_bg_0_scroll);
+	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
 	REG_BG1HOFS = fx2int(_bg_pos_x);
-	REG_BG2HOFS = fx2int(_bg_pos_x);
+	REG_BG2HOFS = fx2int(_bg_2_scroll / 4);
 
 
 	_next_cloud_spawn -= _scroll_x;
@@ -273,7 +292,7 @@ static void update(void) {
 		add_score(fx2int(_scroll_x * 10));
 	}
 
-	if(_next_cloud_spawn < 0) {
+	if(_next_cloud_spawn < 0 && false) {
 		spawn_cloud();
 		_next_cloud_spawn = gba_rand_range(
 			fx2int(CLOUD_WIDTH),
@@ -304,7 +323,7 @@ static void update(void) {
 		}
 	}
 
-	clear_offscreen(MG_CLOUD_SB);
+	// clear_offscreen(MG_CLOUD_SB);
 	clear_offscreen_level();
 
 	update_player();

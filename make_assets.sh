@@ -87,5 +87,6 @@ echo "Creating background tiles / pal / map"
 grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/cloud.png \
+	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundSky.png \
 	$ASSETS/background/build_tile_set.png $BG_OPTIONS

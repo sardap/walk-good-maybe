@@ -30,9 +30,7 @@
 			"program": "${workspaceFolder}/tools/colour-agg",
 			"args": [
 				"out.png",
-				"../../assets/text/numbersfont.png",
-				"../../assets/whale/whale_small.png",
-				"../../assets/whale/whale_small_jump_0.png",
+				"example.png"
 			]
 		}
 	]

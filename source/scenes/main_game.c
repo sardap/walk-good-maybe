@@ -16,11 +16,10 @@
 #include "../gun.h"
 #include "../enemy.h"
 
-#include "../assets/backgroundSky.h"
 #include "../assets/title_text.h"
-#include "../assets/titleScreenShared.h"
-#include "../assets/backgroundSky.h"
+#include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
+#include "../assets/mainGameShared.h"
 
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
@@ -165,33 +164,31 @@ static void clear_offscreen_level() {
 
 static void show(void) {
 	// Load palette
-	dma3_cpy(pal_bg_mem, titleScreenSharedPal, titleScreenSharedPalLen);
+	dma3_cpy(pal_bg_mem, mainGameSharedPal, mainGameSharedPalLen);
 	// Load tiles into MG_SHARED_CB
-	dma3_cpy(&tile_mem[MG_SHARED_CB], titleScreenSharedTiles, titleScreenSharedTilesLen);
+	dma3_cpy(&tile_mem[MG_SHARED_CB], mainGameSharedTiles, mainGameSharedTilesLen);
 
-	for(int i = 0; i < SB_SIZE; i++) {
-		se_mem[MG_BACKGROUND_SB][i] = SKY_OFFSET;
-	}
-
-	dma3_cpy(se_mem[MG_BACKGROUND_SB], backgroundSkyMap, backgroundSkyMapLen);
+	dma3_cpy(se_mem[MG_BACKGROUND_SB], backgroundCityMap, backgroundCityMapLen);
 
 	//Fill cloud layer
 	dma3_cpy(se_mem[MG_CLOUD_SB], fogMap, fogMapLen);
-	// dma3_fill(se_mem[MG_CLOUD_SB], 	0, SB_SIZE);
-	// dma3_fill(se_mem[MG_CLOUD_SB + 1], 0, SB_SIZE);
 
-	_bg_0_scroll = gba_rand();
-	_bg_2_scroll = gba_rand();
+	_bg_0_scroll = int2fx(gba_rand());
+	_bg_2_scroll = int2fx(gba_rand());
 
 	//Set bg postions
-	REG_BG0HOFS = _bg_0_scroll / 6;
+	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
 	REG_BG0VOFS = 0;
 
 	REG_BG1HOFS = 0;
 	REG_BG1VOFS = 0;
 
-	REG_BG2HOFS = _bg_2_scroll / 12;
+	REG_BG2HOFS = fx2int(_bg_2_scroll / 12);
 	REG_BG2VOFS = 0;
+
+	char str[50];
+	sprintf(str, "0:%d\t1:%d", _bg_0_scroll, _bg_2_scroll);
+	write_to_log(LOG_LEVEL_INFO, str);
 
 	// Set bkg reg
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_BACKGROUND_SB) 	| BG_CBB(MG_SHARED_CB) | BG_REG_32x32;

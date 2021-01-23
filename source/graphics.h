@@ -3,9 +3,9 @@
 
 #include <tonc_types.h>
 
-#define SKY_OFFSET 72
+#define SKY_OFFSET 76
 
-#define BUILDINGS_OFFSET 362
+#define BUILDINGS_OFFSET 424
 
 // BUILDING 0
 #define BUILDING_0_LEFT_ROOF BUILDING_0_RIGHT_ROOF

@@ -6,6 +6,8 @@
 #include "../assets/backgroundSky.h"
 #include "../assets/title_text.h"
 #include "../assets/titleScreenShared.h"
+#include "../assets/backgroundSky.h"
+#include "../debug.h"
 
 static const int shared_cb = 0;      // tile gfx
 
@@ -25,10 +27,8 @@ static void show(void) {
 	dma3_cpy(&se_mem[foreground_sb], title_textMap, title_textMapLen);
 
 	//Fill cloud layer
-	for(int i = 0; i < SB_SIZE; i++) {
-		se_mem[cloud_sb][i] = 72;
-	}
-
+	dma3_cpy(se_mem[cloud_sb], backgroundSkyMap, backgroundSkyMapLen);
+	
 	init_seed(652374291);
 	place_n_clouds(
 		shared_cloud_tile_start, cloud_sb, 32,
@@ -55,7 +55,9 @@ static void update(void) {
 	}
 
 	if(key_hit(KEY_A)) {
-		init_seed(frame_count());
+		for(int i = 0; i < frame_count(); i++) {
+			qran();
+		}
 		scene_set(main_game);
 	}
 }

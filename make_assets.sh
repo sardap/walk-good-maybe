@@ -21,7 +21,17 @@ function add_objects {
 	done
 }
 
+BACKGROUNDS=""
+
+function add_background {
+	for i in $(find $1 -type f -name "*.png"); do
+		BACKGROUNDS="$BACKGROUNDS $PWD/${i%.*}.png "
+	done
+}
+
+
 gen_png "./assets/background"
+add_background "./assets/background"
 
 gen_png "./assets/whale"
 add_objects "./assets/whale"
@@ -35,7 +45,8 @@ add_objects "./assets/weapons"
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
 
-go run tools/colour-agg/main.go ./assets/out.png $OBJECTS
+go run tools/colour-agg/main.go ./assets/objects_out.png $OBJECTS
+go run tools/colour-agg/main.go ./assets/backgrounds_out.png $BACKGROUNDS
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -67,7 +78,7 @@ SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
 
 echo "Creating object tiles / pal / map"
 grit \
-	$ASSETS/out.png \
+	$ASSETS/objects_out.png \
 	$OBJECTS \
 	$SP_OPTIONS
 
@@ -81,12 +92,31 @@ BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
 BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O mainGameShared"	# Shared pallet name
+
+echo "Creating background tiles for main game / pal / map"
+grit \
+	$ASSETS/backgrounds_out.png \
+	$ASSETS/background/fog.png \
+	$ASSETS/background/backgroundCity.png \
+	$ASSETS/background/build_tile_set.png $BG_OPTIONS
+
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
 BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 
-echo "Creating background tiles / pal / map"
+echo "Creating background tiles for title screen / pal / map"
 grit \
+	$ASSETS/backgrounds_out.png \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/cloud.png \
-	$ASSETS/background/fog.png \
-	$ASSETS/background/backgroundSky.png \
-	$ASSETS/background/build_tile_set.png $BG_OPTIONS
+	$ASSETS/background/backgroundSky.png $BG_OPTIONS

@@ -57,7 +57,7 @@ void init_seed(int seed) {
 
 
 int gba_rand() {
-	return rand();	
+	return qran();
 }
 
 static void update_score() {

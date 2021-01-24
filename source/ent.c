@@ -28,12 +28,14 @@ void init_obj_atts() {
 int allocate_att(int count) {
 	for(int i = 0; i < 128;) {
 		bool found = true;
+		
 		for(int j = i; j - i < count && j < 128; j++) {
 			if(_allocated_objs[j]) {
 				found = false;
 				break;
 			}
 		}
+
 		if(found) {
 			for(int j = i; j - i < count; j++) {
 				_allocated_objs[j] = 1;
@@ -56,7 +58,7 @@ void free_att(int count, int idx) {
 		_att_count -= count;
 	}
 
-	for(int i = idx; i < count; i++) {
+	for(int i = idx; i < idx + count; i++) {
 		_allocated_objs[i] = 0;
 	}
 

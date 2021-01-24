@@ -19,6 +19,7 @@ void unload_gun_0_tiles() {
 
 void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy) {
 	write_to_log(LOG_LEVEL_INFO, "CREATING BULLET");
+
 	ent_t *bul = &_ents[_bullet_top++];
 	bul->bullet_type = type;
 	bul->x = x;
@@ -39,7 +40,7 @@ void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy) {
 
 	bul->att_idx = allocate_att(1);
 	char str[50];
-	sprintf(str, "att:%d", bul->att_idx);
+	sprintf(str, "NB att:%d", bul->att_idx);
 	write_to_log(LOG_LEVEL_INFO, str);
 
 	obj_set_attr(&_obj_buffer[bul->att_idx],
@@ -65,6 +66,7 @@ void update_bullet(ent_t *bul) {
 	}
 
 	if(fx2int(bul->x) > SCREEN_WIDTH || hit_x) {
+		write_to_log(LOG_LEVEL_INFO, "destroying BULLET");
 		free_att(1, bul->att_idx);
 		bul->active = false;
 		return;

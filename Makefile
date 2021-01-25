@@ -136,6 +136,7 @@ assets: $(shell find assets/ -type f -name '.psd')
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(MUSIC_OUPUT).gba
+	@rm -rf "source/assets"
 
 #---------------------------------------------------------------------------------
 else

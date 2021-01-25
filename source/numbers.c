@@ -11,18 +11,21 @@
 static int _tile_start_idx;
 static int _number;
 
-void load_number_tiles() {
-	_tile_start_idx = allocate_tile_idx(10);
+void load_number_tiles()
+{
+	_tile_start_idx = allocate_obj_tile_idx(10);
 	dma3_cpy(&tile_mem[4][_tile_start_idx], numbersfontTiles, numbersfontTilesLen);
 	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 
 	_number = 0;
 }
 
-void unload_numbers() {
-	free_tile_idx(_tile_start_idx, 10);
+void unload_numbers()
+{
+	free_obj_tile_idx(_tile_start_idx, 10);
 }
 
-int get_number_tile_start() {
+int get_number_tile_start()
+{
 	return _tile_start_idx;
 }

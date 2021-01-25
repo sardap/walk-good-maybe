@@ -5,7 +5,7 @@
 
 #define SKY_OFFSET 76
 
-#define BUILDINGS_OFFSET 424
+#define BUILDINGS_OFFSET 0
 
 // BUILDING 0
 #define BUILDING_0_LEFT_ROOF BUILDING_0_RIGHT_ROOF
@@ -29,12 +29,19 @@
 #define BUILDING_1_MIDDLE_ROOF BUILDING_1_OFFSET + 1
 #define BUILDING_1_MIDDLE_BOT BUILDING_1_OFFSET + 3
 
-#define SPRITE_TILE_ALLC_SIZE 64
+#define OBJ_TILE_ALLC_SIZE 64
+#define BG_TILE_ALLC_SIZE 1024 * 2
 
 void init_graphics();
 
-int allocate_tile_idx(int size);
-void free_tile_idx(int idx, int size);
+int allocate_obj_tile_idx(int size);
+void free_obj_tile_idx(int idx, int size);
+
+int allocate_bg_tile_idx(int size);
+void free_bg_tile_idx(int idx, int size);
+
+int get_buildings_tile_offset();
+void set_buildings_tiles_offset(int idx);
 
 bool valid_cloud_address(int tile_offset, int sb, int width, int x, int y);
 

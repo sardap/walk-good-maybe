@@ -10,7 +10,7 @@
 			"request": "launch",
 			"program": "mGBA.exe",
 			"args": [
-				"${workspaceFolder}\\bin\\ecs.gba"
+				"${workspaceFolder}\\bin\\walk-good-maybe.gba"
 			]
 		},
 		{

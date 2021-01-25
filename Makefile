@@ -20,7 +20,7 @@ LIBTONC := $(DEVKITPRO)/tonclib $(DEVKITPRO)/libtonc
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET      	:=  bin/ecs
+TARGET      	:=  bin/walk-good-maybe
 MUSIC_TARGET 	:=  bin/music
 BUILD       	:=  build
 ASSETS 			:=	assets assets/title_screen assets/whale

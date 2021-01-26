@@ -5,7 +5,6 @@
 #include "assets/gun_0_bullet.h"
 #include "debug.h"
 
-static int _bullet_top = 0;
 static int _gun_0_tile = -1;
 
 void load_gun_0_tiles()
@@ -19,11 +18,16 @@ void unload_gun_0_tiles()
 	free_obj_tile_idx(_gun_0_tile, 1);
 }
 
-void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy)
+int gun_0_tiles()
 {
-	write_to_log(LOG_LEVEL_INFO, "CREATING BULLET");
+	return _gun_0_tile;
+}
 
-	ent_t *bul = &_ents[_bullet_top++];
+void create_bullet(
+	ent_t *bul, int att_idx, bullet_type_t type,
+	FIXED x, FIXED y, FIXED vx, FIXED vy)
+{
+	bul->att_idx = att_idx;
 	bul->bullet_type = type;
 	bul->x = x;
 	bul->y = y;
@@ -38,21 +42,12 @@ void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy)
 		break;
 	}
 
-	if (_bullet_top >= ENT_COUNT)
-	{
-		_bullet_top = 0;
-	}
+	obj_set_attr(
+		get_ent_att(bul),
+		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
+		ATTR2_ID(_gun_0_tile));
 
-	bul->att_idx = allocate_att(1);
-	char str[50];
-	sprintf(str, "NB att:%d", bul->att_idx);
-	write_to_log(LOG_LEVEL_INFO, str);
-
-	obj_set_attr(&_obj_buffer[bul->att_idx],
-				 ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
-				 ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_gun_0_tile));
-
-	obj_set_pos(&_obj_buffer[bul->att_idx], fx2int(bul->x), fx2int(bul->y));
+	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
 }
 
 void update_bullet(ent_t *bul)
@@ -62,16 +57,12 @@ void update_bullet(ent_t *bul)
 
 	int col = ent_level_collision_at(bul, 0, 0);
 
-	if (col & (LEVEL_COL_PLAYER))
-	{
-	}
-
-	if (fx2int(bul->x) > SCREEN_WIDTH || hit_x)
+	if (fx2int(bul->x) > SCREEN_WIDTH || hit_x || bul->ent_cols & (TYPE_ENEMY))
 	{
 		free_att(1, bul->att_idx);
 		bul->ent_type = TYPE_NONE;
 		return;
 	}
 
-	obj_set_pos(&_obj_buffer[bul->att_idx], fx2int(bul->x), fx2int(bul->y));
+	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
 }

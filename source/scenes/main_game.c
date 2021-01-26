@@ -99,7 +99,7 @@ static int spawn_building_0(int start_x)
 	set_level_col(x, y, BUILDING_0_RIGHT_ROOF + get_buildings_tile_offset());
 
 	int att_idx = allocate_att(1);
-	create_toast_enemy(&_ents[att_idx], att_idx, int2fx(x * 8), int2fx(30));
+	create_toast_enemy(&_ents[att_idx], att_idx, int2fx(x * 8), int2fx(160 - BUILDING_Y_SPAWN));
 
 	return width;
 }
@@ -353,7 +353,9 @@ static void update(void)
 
 	if (key_hit(KEY_B))
 	{
+		int att_idx = allocate_att(1);
 		create_bullet(
+			&_ents[att_idx], att_idx,
 			BULLET_TYPE_GUN_0, _player.x + int2fx(16), _player.y + int2fx(4),
 			float2fx(2.5f), 0);
 	}

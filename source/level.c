@@ -4,6 +4,8 @@
 #include "common.h"
 #include "debug.h"
 
+#include "gun.h"
+
 u16 _level[LEVEL_SIZE] = {};
 
 void set_level_col(int x, int y, u16 tile)

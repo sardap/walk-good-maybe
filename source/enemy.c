@@ -19,6 +19,7 @@ const uint *enemy_toast_idle_cycle[] = {
 
 static int _enemy_top_idx = 0;
 static int _enemy_tile_idx;
+static int _enemy_anime_cycle = 0;
 
 void load_enemy_toast()
 {
@@ -46,22 +47,23 @@ void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
 }
 
-void update_enemy(ent_t *ent)
+void step_enemy_global()
 {
-	if (ent->active)
-
-		if (ent->x + ent->w < 0)
-		{
-			free_att(1, ent->att_idx);
-			ent->ent_type = TYPE_NONE;
-			return;
-		}
-
 	if (frame_count() % 2)
 	{
 		step_anime(
 			enemy_toast_idle_cycle, toast_enemy_idle_01TilesLen, ENEMY_TOAST_IDLE_CYCLE,
-			&ent->anime_cycle, _enemy_tile_idx);
+			&_enemy_anime_cycle, _enemy_tile_idx);
+	}
+}
+
+void update_enemy(ent_t *ent)
+{
+	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_BULLET))
+	{
+		free_att(1, ent->att_idx);
+		ent->ent_type = TYPE_NONE;
+		return;
 	}
 
 	bool hit_y = ent_move_y(ent, ent->vy);

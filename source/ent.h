@@ -48,6 +48,7 @@ typedef struct ent_t
 	int tid;
 	int w, h;
 	int att_idx;
+	int ent_cols;
 	ent_types_t ent_type;
 	//Ent speifc vars
 	union

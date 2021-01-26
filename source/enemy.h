@@ -12,4 +12,6 @@ void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y);
 
 void update_enemy(ent_t *ent);
 
+void step_enemy_global();
+
 #endif

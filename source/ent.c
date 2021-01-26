@@ -201,6 +201,32 @@ void update_ents()
 {
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
+		if (_ents[i].ent_type == TYPE_NONE)
+		{
+			continue;
+		}
+
+		_ents[i].ent_cols = TYPE_NONE;
+		write_to_log(LOG_LEVEL_INFO, "COL LOOKING");
+
+		for (int j = 0; j < ENT_COUNT; j++)
+		{
+			if (
+				i != j &&
+				_ents[j].ent_type != TYPE_NONE &&
+				_ents[i].x < _ents[j].x + _ents[j].w &&
+				_ents[i].x + _ents[i].w > _ents[j].x &&
+				_ents[i].y < _ents[j].y + _ents[j].h &&
+				_ents[i].y + _ents[i].h < _ents[j].y)
+			{
+				_ents[i].ent_cols &= _ents[j].ent_type;
+				write_to_log(LOG_LEVEL_INFO, "COL FOUND");
+			}
+		}
+	}
+
+	for (int i = 0; i < ENT_COUNT; i++)
+	{
 		switch (_ents[i].ent_type)
 		{
 		case TYPE_BULLET:
@@ -215,4 +241,6 @@ void update_ents()
 			break;
 		}
 	}
+
+	step_enemy_global();
 }

@@ -26,7 +26,7 @@ void load_enemy_toast()
 	dma3_cpy(&tile_mem[4][_enemy_tile_idx], toast_enemy_idle_01Tiles, toast_enemy_idle_01TilesLen);
 }
 
-void create_toast_enemy(ent_t *ent, FIXED x, FIXED y)
+void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_ENEMY;
 
@@ -36,13 +36,14 @@ void create_toast_enemy(ent_t *ent, FIXED x, FIXED y)
 	ent->vy = 0;
 	ent->w = 8;
 	ent->h = 16;
-	ent->att_idx = allocate_att(1);
+	ent->att_idx = att_idx;
 
-	obj_set_attr(&_obj_buffer[ent->att_idx],
-				 ATTR0_TALL | ATTR0_8BPP, ATTR1_SIZE_8x16,
-				 ATTR2_PALBANK(0) | ATTR2_PRIO(1) | ATTR2_ID(_enemy_tile_idx));
+	obj_set_attr(
+		get_ent_att(ent),
+		ATTR0_TALL | ATTR0_8BPP, ATTR1_SIZE_16x8,
+		ATTR2_PRIO(1) | ATTR2_ID(_enemy_tile_idx));
 
-	obj_set_pos(&_obj_buffer[ent->att_idx], fx2int(ent->x), fx2int(ent->y));
+	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
 }
 
 void destroy_toast_enemy(ent_t *ent)
@@ -59,9 +60,12 @@ void update_enemy(ent_t *ent)
 		return;
 	}
 
-	step_anime(
-		enemy_toast_idle_cycle, toast_enemy_idle_01TilesLen, ENEMY_TOAST_IDLE_CYCLE,
-		&ent->anime_cycle, _enemy_tile_idx);
+	if (frame_count() % 2)
+	{
+		step_anime(
+			enemy_toast_idle_cycle, toast_enemy_idle_01TilesLen, ENEMY_TOAST_IDLE_CYCLE,
+			&ent->anime_cycle, _enemy_tile_idx);
+	}
 
 	bool hit_y = ent_move_y(ent, ent->vy);
 	// Applies gravity

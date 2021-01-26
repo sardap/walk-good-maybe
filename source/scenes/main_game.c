@@ -98,6 +98,9 @@ static int spawn_building_0(int start_x)
 	set_level_at(x, y, BUILDING_0_MIDDLE_ROOF + get_buildings_tile_offset());
 	set_level_col(x, y, BUILDING_0_RIGHT_ROOF + get_buildings_tile_offset());
 
+	int att_idx = allocate_att(1);
+	create_toast_enemy(&_ents[att_idx], att_idx, int2fx(x * 8), int2fx(30));
+
 	return width;
 }
 
@@ -147,12 +150,6 @@ static void spawn_buildings()
 	_building_spawn_x = level_wrap_x(start_x + width);
 
 	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
-
-	int count = gba_rand_range(0, 3);
-	for (int i = 0; i < count; i++)
-	{
-		// create_toast_enemy(&_ents, int2fx(120), int2fx(30));
-	}
 }
 
 static void spawn_cloud()
@@ -260,21 +257,21 @@ static void show(void)
 	_building_spawn_x = 0;
 	_state = MG_S_STARTING;
 
-	while (_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
-	{
-		spawn_buildings();
-	}
-
 	init_player();
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 
+	load_enemy_toast();
 	load_number_tiles();
 	init_score();
-	// load_enemy_toast();
 
-	mmSetModuleVolume(600);
+	mmSetModuleVolume(300);
 	mmStart(MOD_INTRO, MM_PLAY_ONCE);
+
+	while (_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
+	{
+		spawn_buildings();
+	}
 }
 
 static bool check_game_over()

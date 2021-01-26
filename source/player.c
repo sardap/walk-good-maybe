@@ -43,7 +43,8 @@ void init_player()
 {
 	load_player_tile();
 
-	_player.att_idx = allocate_att(1);
+	//Reserved for player
+	_player.att_idx = 0;
 	_player_anime_cycle = 0;
 
 	_player.tid = _tile_start_idx;
@@ -57,9 +58,10 @@ void init_player()
 
 	_player.ent_type = TYPE_PLAYER;
 
-	obj_set_attr(&_obj_buffer[_player.att_idx],
-				 ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_16x16,
-				 ATTR2_PALBANK(0) | _player.tid);
+	obj_set_attr(
+		get_ent_att(&_player),
+		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_16x16,
+		ATTR2_PALBANK(0) | _player.tid);
 }
 
 void unload_player()

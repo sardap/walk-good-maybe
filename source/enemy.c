@@ -46,19 +46,16 @@ void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
 }
 
-void destroy_toast_enemy(ent_t *ent)
-{
-	ent->att_idx = 0;
-}
-
 void update_enemy(ent_t *ent)
 {
-	if (ent->x + ent->w < 0)
-	{
-		free_att(1, ent->att_idx);
-		destroy_toast_enemy(ent);
-		return;
-	}
+	if (ent->active)
+
+		if (ent->x + ent->w < 0)
+		{
+			free_att(1, ent->att_idx);
+			ent->ent_type = TYPE_NONE;
+			return;
+		}
 
 	if (frame_count() % 2)
 	{

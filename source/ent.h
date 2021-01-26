@@ -11,10 +11,12 @@
 #define def extern
 #endif
 
-#define ENT_COUNT 100
+//Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
+#define ENT_COUNT 50
 
 typedef enum ent_types_t
 {
+	TYPE_NONE,
 	TYPE_PLAYER,
 	TYPE_BULLET,
 	TYPE_ENEMY

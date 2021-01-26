@@ -57,11 +57,6 @@ void create_bullet(bullet_type_t type, FIXED x, FIXED y, FIXED vx, FIXED vy)
 
 void update_bullet(ent_t *bul)
 {
-	if (!bul->active)
-	{
-		return;
-	}
-
 	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
 	ent_move_y(bul, bul->vy);
 
@@ -73,35 +68,10 @@ void update_bullet(ent_t *bul)
 
 	if (fx2int(bul->x) > SCREEN_WIDTH || hit_x)
 	{
-		write_to_log(LOG_LEVEL_INFO, "destroying BULLET");
 		free_att(1, bul->att_idx);
-		bul->active = false;
+		bul->ent_type = TYPE_NONE;
 		return;
 	}
 
 	obj_set_pos(&_obj_buffer[bul->att_idx], fx2int(bul->x), fx2int(bul->y));
 }
-
-// void update_bullets() {
-// 	for(int i = 0; i < ENTS_LENGTH; i++) {
-// 		if(!_ents[i].active) {
-// 			continue;
-// 		}
-
-// 		bool hit_x = ent_move_x(&_ents[i], _ents[i].vx - _scroll_x);
-// 		ent_move_y(&_ents[i], _ents[i].vy);
-
-// 		int col = ent_level_collision_at(&_ents[i], 0, 0);
-// 		if(col & (LEVEL_COL_PLAYER)) {
-
-// 		}
-
-// 		if(fx2int(_ents[i].x) > SCREEN_WIDTH || hit_x) {
-// 			free_att(1, _ents[i].att_idx);
-// 			_ents[i].active = false;
-// 			continue;
-// 		}
-
-// 		obj_set_pos(&_obj_buffer[_ents[i].att_idx], fx2int(_ents[i].x), fx2int(_ents[i].y));
-// 	}
-// }

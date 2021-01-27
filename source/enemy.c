@@ -17,7 +17,6 @@ const uint *enemy_toast_idle_cycle[] = {
 	toast_enemy_idle_01Tiles, toast_enemy_idle_01Tiles, toast_enemy_idle_02Tiles,
 	toast_enemy_idle_03Tiles, toast_enemy_idle_04Tiles, toast_enemy_idle_05Tiles};
 
-static int _enemy_top_idx = 0;
 static int _enemy_tile_idx;
 static int _enemy_anime_cycle = 0;
 
@@ -32,11 +31,11 @@ void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->ent_type = TYPE_ENEMY;
 
 	ent->x = x;
+	ent->w = 8;
 	ent->y = y;
+	ent->h = 16;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->w = 8;
-	ent->h = 16;
 	ent->att_idx = att_idx;
 
 	obj_set_attr(

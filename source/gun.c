@@ -30,7 +30,9 @@ void create_bullet(
 	bul->att_idx = att_idx;
 	bul->bullet_type = type;
 	bul->x = x;
+	bul->w = 5;
 	bul->y = y;
+	bul->h = 5;
 	bul->vx = vx;
 	bul->vy = vy;
 	bul->active = true;

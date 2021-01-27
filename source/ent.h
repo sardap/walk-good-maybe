@@ -12,7 +12,7 @@
 #endif
 
 //Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
-#define ENT_COUNT 50
+#define ENT_COUNT 25
 
 typedef enum ent_types_t
 {

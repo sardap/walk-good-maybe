@@ -5,6 +5,9 @@ log/
 
 assets/whale/*.png
 assets/enemy/*.png
+assets/background/*.png
+assets/text/*.png
+assets/weapons/*.png
 
 assets/out.png
 __debug_bin

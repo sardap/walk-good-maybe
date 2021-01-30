@@ -91,7 +91,6 @@ BG_OPTIONS="$BG_OPTIONS -m"						# Export map
 BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
-BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
 BG_OPTIONS="$BG_OPTIONS -O mainGameShared"	# Shared pallet name
 
 echo "Creating background tiles for main game / pal / map"
@@ -99,7 +98,7 @@ grit \
 	$ASSETS/backgrounds_out.png \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
-	$ASSETS/background/build_tile_set.png $BG_OPTIONS
+	$ASSETS/background/buildingtileset.png $BG_OPTIONS
 
 
 BG_OPTIONS=""

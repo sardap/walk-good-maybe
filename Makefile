@@ -20,7 +20,7 @@ LIBTONC := $(DEVKITPRO)/tonclib $(DEVKITPRO)/libtonc
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET      	:=  bin/ecs
+TARGET      	:=  bin/walk-good-maybe
 MUSIC_TARGET 	:=  bin/music
 BUILD       	:=  build
 ASSETS 			:=	assets assets/title_screen assets/whale
@@ -136,6 +136,7 @@ assets: $(shell find assets/ -type f -name '.psd')
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).gba $(MUSIC_OUPUT).gba
+	@rm -rf "source/assets"
 
 #---------------------------------------------------------------------------------
 else

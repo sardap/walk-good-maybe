@@ -99,7 +99,24 @@ static int spawn_building_0(int start_x)
 	set_level_col(x, y, BUILDING_0_RIGHT_ROOF + get_buildings_tile_offset());
 
 	int att_idx = allocate_att(1);
-	create_toast_enemy(&_ents[att_idx], att_idx, int2fx(x * 8), int2fx(160 - BUILDING_Y_SPAWN));
+	if (att_idx != -1)
+	{
+		int enemy_x = gba_rand_range(x_base, x_base + width);
+		char str[75];
+		sprintf(
+			str, "ex:%d,ey:%d,xs:%d,xe:%d,y:%d",
+			level_wrap_x(enemy_x) *
+				8,
+			y * 8 + 16,
+			level_wrap_x(x_base) * 8,
+			level_wrap_x(x_base + width) * 8,
+			y * 8);
+		write_to_log(LOG_LEVEL_INFO, str);
+
+		create_toast_enemy(
+			&_ents[att_idx], att_idx,
+			int2fx(level_wrap_x(enemy_x) * 8), int2fx(y * 8 - 32));
+	}
 
 	return width;
 }

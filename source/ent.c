@@ -58,7 +58,7 @@ int allocate_att(int count)
 		i += count;
 	}
 
-	return 0;
+	return -1;
 }
 
 void free_att(int count, int idx)

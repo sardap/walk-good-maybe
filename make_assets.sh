@@ -45,8 +45,8 @@ add_objects "./assets/weapons"
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
 
-go run tools/colour-agg/main.go ./assets/objects_out.png $OBJECTS
-go run tools/colour-agg/main.go ./assets/backgrounds_out.png $BACKGROUNDS
+colour-agg.exe ./assets/objects_out.png $OBJECTS
+colour-agg.exe ./assets/backgrounds_out.png $BACKGROUNDS
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH

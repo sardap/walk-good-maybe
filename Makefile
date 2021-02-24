@@ -120,16 +120,16 @@ export INCLUDE	:=	$(foreach dir,$(INCLUDES),-iquote $(CURDIR)/$(dir)) \
 
 export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
-.PHONY: $(BUILD) clean assets
+.PHONY: $(BUILD) clean
 
 #---------------------------------------------------------------------------------
-$(BUILD):
+$(BUILD): assets
 	@echo $(INCLUDES)
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
-assets: $(shell find assets/ -type f -name '.psd')
+assets: $(shell find assets/ -type f -name '*.psd')
 	@./make_assets.sh
 
 #---------------------------------------------------------------------------------

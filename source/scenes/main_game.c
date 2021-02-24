@@ -52,8 +52,9 @@ static FIXED wrap_x(FIXED x)
 
 static inline int offset_x_bg(int n)
 {
-	int nfx = (n * 8) * FIX_SCALE;
-	return fx2int(wrap_x(_bg_pos_x + nfx)) / 8;
+	//What the fuck is nfx
+	int nfx = (n * TILE_WIDTH) * FIX_SCALE;
+	return fx2int(wrap_x(_bg_pos_x + nfx)) / TILE_WIDTH;
 }
 
 static void wrap_bkg()
@@ -101,21 +102,28 @@ static int spawn_building_0(int start_x)
 	int att_idx = allocate_att(1);
 	if (att_idx != -1)
 	{
-		int enemy_x = gba_rand_range(x_base, x_base + width);
+		int enemy_x = x_base + width / 2;
+		FIXED enmey_x_fx = int2fx(enemy_x * TILE_WIDTH) + _bg_pos_x;
+
+		if (enmey_x_fx > int2fx(512))
+		{
+			enmey_x_fx = enmey_x_fx - int2fx(512);
+		}
+
 		char str[75];
 		sprintf(
-			str, "ex:%d,ey:%d,xs:%d,xe:%d,y:%d",
-			level_wrap_x(enemy_x) *
-				8,
-			y * 8 + 16,
-			level_wrap_x(x_base) * 8,
-			level_wrap_x(x_base + width) * 8,
-			y * 8);
+			str, "bg:%d,i:%d,f:%d",
+			fx2int(_bg_pos_x),
+			enemy_x,
+			fx2int(enmey_x_fx));
+
 		write_to_log(LOG_LEVEL_INFO, str);
 
-		create_toast_enemy(
-			&_ents[att_idx], att_idx,
-			int2fx(level_wrap_x(enemy_x) * 8), int2fx(y * 8 - 32));
+		free_att(1, att_idx);
+
+		// create_toast_enemy(
+		// 	&_ents[att_idx], att_idx,
+		// 	enmey_x_fx, int2fx(y * 8 - 32));
 	}
 
 	return width;
@@ -167,24 +175,6 @@ static void spawn_buildings()
 	_building_spawn_x = level_wrap_x(start_x + width);
 
 	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
-}
-
-static void spawn_cloud()
-{
-	int x = offset_x_bg(32);
-	int y = gba_rand_range(0, 10);
-	int sb = MG_CLOUD_SB;
-	wrap_x_sb(&x, &sb);
-
-	se_plot(se_mem[sb], x + 0, y, SKY_OFFSET + 1);
-	se_plot(se_mem[sb], x + 1, y, SKY_OFFSET + 2);
-	se_plot(se_mem[sb], x + 2, y, SKY_OFFSET + 3);
-	se_plot(se_mem[sb], x + 3, y, SKY_OFFSET + 4);
-
-	se_plot(se_mem[sb], x + 0, y + 1, SKY_OFFSET + 5);
-	se_plot(se_mem[sb], x + 1, y + 1, SKY_OFFSET + 6);
-	se_plot(se_mem[sb], x + 2, y + 1, SKY_OFFSET + 7);
-	se_plot(se_mem[sb], x + 3, y + 1, SKY_OFFSET + 8);
 }
 
 static void clear_offscreen(int sb)
@@ -356,7 +346,6 @@ static void update(void)
 
 	if (_next_cloud_spawn < 0 && false)
 	{
-		spawn_cloud();
 		_next_cloud_spawn = gba_rand_range(
 								fx2int(CLOUD_WIDTH),
 								fx2int(CLOUD_WIDTH + (int)(100 * FIX_SCALE))) *

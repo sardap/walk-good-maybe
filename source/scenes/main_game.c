@@ -25,7 +25,6 @@
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
-static int _tmp;
 static int _bg_0_scroll;
 static int _bg_2_scroll;
 
@@ -98,33 +97,6 @@ static int spawn_building_0(int start_x)
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_0_MIDDLE_ROOF + get_buildings_tile_offset());
 	set_level_col(x, y, BUILDING_0_RIGHT_ROOF + get_buildings_tile_offset());
-
-	int att_idx = allocate_att(1);
-	if (att_idx != -1)
-	{
-		int enemy_x = x_base + width / 2;
-		FIXED enmey_x_fx = int2fx(enemy_x * TILE_WIDTH) + _bg_pos_x;
-
-		if (enmey_x_fx > int2fx(512))
-		{
-			enmey_x_fx = enmey_x_fx - int2fx(512);
-		}
-
-		char str[75];
-		sprintf(
-			str, "bg:%d,i:%d,f:%d",
-			fx2int(_bg_pos_x),
-			enemy_x,
-			fx2int(enmey_x_fx));
-
-		write_to_log(LOG_LEVEL_INFO, str);
-
-		free_att(1, att_idx);
-
-		// create_toast_enemy(
-		// 	&_ents[att_idx], att_idx,
-		// 	enmey_x_fx, int2fx(y * 8 - 32));
-	}
 
 	return width;
 }

@@ -85,12 +85,27 @@ static int spawn_building_0(int start_x)
 	set_level_col(x_base, y + 1, BUILDING_0_LEFT_ROOF + get_buildings_tile_offset());
 
 	int width = gba_rand_range(5, 10);
-	//MIDDLE SECTION
 	for (int i = 1; i < width; i++)
 	{
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_0_MIDDLE_ROOF + get_buildings_tile_offset());
 		set_level_col(x, y + 1, BUILDING_0_MIDDLE_BOT + get_buildings_tile_offset());
+	}
+
+	if (gba_rand() % 4 == 0)
+	{
+		int lava_width = gba_rand_range(2, width);
+		int start = gba_rand_range(1, width - lava_width);
+		for (int i = start; i < lava_width; i++)
+		{
+			x = level_wrap_x(x_base + i);
+			if (i == start)
+				set_level_at(x, y, LAVA_LEFT + get_buildings_tile_offset());
+			else if (i == lava_width - 1)
+				set_level_at(x, y, LAVA_RIGHT + get_buildings_tile_offset());
+			else
+				set_level_at(x, y, LAVA_MIDDLE + get_buildings_tile_offset());
+		}
 	}
 
 	//RIGHT SECTION

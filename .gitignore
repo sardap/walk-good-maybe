@@ -16,3 +16,6 @@ mus_edit/
 
 backgrounds_out.png
 objects_out.png
+
+act/
+.actrc

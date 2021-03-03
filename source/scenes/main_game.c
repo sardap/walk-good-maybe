@@ -25,7 +25,6 @@
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
-static int _tmp;
 static int _bg_0_scroll;
 static int _bg_2_scroll;
 
@@ -52,8 +51,9 @@ static FIXED wrap_x(FIXED x)
 
 static inline int offset_x_bg(int n)
 {
-	int nfx = (n * 8) * FIX_SCALE;
-	return fx2int(wrap_x(_bg_pos_x + nfx)) / 8;
+	//What the fuck is nfx
+	int nfx = (n * TILE_WIDTH) * FIX_SCALE;
+	return fx2int(wrap_x(_bg_pos_x + nfx)) / TILE_WIDTH;
 }
 
 static void wrap_bkg()
@@ -74,6 +74,22 @@ static void wrap_x_sb(int *x, int *sb)
 	}
 }
 
+static void spawn_lava(int width, int x_base, int y)
+{
+	int lava_width = gba_rand_range(2, width - 2);
+	int start = gba_rand_range(1, width - lava_width);
+	for (int i = start; i < start + lava_width; i++)
+	{
+		int x = level_wrap_x(x_base + i);
+		if (i == start)
+			set_level_at(x, y, LAVA_LEFT + get_buildings_tile_offset());
+		else if (i == start + lava_width - 1)
+			set_level_at(x, y, LAVA_RIGHT + get_buildings_tile_offset());
+		else
+			set_level_at(x, y, LAVA_MIDDLE + get_buildings_tile_offset());
+	}
+}
+
 static int spawn_building_0(int start_x)
 {
 	int x_base = start_x;
@@ -85,7 +101,6 @@ static int spawn_building_0(int start_x)
 	set_level_col(x_base, y + 1, BUILDING_0_LEFT_ROOF + get_buildings_tile_offset());
 
 	int width = gba_rand_range(5, 10);
-	//MIDDLE SECTION
 	for (int i = 1; i < width; i++)
 	{
 		x = level_wrap_x(x_base + i);
@@ -93,30 +108,15 @@ static int spawn_building_0(int start_x)
 		set_level_col(x, y + 1, BUILDING_0_MIDDLE_BOT + get_buildings_tile_offset());
 	}
 
+	if (width > 3 && gba_rand() % 2 == 0)
+	{
+		spawn_lava(width, x_base, y);
+	}
+
 	//RIGHT SECTION
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_0_MIDDLE_ROOF + get_buildings_tile_offset());
 	set_level_col(x, y, BUILDING_0_RIGHT_ROOF + get_buildings_tile_offset());
-
-	int att_idx = allocate_att(1);
-	if (att_idx != -1)
-	{
-		int enemy_x = gba_rand_range(x_base, x_base + width);
-		char str[75];
-		sprintf(
-			str, "ex:%d,ey:%d,xs:%d,xe:%d,y:%d",
-			level_wrap_x(enemy_x) *
-				8,
-			y * 8 + 16,
-			level_wrap_x(x_base) * 8,
-			level_wrap_x(x_base + width) * 8,
-			y * 8);
-		write_to_log(LOG_LEVEL_INFO, str);
-
-		create_toast_enemy(
-			&_ents[att_idx], att_idx,
-			int2fx(level_wrap_x(enemy_x) * 8), int2fx(y * 8 - 32));
-	}
 
 	return width;
 }
@@ -138,6 +138,11 @@ static int spawn_building_1(int start_x)
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_1_MIDDLE_ROOF + get_buildings_tile_offset());
 		set_level_col(x, y + 1, BUILDING_1_MIDDLE_BOT + get_buildings_tile_offset());
+	}
+
+	if (width > 3 && gba_rand() % 5 == 0)
+	{
+		spawn_lava(width, x_base, y);
 	}
 
 	//RIGHT SECTION
@@ -167,24 +172,6 @@ static void spawn_buildings()
 	_building_spawn_x = level_wrap_x(start_x + width);
 
 	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
-}
-
-static void spawn_cloud()
-{
-	int x = offset_x_bg(32);
-	int y = gba_rand_range(0, 10);
-	int sb = MG_CLOUD_SB;
-	wrap_x_sb(&x, &sb);
-
-	se_plot(se_mem[sb], x + 0, y, SKY_OFFSET + 1);
-	se_plot(se_mem[sb], x + 1, y, SKY_OFFSET + 2);
-	se_plot(se_mem[sb], x + 2, y, SKY_OFFSET + 3);
-	se_plot(se_mem[sb], x + 3, y, SKY_OFFSET + 4);
-
-	se_plot(se_mem[sb], x + 0, y + 1, SKY_OFFSET + 5);
-	se_plot(se_mem[sb], x + 1, y + 1, SKY_OFFSET + 6);
-	se_plot(se_mem[sb], x + 2, y + 1, SKY_OFFSET + 7);
-	se_plot(se_mem[sb], x + 3, y + 1, SKY_OFFSET + 8);
 }
 
 static void clear_offscreen(int sb)
@@ -356,7 +343,6 @@ static void update(void)
 
 	if (_next_cloud_spawn < 0 && false)
 	{
-		spawn_cloud();
 		_next_cloud_spawn = gba_rand_range(
 								fx2int(CLOUD_WIDTH),
 								fx2int(CLOUD_WIDTH + (int)(100 * FIX_SCALE))) *

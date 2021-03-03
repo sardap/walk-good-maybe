@@ -1,0 +1,10 @@
+bin/
+assets/
+build/
+data/
+lib/
+log/
+mus_edit/
+music/
+source/
+.git/

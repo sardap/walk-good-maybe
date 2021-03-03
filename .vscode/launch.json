@@ -9,6 +9,7 @@
 			"type":"clr",
 			"request": "launch",
 			"program": "mGBA.exe",
+			"preLaunchTask": "build-rom",
 			"args": [
 				"${workspaceFolder}\\bin\\walk-good-maybe.gba"
 			]
@@ -18,6 +19,7 @@
 			"type":"clr",
 			"request": "launch",
 			"program": "mGBA.exe",
+			"preLaunchTask": "build-rom",
 			"args": [
 				"${workspaceFolder}\\bin\\music.gba"
 			]
@@ -32,6 +34,7 @@
 				"out.png",
 				"example.png"
 			]
-		}
+		},
+		
 	]
 }

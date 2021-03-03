@@ -53,6 +53,7 @@ LDFLAGS  =   -g $(ARCH) -Wl,-Map,$(notdir $@).map
 # Create assets
 #---------------------------------------------------------------------------------
 PNGS		:=	$(foreach dir,$(ASSETS),$(notdir $(wildcard $(dir)/*.png)))
+PSDS		:=	$(foreach dir,$(ASSETS),$(notdir $(wildcard $(dir)/*.psd)))
 
 #---------------------------------------------------------------------------------
 # path to tools - this can be deleted if you set the path to the toolchain in windows
@@ -129,7 +130,7 @@ $(BUILD):
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
-assets: $(shell find assets/ -type f -name '.psd')
+assets:
 	@./make_assets.sh
 
 #---------------------------------------------------------------------------------

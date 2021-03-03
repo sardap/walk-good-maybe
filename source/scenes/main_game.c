@@ -74,6 +74,22 @@ static void wrap_x_sb(int *x, int *sb)
 	}
 }
 
+static void spawn_lava(int width, int x_base, int y)
+{
+	int lava_width = gba_rand_range(2, width - 2);
+	int start = gba_rand_range(1, width - lava_width);
+	for (int i = start; i < start + lava_width; i++)
+	{
+		int x = level_wrap_x(x_base + i);
+		if (i == start)
+			set_level_at(x, y, LAVA_LEFT + get_buildings_tile_offset());
+		else if (i == start + lava_width - 1)
+			set_level_at(x, y, LAVA_RIGHT + get_buildings_tile_offset());
+		else
+			set_level_at(x, y, LAVA_MIDDLE + get_buildings_tile_offset());
+	}
+}
+
 static int spawn_building_0(int start_x)
 {
 	int x_base = start_x;
@@ -92,20 +108,9 @@ static int spawn_building_0(int start_x)
 		set_level_col(x, y + 1, BUILDING_0_MIDDLE_BOT + get_buildings_tile_offset());
 	}
 
-	if (gba_rand() % 4 == 0)
+	if (width > 3 && gba_rand() % 2 == 0)
 	{
-		int lava_width = gba_rand_range(2, width);
-		int start = gba_rand_range(1, width - lava_width);
-		for (int i = start; i < lava_width; i++)
-		{
-			x = level_wrap_x(x_base + i);
-			if (i == start)
-				set_level_at(x, y, LAVA_LEFT + get_buildings_tile_offset());
-			else if (i == lava_width - 1)
-				set_level_at(x, y, LAVA_RIGHT + get_buildings_tile_offset());
-			else
-				set_level_at(x, y, LAVA_MIDDLE + get_buildings_tile_offset());
-		}
+		spawn_lava(width, x_base, y);
 	}
 
 	//RIGHT SECTION
@@ -133,6 +138,11 @@ static int spawn_building_1(int start_x)
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_1_MIDDLE_ROOF + get_buildings_tile_offset());
 		set_level_col(x, y + 1, BUILDING_1_MIDDLE_BOT + get_buildings_tile_offset());
+	}
+
+	if (width > 3 && gba_rand() % 5 == 0)
+	{
+		spawn_lava(width, x_base, y);
 	}
 
 	//RIGHT SECTION

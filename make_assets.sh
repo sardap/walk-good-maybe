@@ -3,8 +3,9 @@
 # Stolen from goodboy advanced
 
 OUTPATH="source/assets"
-ASSETS="../../assets"
+ASSETS="${PWD}/assets"
 
+PWD_OLD=$(pwd)
 
 function gen_png {
 	echo "pnging $1"
@@ -17,7 +18,8 @@ OBJECTS=""
 
 function add_objects {
 	for i in $(find $1 -type f -name "*.png"); do
-		OBJECTS="$OBJECTS $PWD/${i%.*}.png "
+		TMP="${i%.*}.png"
+		OBJECTS="$OBJECTS $PWD/${TMP:2} "
 	done
 }
 
@@ -25,13 +27,15 @@ BACKGROUNDS=""
 
 function add_background {
 	for i in $(find $1 -type f -name "*.png"); do
-		BACKGROUNDS="$BACKGROUNDS $PWD/${i%.*}.png "
+		BACKGROUNDS="$BACKGROUNDS ${i%.*}.png "
 	done
 }
 
 
 gen_png "./assets/background"
 add_background "./assets/background"
+
+colour-agg.exe ./assets/backgrounds_out.png $BACKGROUNDS
 
 gen_png "./assets/whale"
 add_objects "./assets/whale"
@@ -45,8 +49,7 @@ add_objects "./assets/weapons"
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
 
-colour-agg.exe ./assets/objects_out.png $OBJECTS
-colour-agg.exe ./assets/backgrounds_out.png $BACKGROUNDS
+# colour-agg.exe ./assets/objects_out.png $OBJECTS
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -78,7 +81,6 @@ SP_OPTIONS="$SP_OPTIONS -O spriteShared"		# Shared pallet name
 
 echo "Creating object tiles / pal / map"
 grit \
-	$ASSETS/objects_out.png \
 	$OBJECTS \
 	$SP_OPTIONS
 
@@ -95,7 +97,6 @@ BG_OPTIONS="$BG_OPTIONS -O mainGameShared"	# Shared pallet name
 
 echo "Creating background tiles for main game / pal / map"
 grit \
-	$ASSETS/backgrounds_out.png \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
 	$ASSETS/background/buildingtileset.png $BG_OPTIONS
@@ -119,3 +120,6 @@ grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/cloud.png \
 	$ASSETS/background/backgroundSky.png $BG_OPTIONS
+
+echo "compelte creating assets"
+cd ${PWD_OLD}

@@ -10,7 +10,8 @@ RUN go build -o main .
 
 ##################################################
 
-FROM devkitpro/devkitarm:20200730 as GBA-builder
+#Devkit pro image is out of date also deabain is fucked here for some reason
+FROM devkitpro/devkitarm:latest as GBA-builder
 
 # Needed for creating assets
 RUN apt-get update \
@@ -22,5 +23,9 @@ RUN mkdir /app
 
 WORKDIR /app
 
-ENTRYPOINT [ "make" ]
+COPY build.sh .
+
+RUN chmod +x build.sh
+
+ENTRYPOINT [ "./build.sh" ]
 CMD [ "build" ]

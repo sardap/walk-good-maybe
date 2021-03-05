@@ -13,6 +13,7 @@
 #define MIN_JUMP_WIDTH_TILES 3
 
 #define GRAVITY (int)(1.5f * (FIX_SHIFT))
+#define LAVA_BOUNCE (int)(110.5f * (FIX_SHIFT))
 #define TERMINAL_VY GRAVITY * 20
 
 #define GBA_WIDTH 240
@@ -23,7 +24,8 @@
 
 #define SCORE_DIGITS 4
 
-typedef struct scene_t {
+typedef struct scene_t
+{
 	void (*show)(void);
 	void (*update)(void);
 	void (*hide)(void);
@@ -42,7 +44,8 @@ void common_step();
 void init_seed(int seed);
 int gba_rand();
 
-inline int gba_rand_range(int min, int max) {
+inline int gba_rand_range(int min, int max)
+{
 	return (gba_rand() % (max - min + 1)) + min;
 }
 

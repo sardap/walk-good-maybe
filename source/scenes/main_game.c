@@ -82,7 +82,7 @@ static void spawn_lava(int width, int x_base, int y)
 	{
 		int x = level_wrap_x(x_base + i);
 		if (i == start)
-			set_level_at(x, y, LAVA_LEFT + get_buildings_tile_offset());
+			set_level_at(x, y, LAVA_TILE_LEFT + get_buildings_tile_offset());
 		else if (i == start + lava_width - 1)
 			set_level_at(x, y, LAVA_RIGHT + get_buildings_tile_offset());
 		else

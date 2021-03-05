@@ -29,11 +29,17 @@ bool col_cleared(int x)
 	return true;
 }
 
+//Slow point
 int tile_to_collision(u16 tile)
 {
 	if (tile < get_buildings_tile_offset())
 	{
 		return LEVEL_COL_EMPTY;
+	}
+
+	if (tile >= get_buildings_tile_offset() + LAVA_OFFSET && tile <= get_buildings_tile_offset() + LAVA_END)
+	{
+		return LEVEL_LAVA;
 	}
 
 	return LEVEL_COL_GROUND;

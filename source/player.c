@@ -100,6 +100,7 @@ void update_player()
 		_player.vx += -SPEED;
 	}
 
+	// Update v
 	switch (_player.move_state)
 	{
 	case MOVEMENT_AIR:
@@ -126,6 +127,15 @@ void update_player()
 		}
 	}
 
+	//Apply lava shit
+	if (ent_level_collision(&_player) & (LEVEL_LAVA))
+	{
+		_player.vy -= LAVA_BOUNCE;
+		_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
+		_player.move_state = MOVEMENT_AIR;
+	}
+
+	//Handles player anime
 	switch (_player.move_state)
 	{
 	case MOVEMENT_GROUNDED:

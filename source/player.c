@@ -7,6 +7,7 @@
 #include "debug.h"
 #include "graphics.h"
 #include "anime.h"
+#include "life_display.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -27,6 +28,7 @@ static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
 
 static int _player_anime_cycle;
 static int _tile_start_idx;
+static int _player_life;
 
 ent_t _player = {};
 
@@ -46,6 +48,7 @@ void init_player()
 	//Reserved for player
 	_player.att_idx = 0;
 	_player_anime_cycle = 0;
+	_player_life = PLAYER_LIFE_START;
 
 	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
@@ -66,8 +69,14 @@ void init_player()
 
 void unload_player()
 {
-	free_att(1, _player.att_idx);
+	free_att(_player.att_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
+}
+
+static void apply_player_damage(int ammount)
+{
+	_player_life -= ammount;
+	update_life_display(_player_life);
 }
 
 void update_player()
@@ -133,6 +142,7 @@ void update_player()
 		_player.vy -= LAVA_BOUNCE;
 		_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
 		_player.move_state = MOVEMENT_AIR;
+		apply_player_damage(1);
 	}
 
 	//Handles player anime

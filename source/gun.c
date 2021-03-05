@@ -61,7 +61,7 @@ void update_bullet(ent_t *bul)
 
 	if (fx2int(bul->x) > SCREEN_WIDTH || hit_x || bul->ent_cols & (TYPE_ENEMY))
 	{
-		free_att(1, bul->att_idx);
+		free_att(bul->att_idx, 1);
 		bul->ent_type = TYPE_NONE;
 		return;
 	}

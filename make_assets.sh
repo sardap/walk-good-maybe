@@ -43,11 +43,16 @@ add_objects "./assets/whale"
 gen_png "./assets/text"
 add_objects "./assets/text"
 
+gen_png "./assets/misc"
+add_objects "./assets/misc"
+
 gen_png "./assets/weapons"
 add_objects "./assets/weapons"
 
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
+
+OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
 # colour-agg.exe ./assets/objects_out.png $OBJECTS
 

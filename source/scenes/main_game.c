@@ -15,6 +15,7 @@
 #include "../numbers.h"
 #include "../gun.h"
 #include "../enemy.h"
+#include "../life_display.h"
 
 #include "../assets/title_text.h"
 #include "../assets/backgroundCity.h"
@@ -76,7 +77,7 @@ static void wrap_x_sb(int *x, int *sb)
 
 static void spawn_lava(int width, int x_base, int y)
 {
-	int lava_width = gba_rand_range(2, width - 2);
+	int lava_width = gba_rand_range(3, width - 2);
 	int start = gba_rand_range(1, width - lava_width);
 	for (int i = start; i < start + lava_width; i++)
 	{
@@ -207,9 +208,9 @@ static void show(void)
 	dma3_cpy(&tile_mem[MG_SHARED_CB][_fog_tiles_idx], fogTiles, fogTilesLen);
 
 	_foreground_build_tile_idx = _fog_tiles_idx + fogTilesLen / 32;
-	sprintf(str, "fg:%d", _foreground_build_tile_idx / 2);
-	write_to_log(LOG_LEVEL_INFO, str);
 	dma3_cpy(&tile_mem[MG_SHARED_CB][_foreground_build_tile_idx], buildingtilesetTiles, buildingtilesetTilesLen);
+
+	load_life_display();
 
 	set_buildings_tiles_offset(_foreground_build_tile_idx / 2 + 1);
 

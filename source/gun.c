@@ -57,8 +57,6 @@ void update_bullet(ent_t *bul)
 	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
 	ent_move_y(bul, bul->vy);
 
-	int col = ent_level_collision_at(bul, 0, 0);
-
 	if (fx2int(bul->x) > SCREEN_WIDTH || hit_x || bul->ent_cols & (TYPE_ENEMY))
 	{
 		free_att(bul->att_idx, 1);

@@ -27,24 +27,17 @@ void load_life_display()
 
 void update_life_display(int life)
 {
-	void *src;
-	uint size;
+	u32 *tiles = (u32 *)lifeAmmount1Tiles;
 	switch (life)
 	{
 	case 3:
-		src = lifeAmmount3Tiles;
-		size = lifeAmmount3TilesLen;
+		tiles = (u32 *)lifeAmmount3Tiles;
 		break;
 	case 2:
-		src = lifeAmmount2Tiles;
-		size = lifeAmmount2TilesLen;
-		break;
-	case 1:
-		src = lifeAmmount1Tiles;
-		size = lifeAmmount1TilesLen;
+		tiles = (u32 *)lifeAmmount2Tiles;
 		break;
 	}
-	dma3_cpy(&tile_mem[4][_life_tile_start_idx], src, size);
+	dma3_cpy(&tile_mem[4][_life_tile_start_idx], tiles, lifeAmmount3TilesLen);
 }
 
 void unload_life_display()

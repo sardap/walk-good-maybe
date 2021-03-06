@@ -2,6 +2,10 @@
 
 #include <tonc.h>
 #include <stdlib.h>
+#include <maxmod.h>
+
+#include "soundbank.h"
+#include "soundbank_bin.h"
 #include "common.h"
 #include "ent.h"
 #include "debug.h"
@@ -76,6 +80,17 @@ void unload_player()
 static void apply_player_damage(int ammount)
 {
 	_player_life -= ammount;
+
+	//Play sound
+	mm_sound_effect damage = {
+		{SFX_WHALE_DAMGE},
+		(int)(1.0f * (1 << 10)),
+		0,
+		120,
+		127,
+	};
+	mmEffectEx(&damage);
+
 	update_life_display(_player_life);
 }
 

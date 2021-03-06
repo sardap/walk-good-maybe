@@ -62,19 +62,6 @@ static void wrap_bkg()
 	_bg_pos_x = wrap_x(_bg_pos_x);
 }
 
-static void wrap_x_sb(int *x, int *sb)
-{
-	if (*x >= 32)
-	{
-		*sb = *sb + 1;
-		*x -= 32;
-	}
-	else
-	{
-		*sb = *sb;
-	}
-}
-
 static void spawn_lava(int width, int x_base, int y)
 {
 	int lava_width = gba_rand_range(3, width - 2);
@@ -175,17 +162,6 @@ static void spawn_buildings()
 	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
 }
 
-static void clear_offscreen(int sb)
-{
-	int x = offset_x_bg(-1);
-	wrap_x_sb(&x, &sb);
-
-	for (int y = 0; y < 32; y++)
-	{
-		se_plot(se_mem[sb], x, y, 0);
-	}
-}
-
 static void clear_offscreen_level()
 {
 	int x = level_wrap_x((fx2int(_bg_pos_x) / TILE_WIDTH) - 3);
@@ -199,7 +175,6 @@ static void show(void)
 
 	_bg_0_scroll = int2fx(gba_rand());
 	_bg_2_scroll = int2fx(gba_rand());
-	char str[50];
 
 	_far_building_tiles_idx = 0;
 	dma3_cpy(&tile_mem[MG_SHARED_CB][_far_building_tiles_idx], backgroundCityTiles, backgroundCityTilesLen);
@@ -380,7 +355,6 @@ static void update(void)
 		}
 	}
 
-	// clear_offscreen(MG_CLOUD_SB);
 	clear_offscreen_level();
 
 	update_player();

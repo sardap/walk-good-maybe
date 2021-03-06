@@ -33,6 +33,7 @@ static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
+static POINT _player_mos;
 
 ent_t _player = {};
 
@@ -91,11 +92,34 @@ static void apply_player_damage(int ammount)
 	};
 	mmEffectEx(&damage);
 
+	_player_mos.x = 32;
+	obj_set_attr(
+		get_ent_att(&_player),
+		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_MOSAIC,
+		get_ent_att(&_player)->attr1,
+		get_ent_att(&_player)->attr2);
+
 	update_life_display(_player_life);
 }
 
 void update_player()
 {
+	//Handles damage mos effect
+	if (frame_count() % 3 == 0 && _player_mos.x > 0)
+	{
+		_player_mos.x--;
+		REG_MOSAIC = MOS_BUILD(0, 0, _player_mos.x >> 3, 0);
+
+		if (_player_mos.x-- <= 0)
+		{
+			obj_set_attr(
+				get_ent_att(&_player),
+				ATTR0_SQUARE | ATTR0_8BPP,
+				get_ent_att(&_player)->attr1,
+				get_ent_att(&_player)->attr2);
+		}
+	}
+
 	//Handles fliping the sprite if facing the other direction
 	if (_player.facing == FACING_RIGHT && key_hit(KEY_LEFT))
 	{

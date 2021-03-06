@@ -92,6 +92,7 @@ static void apply_player_damage(int ammount)
 	};
 	mmEffectEx(&damage);
 
+	//Setup moasic effect
 	_player_mos.x = 32;
 	obj_set_attr(
 		get_ent_att(&_player),
@@ -104,7 +105,7 @@ static void apply_player_damage(int ammount)
 
 void update_player()
 {
-	//Handles damage mos effect
+	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
 		_player_mos.x--;
@@ -148,7 +149,7 @@ void update_player()
 		_player.vx += -SPEED;
 	}
 
-	// Update v
+	// Update velocity
 	switch (_player.move_state)
 	{
 	case MOVEMENT_AIR:
@@ -293,6 +294,7 @@ void update_player()
 		_player.y = PLAYER_SPAWN_Y;
 	}
 
+	//What the fuck does this do?
 	// increment/decrement starting tile with R/L
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
 

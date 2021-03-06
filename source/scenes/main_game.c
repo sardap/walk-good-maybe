@@ -267,7 +267,7 @@ static void update(void)
 {
 	if (!mmActive())
 	{
-		mmStart(MOD_PD_BACKGROUND_0, MM_PLAY_LOOP);
+		mmStart(MOD_PD_CITY_0, MM_PLAY_LOOP);
 	}
 
 	// Pausing!

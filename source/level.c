@@ -32,17 +32,17 @@ bool col_cleared(int x)
 //Slow point
 int tile_to_collision(u16 tile)
 {
-	if (tile >= get_buildings_tile_offset() && tile <= get_buildings_tile_offset_end())
+	if (tile >= get_lava_tile_offset() && tile <= get_lava_tile_offset() + LAVA_TILE_END)
 	{
-		return LEVEL_COL_EMPTY;
+		return LEVEL_LAVA;
 	}
 
-	// if (tile >= get_lava_tile_offset() && tile <= get_lava_tile_offset())
-	// {
-	// 	return LEVEL_LAVA;
-	// }
+	if (tile >= get_buildings_tile_offset() && tile <= get_buildings_tile_offset_end())
+	{
+		return LEVEL_COL_GROUND;
+	}
 
-	return LEVEL_COL_GROUND;
+	return LEVEL_COL_EMPTY;
 }
 
 int level_collision_rect(int x, int y, int w, int h)

@@ -29,7 +29,7 @@
 #define LAVA_TILE_LEFT LAVA_OFFSET
 #define LAVA_TILE_MIDDLE LAVA_OFFSET + 1
 #define LAVA_TILE_RIGHT LAVA_OFFSET + 2
-#define LAVA_END LAVA_RIGHT
+#define LAVA_TILE_END LAVA_TILE_RIGHT
 
 int get_lava_tile_offset();
 int get_buildings_tile_offset();

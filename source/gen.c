@@ -21,13 +21,13 @@ int get_lava_tile_offset()
 int get_buildings_tile_offset()
 {
 	//Issue this is fucked need to track which building is loaded first
-	return _building_0_idx;
+	return _building_0_idx / 2;
 }
 
 int get_buildings_tile_offset_end()
 {
 	//Issue this is fucked need to track which building is loaded first
-	return _building_1_idx + BUILDING_1_RIGHT_BOT;
+	return (_building_1_idx / 2) + BUILDING_1_RIGHT_BOT;
 }
 
 void load_lava_0(int cb)

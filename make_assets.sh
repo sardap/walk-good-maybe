@@ -104,7 +104,11 @@ echo "Creating background tiles for main game / pal / map"
 grit \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
-	$ASSETS/background/buildingtileset.png $BG_OPTIONS
+	$ASSETS/background/building0TileSet.png \
+	$ASSETS/background/building1TileSet.png \
+	$ASSETS/background/lava0TileSet.png \
+	$ASSETS/background/buildingtileset.png \
+	$BG_OPTIONS
 
 
 BG_OPTIONS=""

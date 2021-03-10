@@ -3,8 +3,8 @@
 
 #define BUILDING_Y_SPAWN 136
 #define BUILDING_Y_TILE_SPAWN BUILDING_Y_SPAWN / 8
-#define MAX_JUMP_WIDTH_TILES 6
-#define MIN_JUMP_WIDTH_TILES 3
+#define MAX_JUMP_WIDTH_TILES 7
+#define MIN_JUMP_WIDTH_TILES 4
 
 // BUILDING 0
 //What the fuck is this shit why did I do this shit

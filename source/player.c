@@ -12,6 +12,7 @@
 #include "graphics.h"
 #include "anime.h"
 #include "life_display.h"
+#include "gun.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -109,7 +110,7 @@ void update_player()
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
 		_player_mos.x--;
-		REG_MOSAIC = MOS_BUILD(0, 0, _player_mos.x >> 3, 0);
+		REG_MOSAIC = MOS_BUILD(0, 0, _player_mos.x >> 3, _player_mos.y >> 3);
 
 		if (_player_mos.x-- <= 0)
 		{
@@ -141,6 +142,29 @@ void update_player()
 	else if (key_held(KEY_RIGHT))
 	{
 		_player.vx = SPEED;
+	}
+
+	//Shoot
+	if (key_hit(KEY_B))
+	{
+		int att_idx = allocate_att(1);
+		FIXED vx, x, y;
+		if (_player.facing == FACING_RIGHT)
+		{
+			vx = 2.5 * FIX_SCALE;
+			x = _player.x + 16 * FIX_SCALE;
+		}
+		else
+		{
+			vx = -2.5 * FIX_SCALE;
+			x = _player.x + -16 * FIX_SCALE;
+		}
+
+		y = _player.y + 4 * FIX_SCALE;
+		create_bullet(
+			&_ents[att_idx], att_idx,
+			BULLET_TYPE_GUN_0, x, y,
+			vx, 0, _player.facing == FACING_LEFT);
 	}
 
 	// Stops player from going offscreen to the right

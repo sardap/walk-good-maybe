@@ -285,15 +285,6 @@ static void update(void)
 		spawn_buildings();
 	}
 
-	if (key_hit(KEY_B))
-	{
-		int att_idx = allocate_att(1);
-		create_bullet(
-			&_ents[att_idx], att_idx,
-			BULLET_TYPE_GUN_0, _player.x + int2fx(16), _player.y + int2fx(4),
-			float2fx(2.5f), 0);
-	}
-
 	//Copy buldings into VRAM
 	for (int x = 0; x < LEVEL_WIDTH; x++)
 	{

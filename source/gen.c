@@ -4,6 +4,8 @@
 #include "common.h"
 #include "graphics.h"
 #include "debug.h"
+#include "ent.h"
+#include "enemy.h"
 
 #include "assets/lava0TileSet.h"
 #include "assets/building0TileSet.h"
@@ -58,6 +60,15 @@ static void spawn_lava(int width, int x_base, int y)
 	}
 }
 
+static FIXED level_to_screen(int level_x)
+{
+	//I can't do this at the moment
+	if (fx2int(_bg_pos_x) + GBA_WIDTH >= 64 * 8)
+		return -1;
+
+	return (level_x * 8) - fx2int(_bg_pos_x);
+}
+
 void load_building_0(int cb)
 {
 	_building_0_idx = allocate_bg_tile_idx(2);
@@ -88,15 +99,26 @@ int spawn_building_0(int start_x)
 		set_level_col(x, y + 1, BUILDING_0_WINDOW + tile);
 	}
 
-	if (width > 3 && gba_rand() % 2 == 0)
-	{
-		spawn_lava(width, x_base, y);
-	}
-
 	//RIGHT SECTION
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_0_BRICK + tile);
 	set_level_col(x, y, BUILDING_0_BRICK + tile);
+
+	if (width > 3 && gba_rand() % 4 == 0)
+	{
+		spawn_lava(width, x_base, y);
+		return width;
+	}
+
+	FIXED att_x = level_to_screen(start_x + width / 2);
+	//early return to avoid that awesome wraping bug
+	if (att_x < 0 || gba_rand() % 100 > 75)
+		return width;
+
+	int ent_idx = allocate_att(1);
+	create_toast_enemy(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 32));
 
 	return width;
 }
@@ -141,6 +163,22 @@ int spawn_building_1(int start_x)
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_1_RIGHT_ROOF + tile);
 	set_level_col(x, y + 1, BUILDING_1_RIGHT_BOT + tile);
+
+	if (width > 3 && gba_rand() % 4 == 0)
+	{
+		spawn_lava(width, x_base, y);
+		return width;
+	}
+
+	FIXED att_x = level_to_screen(start_x + width / 2);
+	//early return to avoid that awesome wraping bug
+	if (att_x < 0 || gba_rand() % 100 > 75)
+		return width;
+
+	int ent_idx = allocate_att(1);
+	create_toast_enemy(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 32));
 
 	return width;
 }

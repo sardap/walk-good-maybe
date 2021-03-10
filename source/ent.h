@@ -109,7 +109,6 @@ inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy)
 		e->h);
 }
 
-FIXED level_to_screen(int l);
 int att_count();
 
 void push_up_from_ground(ent_t *e);

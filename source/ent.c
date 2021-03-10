@@ -96,11 +96,6 @@ FIXED translate_y(ent_t *e)
 	return e->y;
 }
 
-FIXED level_to_screen(int l)
-{
-	return int2fx(l * TILE_WIDTH + l % TILE_WIDTH);
-}
-
 // STOLEN from https://github.com/exelotl/goodboy-advance
 bool did_hit_x(ent_t *e, FIXED dx)
 {

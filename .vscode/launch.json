@@ -11,7 +11,9 @@
 			"program": "mGBA.exe",
 			"preLaunchTask": "build-rom",
 			"args": [
-				"${workspaceFolder}\\bin\\walk-good-maybe.gba"
+				"-l",
+				"31",
+				"${workspaceFolder}\\bin\\walk-good-maybe.gba",
 			]
 		},
 		{

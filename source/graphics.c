@@ -43,7 +43,6 @@ static int allocate_tile_idx(int *allc, int len, int size)
 			for (int j = 0; j < size; j++)
 			{
 				allc[i + j] = 1;
-				write_to_log(LOG_LEVEL_INFO, "END");
 			}
 			return i;
 		}
@@ -80,16 +79,6 @@ int allocate_bg_tile_idx(int size)
 void free_bg_tile_idx(int idx, int size)
 {
 	free_tile_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, idx, size);
-}
-
-int get_buildings_tile_offset()
-{
-	return _building_offset;
-}
-
-void set_buildings_tiles_offset(int idx)
-{
-	_building_offset = idx;
 }
 
 static inline int calc_address(int width, int x, int y)

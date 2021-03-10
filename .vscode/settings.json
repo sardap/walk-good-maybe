@@ -3,7 +3,10 @@
 		"*.bf": "plaintext",
 		"cstdlib": "c",
 		"algorithm": "c",
-		"sstream": "c"
+		"sstream": "c",
+		"lifeammount.h": "c",
+		"buildingtileset.h": "c",
+		"gun.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

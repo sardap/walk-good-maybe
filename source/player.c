@@ -2,11 +2,17 @@
 
 #include <tonc.h>
 #include <stdlib.h>
+#include <maxmod.h>
+
+#include "soundbank.h"
+#include "soundbank_bin.h"
 #include "common.h"
 #include "ent.h"
 #include "debug.h"
 #include "graphics.h"
 #include "anime.h"
+#include "life_display.h"
+#include "gun.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -27,6 +33,9 @@ static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
 
 static int _player_anime_cycle;
 static int _tile_start_idx;
+static int _player_life;
+static POINT _player_mos;
+static int _invincible_frames;
 
 ent_t _player = {};
 
@@ -46,6 +55,7 @@ void init_player()
 	//Reserved for player
 	_player.att_idx = 0;
 	_player_anime_cycle = 0;
+	_player_life = PLAYER_LIFE_START;
 
 	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
@@ -66,12 +76,55 @@ void init_player()
 
 void unload_player()
 {
-	free_att(1, _player.att_idx);
+	free_att(_player.att_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
+}
+
+static void apply_player_damage(int ammount)
+{
+	_player_life -= ammount;
+
+	//Play sound
+	mm_sound_effect damage = {
+		{SFX_WHALE_DAMGE},
+		(int)(1.0f * (1 << 10)),
+		0,
+		120,
+		127,
+	};
+	mmEffectEx(&damage);
+
+	//Setup moasic effect
+	_player_mos.x = 32;
+	obj_set_attr(
+		get_ent_att(&_player),
+		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_MOSAIC,
+		get_ent_att(&_player)->attr1,
+		get_ent_att(&_player)->attr2);
+
+	update_life_display(_player_life);
+	//Half a second
+	_invincible_frames = 60;
 }
 
 void update_player()
 {
+	//Handles damage moasic effect
+	if (frame_count() % 3 == 0 && _player_mos.x > 0)
+	{
+		_player_mos.x--;
+		REG_MOSAIC = MOS_BUILD(0, 0, _player_mos.x >> 3, _player_mos.y >> 3);
+
+		if (_player_mos.x-- <= 0)
+		{
+			obj_set_attr(
+				get_ent_att(&_player),
+				ATTR0_SQUARE | ATTR0_8BPP,
+				get_ent_att(&_player)->attr1,
+				get_ent_att(&_player)->attr2);
+		}
+	}
+
 	//Handles fliping the sprite if facing the other direction
 	if (_player.facing == FACING_RIGHT && key_hit(KEY_LEFT))
 	{
@@ -94,12 +147,35 @@ void update_player()
 		_player.vx = SPEED;
 	}
 
+	//Shoot
+	if (key_hit(KEY_B))
+	{
+		int att_idx = allocate_att(1);
+		FIXED vx, x;
+		if (_player.facing == FACING_RIGHT)
+		{
+			vx = 2.5 * FIX_SCALE;
+			x = _player.x + 16 * FIX_SCALE;
+		}
+		else
+		{
+			vx = -2.5 * FIX_SCALE;
+			x = _player.x + -16 * FIX_SCALE;
+		}
+
+		create_bullet(
+			&_ents[att_idx], att_idx,
+			BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
+			vx, 0, _player.facing == FACING_LEFT);
+	}
+
 	// Stops player from going offscreen to the right
 	if (fx2int(_player.x) > GBA_WIDTH - 20)
 	{
 		_player.vx += -SPEED;
 	}
 
+	// Update velocity
 	switch (_player.move_state)
 	{
 	case MOVEMENT_AIR:
@@ -126,6 +202,29 @@ void update_player()
 		}
 	}
 
+	//Apply all damage
+	if (_invincible_frames <= 0)
+	{
+		//Lava damage
+		if (ent_level_collision(&_player) & (LEVEL_LAVA))
+		{
+			_player.vy -= LAVA_BOUNCE;
+			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
+			_player.move_state = MOVEMENT_AIR;
+			apply_player_damage(1);
+		}
+		//Enemy Damage
+		if (_player.ent_cols & (TYPE_ENEMY))
+		{
+			apply_player_damage(1);
+		}
+	}
+	else
+	{
+		_invincible_frames--;
+	}
+
+	//Handles player anime
 	switch (_player.move_state)
 	{
 	case MOVEMENT_GROUNDED:
@@ -234,6 +333,7 @@ void update_player()
 		_player.y = PLAYER_SPAWN_Y;
 	}
 
+	//What the fuck does this do?
 	// increment/decrement starting tile with R/L
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
 

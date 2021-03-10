@@ -25,7 +25,7 @@ int gun_0_tiles()
 
 void create_bullet(
 	ent_t *bul, int att_idx, bullet_type_t type,
-	FIXED x, FIXED y, FIXED vx, FIXED vy)
+	FIXED x, FIXED y, FIXED vx, FIXED vy, int flip)
 {
 	bul->att_idx = att_idx;
 	bul->bullet_type = type;
@@ -46,7 +46,7 @@ void create_bullet(
 
 	obj_set_attr(
 		get_ent_att(bul),
-		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
+		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8 || flip ? ATTR1_HFLIP : 0,
 		ATTR2_ID(_gun_0_tile));
 
 	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
@@ -57,11 +57,9 @@ void update_bullet(ent_t *bul)
 	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
 	ent_move_y(bul, bul->vy);
 
-	int col = ent_level_collision_at(bul, 0, 0);
-
-	if (fx2int(bul->x) > SCREEN_WIDTH || hit_x || bul->ent_cols & (TYPE_ENEMY))
+	if (fx2int(bul->x) > SCREEN_WIDTH || fx2int(bul->x) < 0 || hit_x || bul->ent_cols & (TYPE_ENEMY))
 	{
-		free_att(1, bul->att_idx);
+		free_att(bul->att_idx, 1);
 		bul->ent_type = TYPE_NONE;
 		return;
 	}

@@ -6,7 +6,7 @@
 		{
 			"label": "build-rom",
 			"type": "shell",
-			"command": "docker run -v ${PWD}:/app wgm-builder:latest",
+			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest",
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -20,7 +20,7 @@
 		{
 			"label": "clean-rom",
 			"type": "shell",
-			"command": "docker run -v ${PWD}:/app wgm-builder:latest clean",
+			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest clean",
 			"group": {
 				"kind": "build",
 				"isDefault": true

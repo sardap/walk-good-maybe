@@ -81,7 +81,7 @@ def ent_t _ents[ENT_COUNT];
 
 void init_obj_atts();
 int allocate_att(int count);
-void free_att(int count, int idx);
+void free_att(int idx, int count);
 
 inline OBJ_ATTR *get_ent_att(ent_t *e)
 {
@@ -109,7 +109,6 @@ inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy)
 		e->h);
 }
 
-FIXED level_to_screen(int l);
 int att_count();
 
 void push_up_from_ground(ent_t *e);

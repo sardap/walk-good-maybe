@@ -43,11 +43,16 @@ add_objects "./assets/whale"
 gen_png "./assets/text"
 add_objects "./assets/text"
 
+gen_png "./assets/misc"
+add_objects "./assets/misc"
+
 gen_png "./assets/weapons"
 add_objects "./assets/weapons"
 
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
+
+OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
 # colour-agg.exe ./assets/objects_out.png $OBJECTS
 
@@ -99,7 +104,11 @@ echo "Creating background tiles for main game / pal / map"
 grit \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
-	$ASSETS/background/buildingtileset.png $BG_OPTIONS
+	$ASSETS/background/building0TileSet.png \
+	$ASSETS/background/building1TileSet.png \
+	$ASSETS/background/lava0TileSet.png \
+	$ASSETS/background/buildingtileset.png \
+	$BG_OPTIONS
 
 
 BG_OPTIONS=""

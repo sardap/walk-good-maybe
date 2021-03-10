@@ -194,29 +194,37 @@ bool apply_gravity(ent_t *e)
 
 void update_ents()
 {
+	//Add player to ent array
+	_ents[ENT_COUNT - 1] = _player;
+
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		if (_ents[i].ent_type == TYPE_NONE)
-		{
 			continue;
-		}
 
 		_ents[i].ent_cols = TYPE_NONE;
 
 		for (int j = 0; j < ENT_COUNT; j++)
 		{
 			if (
+				//Don't check vs self
 				i != j &&
+				//Don't check vs unallocated ents
 				_ents[j].ent_type != TYPE_NONE &&
-				fx2int(_ents[i].x) < fx2int(_ents[j].x) + _ents[j].w &&
-				fx2int(_ents[i].x) + _ents[i].w > fx2int(_ents[j].x) &&
-				fx2int(_ents[i].y) < fx2int(_ents[j].y) + _ents[j].h &&
-				fx2int(_ents[i].y) + _ents[i].h > fx2int(_ents[j].y))
+				//Rect intersection
+				_ents[i].x < _ents[j].x + int2fx(_ents[j].w) &&
+				_ents[i].x + int2fx(_ents[i].w) > _ents[j].x &&
+				_ents[i].y < _ents[j].y + int2fx(_ents[j].h) &&
+				_ents[i].y + int2fx(_ents[i].h) > _ents[j].y)
 			{
-				_ents[i].ent_cols |= _ents[j].ent_type;
+				_ents[i]
+					.ent_cols |= _ents[j].ent_type;
 			}
 		}
 	}
+
+	//Copy updated player ent back into player
+	_player = _ents[ENT_COUNT - 1];
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{

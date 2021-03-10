@@ -35,6 +35,7 @@ static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
 static POINT _player_mos;
+static int _invincible_frames;
 
 ent_t _player = {};
 
@@ -102,6 +103,8 @@ static void apply_player_damage(int ammount)
 		get_ent_att(&_player)->attr2);
 
 	update_life_display(_player_life);
+	//Half a second
+	_invincible_frames = 60;
 }
 
 void update_player()
@@ -148,7 +151,7 @@ void update_player()
 	if (key_hit(KEY_B))
 	{
 		int att_idx = allocate_att(1);
-		FIXED vx, x, y;
+		FIXED vx, x;
 		if (_player.facing == FACING_RIGHT)
 		{
 			vx = 2.5 * FIX_SCALE;
@@ -160,10 +163,9 @@ void update_player()
 			x = _player.x + -16 * FIX_SCALE;
 		}
 
-		y = _player.y + 4 * FIX_SCALE;
 		create_bullet(
 			&_ents[att_idx], att_idx,
-			BULLET_TYPE_GUN_0, x, y,
+			BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
 			vx, 0, _player.facing == FACING_LEFT);
 	}
 
@@ -200,13 +202,26 @@ void update_player()
 		}
 	}
 
-	//Apply lava shit
-	if (ent_level_collision(&_player) & (LEVEL_LAVA))
+	//Apply all damage
+	if (_invincible_frames <= 0)
 	{
-		_player.vy -= LAVA_BOUNCE;
-		_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
-		_player.move_state = MOVEMENT_AIR;
-		apply_player_damage(1);
+		//Lava damage
+		if (ent_level_collision(&_player) & (LEVEL_LAVA))
+		{
+			_player.vy -= LAVA_BOUNCE;
+			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
+			_player.move_state = MOVEMENT_AIR;
+			apply_player_damage(1);
+		}
+		//Enemy Damage
+		if (_player.ent_cols & (TYPE_ENEMY))
+		{
+			apply_player_damage(1);
+		}
+	}
+	else
+	{
+		_invincible_frames--;
 	}
 
 	//Handles player anime

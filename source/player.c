@@ -238,12 +238,6 @@ void update_player()
 	case MOVEMENT_GROUNDED:
 		if (abs(_player.vx) > _scroll_x)
 		{
-			const int walk_cycle_count = 25;
-			if (_player_anime_cycle <= 0)
-			{
-				_player_anime_cycle = walk_cycle_count;
-			}
-
 			step_anime(
 				walk_anime_cycle, whale_smallTilesLen, PLAYER_WALK_CYCLE_COUNT,
 				&_player_anime_cycle, _tile_start_idx);

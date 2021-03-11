@@ -27,7 +27,7 @@
 			]
 		},
 		{
-			"name": "Launch Package",
+			"name": "Launch color agg",
 			"type": "go",
 			"request": "launch",
 			"mode": "debug",
@@ -37,6 +37,17 @@
 				"example.png"
 			]
 		},
-		
+		{
+			"name": "Launch builder",
+			"type": "go",
+			"request": "launch",
+			"mode": "debug",
+			"program": "${workspaceFolder}/tools/builder",
+			"cwd": "${workspaceFolder}",
+			"args": [
+				"build",
+			]
+		},
+
 	]
 }

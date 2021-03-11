@@ -39,7 +39,15 @@ static int _invincible_frames;
 
 ent_t _player = {};
 
-const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+static const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+static const uint *walk_anime_cycle[] = {
+	whale_walk_0Tiles,
+	whale_walk_1Tiles,
+	whale_walk_2Tiles,
+	whale_walk_3Tiles,
+	whale_walk_4Tiles,
+	whale_smallTiles,
+};
 
 void load_player_tile()
 {
@@ -236,33 +244,9 @@ void update_player()
 				_player_anime_cycle = walk_cycle_count;
 			}
 
-			if (_player_anime_cycle == walk_cycle_count)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_0Tiles, whale_walk_0TilesLen);
-			}
-			else if (_player_anime_cycle == 20)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_1Tiles, whale_walk_1TilesLen);
-			}
-			else if (_player_anime_cycle == 15)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_2Tiles, whale_walk_2TilesLen);
-			}
-			else if (_player_anime_cycle == 10)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_3Tiles, whale_walk_3TilesLen);
-			}
-			else if (_player_anime_cycle == 5)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_4Tiles, whale_walk_4TilesLen);
-			}
-			else if (_player_anime_cycle <= 0)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
-				_player_anime_cycle = walk_cycle_count;
-			}
-
-			_player_anime_cycle--;
+			step_anime(
+				walk_anime_cycle, whale_smallTilesLen, PLAYER_WALK_CYCLE_COUNT,
+				&_player_anime_cycle, _tile_start_idx);
 		}
 		else
 		{

@@ -25,7 +25,8 @@ func runMake(arg string) {
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("error running make %v\n", err)
-		panic(err)
+		fmt.Printf("out %s", out)
+		os.Exit(2)
 	}
 	fmt.Printf("%s", out)
 }

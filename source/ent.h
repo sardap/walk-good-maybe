@@ -16,10 +16,10 @@
 
 typedef enum ent_types_t
 {
-	TYPE_NONE,
-	TYPE_PLAYER,
-	TYPE_BULLET,
-	TYPE_ENEMY
+	TYPE_NONE = 0,
+	TYPE_PLAYER = 1,
+	TYPE_BULLET = 10,
+	TYPE_ENEMY = 100
 } ent_types_t;
 
 typedef enum movement_state_t

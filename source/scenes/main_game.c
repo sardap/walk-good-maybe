@@ -67,7 +67,7 @@ static void spawn_buildings()
 {
 	int start_x = _building_spawn_x;
 
-	int width;
+	int width = 0;
 	switch (_mode)
 	{
 	case MG_MODE_CITY:

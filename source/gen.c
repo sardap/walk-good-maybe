@@ -31,7 +31,7 @@ int get_buildings_tile_offset()
 int get_buildings_tile_offset_end()
 {
 	//Issue this is fucked need to track which building is loaded first
-	return (_building_2_idx / 2) + BUILDING_1_RIGHT_BOT;
+	return (_building_2_idx / 2) + building2TileSetTilesLen / 64 - 1;
 }
 
 void load_lava_0(int cb)
@@ -147,18 +147,13 @@ int spawn_building_1(int start_x)
 	set_level_at(x_base, y, BUILDING_1_LEFT_ROOF + tile);
 	set_level_col(x_base, y + 1, BUILDING_1_LEFT_BOT + tile);
 
-	int width = gba_rand_range(4, 10);
+	int width = gba_rand_range(3, 5);
 	//MIDDLE SECTION
 	for (int i = 1; i < width; i++)
 	{
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_1_MIDDLE_ROOF + tile);
 		set_level_col(x, y + 1, BUILDING_1_MIDDLE_BOT + tile);
-	}
-
-	if (width > 3 && gba_rand() % 5 == 0)
-	{
-		spawn_lava(width, x_base, y);
 	}
 
 	//RIGHT SECTION
@@ -200,14 +195,14 @@ int spawn_building_2(int start_x)
 {
 	int x_base = start_x;
 	int x;
-	int y = gba_rand_range(CITY_BUILDING_Y_TILE_SPAWN - 4, CITY_BUILDING_Y_TILE_SPAWN);
+	int y = gba_rand_range(CITY_BUILDING_Y_TILE_SPAWN - 5, CITY_BUILDING_Y_TILE_SPAWN);
 
 	int tile = _building_2_idx / 2;
 	//LEFT SECTION
 	set_level_at(x_base, y, BUILDING_2_LEFT_ROOF + tile);
 	set_level_col(x_base, y + 1, BUILDING_2_LEFT_MIDDLE + tile);
 
-	int width = gba_rand_range(3, 7);
+	int width = gba_rand_range(3, 8);
 	if (width % 2 != 0)
 		width++;
 
@@ -216,7 +211,7 @@ int spawn_building_2(int start_x)
 	{
 		x = level_wrap_x(x_base + i);
 		set_level_at(x, y, BUILDING_2_MIDDLE_ROOF_HANGING + tile);
-		for (int j = y + 1; j < 24; j += 2)
+		for (int j = y + 1; j < 30; j += 3)
 		{
 			if (i % 2 == 0)
 			{
@@ -228,6 +223,8 @@ int spawn_building_2(int start_x)
 				set_level_at(x, j, BUILDING_2_MIDDLE_WHITE + tile);
 				set_level_at(x, j + 1, BUILDING_2_MIDDLE_WHITE_CLEAN + tile);
 			}
+
+			set_level_at(x, j + 2, BUILDING_2_MIDDLE_BLUE + tile);
 		}
 	}
 
@@ -235,6 +232,22 @@ int spawn_building_2(int start_x)
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_2_RIGHT_ROOF + tile);
 	set_level_col(x, y + 1, BUILDING_2_RIGHT_MIDDLE + tile);
+
+	if (width > 3 && gba_rand() % 6 == 0)
+	{
+		spawn_lava(width, x_base, y);
+		return width;
+	}
+
+	FIXED att_x = level_to_screen(start_x + width / 2);
+	//early return to avoid that awesome wraping bug
+	if (att_x < 0 || gba_rand() % 100 > 75)
+		return width;
+
+	int ent_idx = allocate_att(1);
+	create_toast_enemy(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 32));
 
 	return width;
 }

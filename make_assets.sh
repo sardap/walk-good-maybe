@@ -107,6 +107,7 @@ grit \
 	$ASSETS/background/building0TileSet.png \
 	$ASSETS/background/building1TileSet.png \
 	$ASSETS/background/building2TileSet.png \
+	$ASSETS/background/building3TileSet.png \
 	$ASSETS/background/lava0TileSet.png \
 	$ASSETS/background/buildingtileset.png \
 	$BG_OPTIONS

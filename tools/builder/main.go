@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -52,8 +53,8 @@ func latestModify(path string) time.Time {
 
 func main() {
 	//Hacked makefile lamo
-	if _, err := os.Stat("source/assets"); os.Args[1] != "clean" &&
-		(os.IsNotExist(err) || latestModify("assets").After(latestModify("source/assets"))) {
+	if files, _ := ioutil.ReadDir("source/assets"); os.Args[1] != "clean" &&
+		(len(files) == 0 || latestModify("assets").After(latestModify("source/assets"))) {
 		makeAssets()
 	}
 

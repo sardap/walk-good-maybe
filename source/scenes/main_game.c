@@ -31,7 +31,6 @@ static int _bg_0_scroll;
 static int _bg_2_scroll;
 
 static int _far_building_tiles_idx;
-static int _foreground_build_tile_idx;
 static int _fog_tiles_idx;
 
 static mg_states_t _state;
@@ -72,11 +71,18 @@ static void spawn_buildings()
 	switch (_mode)
 	{
 	case MG_MODE_CITY:
-		if (gba_rand() % 2 == 0)
+		switch (gba_rand() % 3)
+		{
+		case 0:
 			width = spawn_building_0(start_x);
-		else
+			break;
+		case 1:
 			width = spawn_building_1(start_x);
-		break;
+			break;
+		case 2:
+			width = spawn_building_2(start_x);
+			break;
+		}
 	case MG_MODE_BEACH:
 		break;
 	}
@@ -99,9 +105,10 @@ static void load_foreground_tiles()
 	switch (_mode)
 	{
 	case MG_MODE_CITY:
-		load_building_0(MG_SHARED_CB);
 		load_lava_0(MG_SHARED_CB);
+		load_building_0(MG_SHARED_CB);
 		load_building_1(MG_SHARED_CB);
+		load_building_2(MG_SHARED_CB);
 		break;
 	case MG_MODE_BEACH:
 		break;
@@ -113,8 +120,10 @@ static void unload_foreground_tiles()
 	switch (_mode)
 	{
 	case MG_MODE_CITY:
+		unload_lava_0();
 		unload_building_0();
 		unload_building_1();
+		unload_building_2();
 		break;
 	case MG_MODE_BEACH:
 		break;

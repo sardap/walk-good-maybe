@@ -24,6 +24,9 @@
 #include "../assets/fog.h"
 #include "../assets/mainGameShared.h"
 #include "../assets/buildingtileset.h"
+#include "../assets/ready.h"
+#include "../assets/set.h"
+#include "../assets/go.h"
 
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
@@ -33,10 +36,12 @@ static int _bg_2_scroll;
 
 static int _far_building_tiles_idx;
 static int _fog_tiles_idx;
+static int _ready_tile_start;
 
 static mg_states_t _state;
 static mg_states_t _old_state;
 static mg_mode_t _mode;
+const static mm_sfxhand _intro_handler = 1;
 
 static FIXED wrap_x(FIXED x)
 {
@@ -147,13 +152,16 @@ static void show(void)
 	_bg_2_scroll = int2fx(gba_rand());
 
 	//Bad but cbf
-	allocate_bg_tile_idx(449);
+	allocate_bg_tile_idx(528);
 
 	_far_building_tiles_idx = 0;
 	dma3_cpy(&tile_mem[MG_SHARED_CB][_far_building_tiles_idx], backgroundCityTiles, backgroundCityTilesLen);
 
 	_fog_tiles_idx = backgroundCityTilesLen / 32;
 	dma3_cpy(&tile_mem[MG_SHARED_CB][_fog_tiles_idx], fogTiles, fogTilesLen);
+
+	_ready_tile_start = _fog_tiles_idx + fogTilesLen / 32; //allocate_bg_tile_idx(readyTilesLen / 64);
+	dma3_cpy(&tile_mem[MG_SHARED_CB][_ready_tile_start], readyTiles, readyTilesLen);
 
 	load_foreground_tiles();
 
@@ -170,6 +178,11 @@ static void show(void)
 		se_mem[MG_CLOUD_SB][i] += _fog_tiles_idx / 2;
 	}
 
+	dma3_cpy(se_mem[MG_TEXT_SB], readyMap, readyMapLen);
+	//TODO: stop this double iteration bullshit
+	for (int i = 0; i < SB_SIZE; i++)
+		se_mem[MG_TEXT_SB][i] += _ready_tile_start / 2;
+
 	//Set bg postions
 	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
 	REG_BG0VOFS = 0;
@@ -184,8 +197,9 @@ static void show(void)
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_CITY_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(MG_BUILDING_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
 	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
+	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_TEXT_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
-	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
+	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
 
 	//Blend reg
 	REG_BLDCNT = BLD_BUILD(
@@ -205,20 +219,26 @@ static void show(void)
 	_next_building_spawn = 0;
 	_scroll_x = 0;
 	_building_spawn_x = 0;
-	_state = MG_S_STARTING;
+	_state = MG_S_READY;
 
 	init_player();
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
+
+	mm_sound_effect shoot_sound = {
+		{SFX_READY_0},
+		(int)(1.0f * (1 << 10)),
+		_intro_handler,
+		120,
+		127,
+	};
+	mmEffectEx(&shoot_sound);
 
 	//These should be moved into level speifc stuff
 	load_enemy_toast();
 	load_number_tiles();
 	load_speed_up();
 	init_score();
-
-	mmSetModuleVolume(300);
-	mmStart(MOD_INTRO, MM_PLAY_ONCE);
 
 	while (_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
 	{
@@ -237,6 +257,54 @@ static bool check_game_over()
 
 static void update(void)
 {
+	if (_state == MG_S_READY)
+	{
+		if (!mmEffectActive(_intro_handler))
+		{
+			dma3_cpy(&tile_mem[MG_SHARED_CB][_ready_tile_start], setTiles, setTilesLen);
+			dma3_cpy(se_mem[MG_TEXT_SB], setMap, setMapLen);
+			//Fuck it
+			for (int i = 0; i < SB_SIZE; i++)
+				se_mem[MG_TEXT_SB][i] += _ready_tile_start / 2;
+
+			mm_sound_effect set_sound = {
+				{SFX_SET_0},
+				(int)(1.0f * (1 << 10)),
+				_intro_handler,
+				120,
+				127,
+			};
+			mmEffectEx(&set_sound);
+			_state = MG_S_SET;
+		}
+		return;
+	}
+	else if (_state == MG_S_SET)
+	{
+		if (!mmEffectActive(_intro_handler))
+		{
+			dma3_cpy(&tile_mem[MG_SHARED_CB][_ready_tile_start], goTiles, goTilesLen);
+			dma3_cpy(se_mem[MG_TEXT_SB], goMap, goMapLen);
+			//Fuck it
+			for (int i = 0; i < SB_SIZE; i++)
+				se_mem[MG_TEXT_SB][i] += _ready_tile_start / 2;
+
+			mm_sound_effect go_sound = {
+				{SFX_GO_0},
+				(int)(1.0f * (1 << 10)),
+				_intro_handler,
+				120,
+				127,
+			};
+			mmEffectEx(&go_sound);
+			mmSetModuleVolume(300);
+			mmStart(MOD_INTRO, MM_PLAY_ONCE);
+			_state = MG_S_STARTING;
+		}
+		return;
+	}
+
+	//Starts main track after intro
 	if (!mmActive())
 	{
 		mmStart(MOD_PD_CITY_0, MM_PLAY_LOOP);
@@ -332,6 +400,8 @@ static void update(void)
 		{
 			_scroll_x = (int)(0.25f * FIX_SCALE);
 			_state = MG_S_SCROLLING;
+			//Clear text layer
+			REG_DISPCNT ^= DCNT_BG3;
 		}
 		break;
 	case MG_S_SCROLLING:

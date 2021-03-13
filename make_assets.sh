@@ -106,6 +106,9 @@ BG_OPTIONS="$BG_OPTIONS -O mainGameShared"	# Shared pallet name
 
 echo "Creating background tiles for main game / pal / map"
 grit \
+	$ASSETS/text/ready.png \
+	$ASSETS/text/set.png \
+	$ASSETS/text/go.png \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
 	$ASSETS/background/building0TileSet.png \

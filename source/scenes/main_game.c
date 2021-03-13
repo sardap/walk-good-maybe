@@ -17,6 +17,7 @@
 #include "../enemy.h"
 #include "../life_display.h"
 #include "../gen.h"
+#include "../obstacles.h"
 
 #include "../assets/title_text.h"
 #include "../assets/backgroundCity.h"
@@ -210,8 +211,10 @@ static void show(void)
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 
+	//These should be moved into level speifc stuff
 	load_enemy_toast();
 	load_number_tiles();
+	load_speed_up();
 	init_score();
 
 	mmSetModuleVolume(300);

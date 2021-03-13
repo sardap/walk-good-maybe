@@ -60,7 +60,7 @@ void update_enemy(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_BULLET))
 	{
-		free_att(ent->att_idx, 1);
+		free_ent(ent->att_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		return;
 	}

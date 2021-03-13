@@ -9,6 +9,7 @@ assets/background/*.png
 assets/text/*.png
 assets/weapons/*.png
 assets/misc/*.png
+assets/obstacles/*.png
 
 assets/out.png
 __debug_bin

@@ -5,7 +5,7 @@
 #include "common.h"
 #include "level.h"
 #include "debug.h"
-
+#include "obstacles.h"
 #include "gun.h"
 #include "enemy.h"
 
@@ -28,7 +28,7 @@ void init_obj_atts()
 	_allocated_objs[0] = 1;
 }
 
-int allocate_att(int count)
+int allocate_ent(int count)
 {
 	for (int i = 0; i < 128;)
 	{
@@ -61,7 +61,7 @@ int allocate_att(int count)
 	return -1;
 }
 
-void free_att(int idx, int count)
+void free_ent(int idx, int count)
 {
 	obj_set_attr(&_obj_buffer[idx], ATTR0_HIDE, 0, 0);
 
@@ -153,6 +153,11 @@ bool ent_move_x(ent_t *e, FIXED dx)
 	return false;
 }
 
+void ent_move_x_dirty(ent_t *e)
+{
+	e->x += e->vx;
+}
+
 // STOLEN from https://github.com/exelotl/goodboy-advance
 bool did_hit_y(ent_t *e, FIXED dy)
 {
@@ -176,6 +181,11 @@ bool ent_move_y(ent_t *e, FIXED dy)
 
 	e->y += e->vy;
 	return false;
+}
+
+void ent_move_y_dirty(ent_t *e)
+{
+	e->y += e->vy;
 }
 
 bool apply_gravity(ent_t *e)
@@ -239,6 +249,12 @@ void update_ents()
 		case TYPE_PLAYER:
 			break;
 		case TYPE_NONE:
+			break;
+		case TYPE_SPEED_UP:
+			update_speed_up(&_ents[i]);
+			break;
+		case TYPE_SPEED_LINE:
+			update_speed_line(&_ents[i]);
 			break;
 		}
 	}

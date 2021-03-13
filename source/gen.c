@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "ent.h"
 #include "enemy.h"
+#include "obstacles.h"
 
 #include "assets/lava0TileSet.h"
 #include "assets/building0TileSet.h"
@@ -119,7 +120,7 @@ int spawn_building_0(int start_x)
 	if (att_x < 0 || gba_rand() % 100 > 75)
 		return width;
 
-	int ent_idx = allocate_att(1);
+	int ent_idx = allocate_ent(1);
 	create_toast_enemy(
 		&_ents[ent_idx], ent_idx,
 		int2fx(att_x), int2fx(y * 8 - 32));
@@ -174,7 +175,7 @@ int spawn_building_1(int start_x)
 	if (att_x < 0 || gba_rand() % 100 > 75)
 		return width;
 
-	int ent_idx = allocate_att(1);
+	int ent_idx = allocate_ent(1);
 	create_toast_enemy(
 		&_ents[ent_idx], ent_idx,
 		int2fx(att_x), int2fx(y * 8 - 32));
@@ -246,7 +247,7 @@ int spawn_building_2(int start_x)
 	if (att_x < 0 || gba_rand() % 100 > 75)
 		return width;
 
-	int ent_idx = allocate_att(1);
+	int ent_idx = allocate_ent(1);
 	create_toast_enemy(
 		&_ents[ent_idx], ent_idx,
 		int2fx(att_x), int2fx(y * 8 - 32));
@@ -304,15 +305,15 @@ int spawn_building_3(int start_x)
 		return width;
 	}
 
-	FIXED att_x = level_to_screen(start_x + width / 2);
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
 	//early return to avoid that awesome wraping bug
-	if (att_x < 0 || gba_rand() % 100 > 75)
+	if (att_x < 0)
 		return width;
 
-	int ent_idx = allocate_att(1);
-	create_toast_enemy(
+	int ent_idx = allocate_ent(1);
+	create_speed_up(
 		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 32));
+		int2fx(att_x), int2fx(y * 8 - 10));
 
 	return width;
 }

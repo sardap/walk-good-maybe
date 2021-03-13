@@ -15,4 +15,7 @@ void unload_player();
 
 void update_player();
 
+//This really shouldn't be here
+int speed_up_active();
+
 #endif

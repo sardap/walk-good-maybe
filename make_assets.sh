@@ -52,6 +52,10 @@ add_objects "./assets/weapons"
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
 
+gen_png "./assets/obstacles"
+add_objects "./assets/obstacles"
+
+
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
 # colour-agg.exe ./assets/objects_out.png $OBJECTS

@@ -17,7 +17,7 @@ void load_life_display()
 	_life_tile_start_idx = allocate_obj_tile_idx(4);
 	update_life_display(PLAYER_LIFE_START);
 
-	_att_life_idx = allocate_att(1);
+	_att_life_idx = allocate_ent(1);
 	obj_set_attr(
 		&_obj_buffer[_att_life_idx],
 		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_16x16,
@@ -43,5 +43,5 @@ void update_life_display(int life)
 void unload_life_display()
 {
 	free_obj_tile_idx(_life_tile_start_idx, 4);
-	free_att(_att_life_idx, 1);
+	free_ent(_att_life_idx, 1);
 }

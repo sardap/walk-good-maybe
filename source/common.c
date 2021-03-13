@@ -100,14 +100,14 @@ static void update_score()
 void init_score()
 {
 	_score = 0;
-	_score_att_start = allocate_att(SCORE_DIGITS);
+	_score_att_start = allocate_ent(SCORE_DIGITS);
 
 	update_score();
 }
 
 void clear_score()
 {
-	free_att(_score_att_start, SCORE_DIGITS);
+	free_ent(_score_att_start, SCORE_DIGITS);
 }
 
 void add_score(int x)

@@ -29,13 +29,13 @@
 #include "assets/whale_air_1.h"
 #include "assets/whale_air_2.h"
 
-static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
-
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
 static POINT _player_mos;
 static int _invincible_frames;
+static FIXED _player_speed = (int)(2.0f * (FIX_SCALE));
+static int _speed_up;
 
 ent_t _player = {};
 
@@ -84,7 +84,7 @@ void init_player()
 
 void unload_player()
 {
-	free_att(_player.att_idx, 1);
+	free_ent(_player.att_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
 }
 
@@ -127,7 +127,7 @@ static void player_shoot()
 	};
 	mmEffectEx(&shoot_sound);
 
-	int att_idx = allocate_att(1);
+	int att_idx = allocate_ent(1);
 	FIXED vx, x;
 	if (_player.facing == FACING_RIGHT)
 	{
@@ -178,13 +178,9 @@ void update_player()
 
 	// Player movement
 	if (key_held(KEY_LEFT))
-	{
-		_player.vx = -SPEED;
-	}
+		_player.vx = -_player_speed;
 	else if (key_held(KEY_RIGHT))
-	{
-		_player.vx = SPEED;
-	}
+		_player.vx = _player_speed;
 
 	//Shoot
 	if (key_hit(KEY_B))
@@ -193,7 +189,7 @@ void update_player()
 	// Stops player from going offscreen to the right
 	if (fx2int(_player.x) > GBA_WIDTH - 20)
 	{
-		_player.vx += -SPEED;
+		_player.vx += -_player_speed;
 	}
 
 	// Update velocity
@@ -243,6 +239,23 @@ void update_player()
 	else
 	{
 		_invincible_frames--;
+	}
+
+	//Check colsion with other
+	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP))
+	{
+		_speed_up = 120;
+		_scroll_x += 0.5f * FIX_SCALEF;
+		_player_speed += 0.5f * FIX_SCALEF;
+	}
+	else if (_speed_up > 0)
+	{
+		_speed_up--;
+		if (_speed_up == 0)
+		{
+			_scroll_x -= 0.5f * FIX_SCALEF;
+			_player_speed == 0.25f * FIX_SCALEF;
+		}
 	}
 
 	//Handles player anime
@@ -329,4 +342,9 @@ void update_player()
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
 
 	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
+}
+
+int speed_up_active()
+{
+	return _speed_up;
 }

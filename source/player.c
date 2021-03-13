@@ -115,6 +115,37 @@ static void apply_player_damage(int ammount)
 	_invincible_frames = 60;
 }
 
+static void player_shoot()
+{
+	//Play sound
+	mm_sound_effect shoot_sound = {
+		{SFX_LASER_4},
+		(int)(1.0f * (1 << 10)),
+		0,
+		120,
+		127,
+	};
+	mmEffectEx(&shoot_sound);
+
+	int att_idx = allocate_att(1);
+	FIXED vx, x;
+	if (_player.facing == FACING_RIGHT)
+	{
+		vx = 2.5 * FIX_SCALE;
+		x = _player.x + 16 * FIX_SCALE;
+	}
+	else
+	{
+		vx = -2.5 * FIX_SCALE;
+		x = _player.x + -16 * FIX_SCALE;
+	}
+
+	create_bullet(
+		&_ents[att_idx], att_idx,
+		BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
+		vx, 0, _player.facing == FACING_LEFT);
+}
+
 void update_player()
 {
 	//Handles damage moasic effect
@@ -157,25 +188,7 @@ void update_player()
 
 	//Shoot
 	if (key_hit(KEY_B))
-	{
-		int att_idx = allocate_att(1);
-		FIXED vx, x;
-		if (_player.facing == FACING_RIGHT)
-		{
-			vx = 2.5 * FIX_SCALE;
-			x = _player.x + 16 * FIX_SCALE;
-		}
-		else
-		{
-			vx = -2.5 * FIX_SCALE;
-			x = _player.x + -16 * FIX_SCALE;
-		}
-
-		create_bullet(
-			&_ents[att_idx], att_idx,
-			BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
-			vx, 0, _player.facing == FACING_LEFT);
-	}
+		player_shoot();
 
 	// Stops player from going offscreen to the right
 	if (fx2int(_player.x) > GBA_WIDTH - 20)

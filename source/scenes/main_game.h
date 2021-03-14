@@ -12,6 +12,8 @@
 #define MG_BG_X 64
 #define MG_BG_X_PIX (int)(MG_BG_X * 8 * (FIX_SCALE))
 
+#include "../common.h"
+
 typedef enum mg_mode_t
 {
 	MG_MODE_CITY,
@@ -20,12 +22,11 @@ typedef enum mg_mode_t
 
 typedef enum mg_states_t
 {
-	MG_S_READY,
-	MG_S_SET,
-	MG_S_GO,
 	MG_S_STARTING,
 	MG_S_SCROLLING,
 	MG_S_PAUSED
 } mg_states_t;
+
+extern const scene_t main_game;
 
 #endif

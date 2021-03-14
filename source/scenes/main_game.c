@@ -6,7 +6,7 @@
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
-#include "../common.h"
+#include "title_screen.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -24,9 +24,6 @@
 #include "../assets/fog.h"
 #include "../assets/mainGameShared.h"
 #include "../assets/buildingtileset.h"
-#include "../assets/ready.h"
-#include "../assets/set.h"
-#include "../assets/go.h"
 
 static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
@@ -41,7 +38,6 @@ static int _ready_tile_start;
 static mg_states_t _state;
 static mg_states_t _old_state;
 static mg_mode_t _mode;
-const static mm_sfxhand _intro_handler = 1;
 
 static FIXED wrap_x(FIXED x)
 {
@@ -160,9 +156,6 @@ static void show(void)
 	_fog_tiles_idx = backgroundCityTilesLen / 32;
 	dma3_cpy(&tile_mem[MG_SHARED_CB][_fog_tiles_idx], fogTiles, fogTilesLen);
 
-	_ready_tile_start = _fog_tiles_idx + fogTilesLen / 32; //allocate_bg_tile_idx(readyTilesLen / 64);
-	dma3_cpy(&tile_mem[MG_SHARED_CB][_ready_tile_start], readyTiles, readyTilesLen);
-
 	load_foreground_tiles();
 
 	load_life_display();
@@ -177,11 +170,6 @@ static void show(void)
 	{
 		se_mem[MG_CLOUD_SB][i] += _fog_tiles_idx / 2;
 	}
-
-	dma3_cpy(se_mem[MG_TEXT_SB], readyMap, readyMapLen);
-	//TODO: stop this double iteration bullshit
-	for (int i = 0; i < SB_SIZE; i++)
-		se_mem[MG_TEXT_SB][i] += _ready_tile_start / 2;
 
 	//Set bg postions
 	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
@@ -219,20 +207,11 @@ static void show(void)
 	_next_building_spawn = 0;
 	_scroll_x = 0;
 	_building_spawn_x = 0;
-	_state = MG_S_READY;
+	_state = MG_S_STARTING;
 
 	init_player();
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
-
-	mm_sound_effect shoot_sound = {
-		{SFX_READY_0},
-		(int)(1.0f * (1 << 10)),
-		_intro_handler,
-		120,
-		127,
-	};
-	mmEffectEx(&shoot_sound);
 
 	//These should be moved into level speifc stuff
 	load_enemy_toast();
@@ -257,53 +236,6 @@ static bool check_game_over()
 
 static void update(void)
 {
-	if (_state == MG_S_READY)
-	{
-		if (!mmEffectActive(_intro_handler))
-		{
-			dma3_cpy(&tile_mem[MG_SHARED_CB][_ready_tile_start], setTiles, setTilesLen);
-			dma3_cpy(se_mem[MG_TEXT_SB], setMap, setMapLen);
-			//Fuck it
-			for (int i = 0; i < SB_SIZE; i++)
-				se_mem[MG_TEXT_SB][i] += _ready_tile_start / 2;
-
-			mm_sound_effect set_sound = {
-				{SFX_SET_0},
-				(int)(1.0f * (1 << 10)),
-				_intro_handler,
-				120,
-				127,
-			};
-			mmEffectEx(&set_sound);
-			_state = MG_S_SET;
-		}
-		return;
-	}
-	else if (_state == MG_S_SET)
-	{
-		if (!mmEffectActive(_intro_handler))
-		{
-			dma3_cpy(&tile_mem[MG_SHARED_CB][_ready_tile_start], goTiles, goTilesLen);
-			dma3_cpy(se_mem[MG_TEXT_SB], goMap, goMapLen);
-			//Fuck it
-			for (int i = 0; i < SB_SIZE; i++)
-				se_mem[MG_TEXT_SB][i] += _ready_tile_start / 2;
-
-			mm_sound_effect go_sound = {
-				{SFX_GO_0},
-				(int)(1.0f * (1 << 10)),
-				_intro_handler,
-				120,
-				127,
-			};
-			mmEffectEx(&go_sound);
-			mmSetModuleVolume(300);
-			mmStart(MOD_INTRO, MM_PLAY_ONCE);
-			_state = MG_S_STARTING;
-		}
-		return;
-	}
-
 	//Starts main track after intro
 	if (!mmActive())
 	{
@@ -430,7 +362,7 @@ static void hide(void)
 	dma3_fill(se_mem[MG_CITY_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_BUILDING_SB], 0x0, SB_SIZE);
 
-	free_bg_tile_idx(0, 449);
+	free_bg_tile_idx(0, BG_TILE_ALLC_SIZE);
 
 	unload_foreground_tiles();
 	clear_score();

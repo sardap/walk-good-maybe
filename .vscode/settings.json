@@ -6,7 +6,10 @@
 		"sstream": "c",
 		"lifeammount.h": "c",
 		"buildingtileset.h": "c",
-		"gun.h": "c"
+		"gun.h": "c",
+		"common.h": "c",
+		"main_game.h": "c",
+		"gicoolbackground.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -55,6 +55,8 @@ add_objects "./assets/enemy"
 gen_png "./assets/obstacles"
 add_objects "./assets/obstacles"
 
+gen_png "./assets/game_intro"
+
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
@@ -106,9 +108,6 @@ BG_OPTIONS="$BG_OPTIONS -O mainGameShared"	# Shared pallet name
 
 echo "Creating background tiles for main game / pal / map"
 grit \
-	$ASSETS/text/ready.png \
-	$ASSETS/text/set.png \
-	$ASSETS/text/go.png \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
 	$ASSETS/background/building0TileSet.png \
@@ -138,6 +137,29 @@ grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/cloud.png \
 	$ASSETS/background/backgroundSky.png $BG_OPTIONS
+
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O gameIntroShared"	# Shared pallet name
+
+echo "Creating game intro tiles / pal / map"
+grit \
+	$ASSETS/text/ready.png \
+	$ASSETS/text/set.png \
+	$ASSETS/text/go.png \
+	$ASSETS/game_intro/whaleClose.png \
+	$ASSETS/game_intro/whaleFar.png \
+	$ASSETS/game_intro/whaleVeryClose.png \
+	$ASSETS/game_intro/giCoolBackground.png $BG_OPTIONS
 
 echo "compelte creating assets"
 cd ${PWD_OLD}

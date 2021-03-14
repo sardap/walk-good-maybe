@@ -27,8 +27,6 @@ typedef struct scene_t
 	void (*hide)(void);
 } scene_t;
 
-extern const scene_t main_game, title_screen;
-
 extern FIXED _scroll_x;
 
 void scene_set(scene_t scene);

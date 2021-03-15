@@ -25,7 +25,6 @@
 #include "../assets/mainGameShared.h"
 #include "../assets/buildingtileset.h"
 
-static FIXED _next_cloud_spawn;
 static FIXED _next_building_spawn;
 static int _building_spawn_x;
 static int _bg_0_scroll;
@@ -171,6 +170,9 @@ static void show(void)
 		se_mem[MG_CLOUD_SB][i] += _fog_tiles_idx / 2;
 	}
 
+	irq_init(NULL);
+	irq_add(II_VBLANK, mmVBlank);
+
 	//Set bg postions
 	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
 	REG_BG0VOFS = 0;
@@ -203,7 +205,6 @@ static void show(void)
 	REG_BLDALPHA = BLDA_BUILD(8, 6);
 	REG_BLDY = BLDY_BUILD(0);
 
-	_next_cloud_spawn = 0;
 	_next_building_spawn = 0;
 	_scroll_x = 0;
 	_building_spawn_x = 0;
@@ -281,20 +282,11 @@ static void update(void)
 	REG_BG1HOFS = fx2int(_bg_pos_x);
 	REG_BG2HOFS = fx2int(_bg_2_scroll / 4);
 
-	_next_cloud_spawn -= _scroll_x;
 	_next_building_spawn -= _scroll_x;
 
 	if (frame_count() % 60 == 0)
 	{
 		add_score(fx2int(_scroll_x * 10));
-	}
-
-	if (_next_cloud_spawn < 0 && false)
-	{
-		_next_cloud_spawn = gba_rand_range(
-								fx2int(CLOUD_WIDTH),
-								fx2int(CLOUD_WIDTH + (int)(100 * FIX_SCALE))) *
-							FIX_SCALE;
 	}
 
 	if (_next_building_spawn < 0)

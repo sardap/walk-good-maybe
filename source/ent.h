@@ -52,14 +52,14 @@ typedef enum
 
 typedef struct ent_t
 {
+	int tid;
+	int att_idx;
 	FIXED x, y;
 	FIXED vx, vy;
-	int tid;
 	int w, h;
-	int att_idx;
 	int ent_cols;
 	ent_types_t ent_type;
-	
+
 	//Ent speifc vars
 	union
 	{
@@ -74,7 +74,6 @@ typedef struct ent_t
 		struct
 		{
 			bullet_type_t bullet_type;
-			bool active;
 		};
 		//Enemy
 		struct

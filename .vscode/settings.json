@@ -9,7 +9,9 @@
 		"gun.h": "c",
 		"common.h": "c",
 		"main_game.h": "c",
-		"gicoolbackground.h": "c"
+		"gicoolbackground.h": "c",
+		"whaleclose.h": "c",
+		"maxmod.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

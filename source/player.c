@@ -53,6 +53,7 @@ void load_player_tile()
 {
 	_tile_start_idx = allocate_obj_tile_idx(whale_smallTilesLen / 64);
 	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
+	//This really shouldn't happen here
 	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 }
 
@@ -152,6 +153,7 @@ void update_player()
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
 		_player_mos.x--;
+		//update to be in global space
 		REG_MOSAIC = MOS_BUILD(0, 0, _player_mos.x >> 3, _player_mos.y >> 3);
 
 		if (_player_mos.x-- <= 0)

@@ -35,7 +35,6 @@ void create_bullet(
 	bul->h = 5;
 	bul->vx = vx;
 	bul->vy = vy;
-	bul->active = true;
 	bul->ent_type = TYPE_BULLET;
 
 	switch (type)

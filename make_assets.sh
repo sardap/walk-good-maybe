@@ -67,19 +67,6 @@ mkdir -p $OUTPATH
 
 cd $OUTPATH
 
-SPRITE_8x8=""
-SPRITE_8x8="$SPRITE_8x8 -ftc"       # output to C files
-SPRITE_8x8="$SPRITE_8x8 -gt"        # output tiled graphics
-SPRITE_8x8="$SPRITE_8x8 -gB4"       # output 4bpp graphics
-SPRITE_8x8="$SPRITE_8x8 -gu32"       # output data as byte array
-SPRITE_8x8="$SPRITE_8x8 -gT ff00f7" # transparent colour
-# SPRITE_8x8="$SPRITE_8x8 -pe 16"     # up to 16 colours in the palette
-
-SPRITE_16x16="$SPRITE_8x8 -Mw 2 -Mh 2"
-SPRITE_32x32="$SPRITE_8x8 -Mw 4 -Mh 4"
-SPRITE_32x64="$SPRITE_8x8 -Mw 4 -Mh 8"
-SPRITE_64x64="$SPRITE_8x8 -Mw 8 -Mh 8"
-
 SP_OPTIONS=""
 SP_OPTIONS="$SP_OPTIONS -ftc"
 SP_OPTIONS="$SP_OPTIONS -gt"        			# output tiled graphics
@@ -149,17 +136,31 @@ BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
 BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
-BG_OPTIONS="$BG_OPTIONS -O gameIntroShared"	# Shared pallet name
+BG_OPTIONS="$BG_OPTIONS -O giBackgroundShared"	# Shared pallet name
 
 echo "Creating game intro tiles / pal / map"
 grit \
-	$ASSETS/text/ready.png \
-	$ASSETS/text/set.png \
-	$ASSETS/text/go.png \
-	$ASSETS/game_intro/whaleClose.png \
-	$ASSETS/game_intro/whaleFar.png \
-	$ASSETS/game_intro/whaleVeryClose.png \
+	$ASSETS/game_intro/ready.png \
+	$ASSETS/game_intro/set.png \
+	$ASSETS/game_intro/go.png \
+	$ASSETS/game_intro/giSky.png \
 	$ASSETS/game_intro/giCoolBackground.png $BG_OPTIONS
+
+SP_OPTIONS=""
+SP_OPTIONS="$SP_OPTIONS -ftc"
+SP_OPTIONS="$SP_OPTIONS -gt"        			# output tiled graphics
+SP_OPTIONS="$SP_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+SP_OPTIONS="$SP_OPTIONS -gB8"       			# output 4bpp graphics
+SP_OPTIONS="$SP_OPTIONS -gu32"       			# output data as byte array
+SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
+SP_OPTIONS="$SP_OPTIONS -O giSpriteShared"		# Shared pallet name
+# SP_OPTIONS="$SP_OPTIONS -Mw 2 -Mh 2"			# SPRITE_16x16
+
+echo "Creating objects for game_intro"
+grit \
+	$ASSETS/game_intro/whaleLarge.png \
+	$SP_OPTIONS
+
 
 echo "compelte creating assets"
 cd ${PWD_OLD}

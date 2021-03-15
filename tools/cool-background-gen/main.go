@@ -13,6 +13,7 @@ import (
 )
 
 const stepSize = 8
+const size = 512
 
 func messUp(img *image.RGBA, x, y int, c color.Color, steps int) {
 	tmp := rand.Intn(1000)
@@ -47,17 +48,17 @@ func messUp(img *image.RGBA, x, y int, c color.Color, steps int) {
 
 func createColourFile(outfile string) {
 	img := image.NewRGBA(image.Rectangle{
-		image.Point{0, 0}, image.Point{256, 256},
+		image.Point{0, 0}, image.Point{size, size},
 	})
 
-	for y := 0; y < 256; y += stepSize {
+	for y := 0; y < size; y += stepSize {
 		c := color.NRGBA{
 			R: uint8(rand.Intn(255)),
 			G: uint8(rand.Intn(255)),
 			B: uint8(rand.Intn(255)),
 			A: 255,
 		}
-		for x := 0; x < 256; x++ {
+		for x := 0; x < size; x++ {
 			for i := y; i < y+stepSize; i++ {
 				img.Set(x, i, c)
 			}

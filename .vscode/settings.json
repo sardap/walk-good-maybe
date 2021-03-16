@@ -11,7 +11,10 @@
 		"main_game.h": "c",
 		"gicoolbackground.h": "c",
 		"whaleclose.h": "c",
-		"maxmod.h": "c"
+		"maxmod.h": "c",
+		"gibackgroundaffineshared.h": "c",
+		"gibackgroundshared.h": "c",
+		"gibackgroundaffshared.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

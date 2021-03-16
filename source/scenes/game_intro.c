@@ -16,8 +16,9 @@
 #include "../assets/giBackgroundShared.h"
 #include "../assets/giSpriteShared.h"
 #include "../assets/whaleLarge.h"
-#include "../assets/giCoolBackground.h"
+#include "../assets/giCityTop.h"
 #include "../assets/giSky.h"
+#include "../assets/giBackgroundAffShared.h"
 
 static const int shared_cb = 0;
 static const int cool_background_ssb = 8;
@@ -78,16 +79,20 @@ static void show(void)
 	REG_BG1HOFS = 0;
 	REG_BG1VOFS = 0;
 
-	// Load palette
-	GRIT_CPY(pal_bg_mem, giBackgroundSharedPal);
+	/* Load palettes */
+	GRIT_CPY(pal_bg_mem + 240, giBackgroundSharedPal);
+	GRIT_CPY(pal_bg_mem, giBackgroundAffSharedPal);
 	GRIT_CPY(pal_obj_mem, giSpriteSharedPal);
-	// Load background tiles into shared_cb
-	GRIT_CPY(&tile_mem[shared_cb], giBackgroundSharedTiles);
+	/* Load background tiles into shared_cb */
+	//afine background
+	GRIT_CPY(&tile_mem[shared_cb], giBackgroundAffSharedTiles);
+	//reg background
+	GRIT_CPY(&tile_mem[shared_cb][450 * 2], giBackgroundSharedTiles);
 	//Load object tiles
 	GRIT_CPY(&tile_mem[4][0], whaleLargeTiles);
 
 	// Background maps
-	GRIT_CPY(&se_mem[cool_background_ssb], giCoolBackgroundMap);
+	GRIT_CPY(&se_mem[cool_background_ssb], giCityTopMap);
 	GRIT_CPY(&se_mem[text_ssb], readyMap);
 	GRIT_CPY(&se_mem[sky_ssb], giSkyMap);
 
@@ -106,7 +111,7 @@ static void show(void)
 
 	// Setup cam
 	cam_pos.x = 257.89f * FIX_SCALEF;
-	cam_pos.y = 100.0f * FIX_SCALEF;
+	cam_pos.y = 200.0f * FIX_SCALEF;
 	cam_pos.z = 496.38f * FIX_SCALEF;
 	cam_phi = 0;
 	g_cosf = lu_cos(cam_phi) >> 4;
@@ -140,7 +145,7 @@ static void show(void)
 
 static void update(void)
 {
-	cam_pos.y -= 0.9f * FIX_SCALE;
+	cam_pos.y -= 1.8f * FIX_SCALE;
 	whale_scale -= 5;
 	whale_rotate += 1024;
 

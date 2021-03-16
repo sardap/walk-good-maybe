@@ -132,19 +132,40 @@ BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
 BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
 BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
 BG_OPTIONS="$BG_OPTIONS -m"						# Export map
-BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -ma 450"				# Tiles start at 450
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -ps 240" 				# start pallet at 240
+BG_OPTIONS="$BG_OPTIONS -ps 249" 				# start pallet at 240
+BG_OPTIONS="$BG_OPTIONS -pn 15" 				# start pallet at 240
 BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
 BG_OPTIONS="$BG_OPTIONS -O giBackgroundShared"	# Shared pallet name
 
-echo "Creating game intro tiles / pal / map"
+echo "Creating reg background for game intro tiles / pal / map"
 grit \
+	$ASSETS/game_intro/giEmpty.png \
 	$ASSETS/game_intro/ready.png \
 	$ASSETS/game_intro/set.png \
 	$ASSETS/game_intro/go.png \
-	$ASSETS/game_intro/giSky.png \
-	$ASSETS/game_intro/giCoolBackground.png $BG_OPTIONS
+	$ASSETS/game_intro/giSky.png $BG_OPTIONS
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"						# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 				# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"						# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 						# use short
+BG_OPTIONS="$BG_OPTIONS -m"							# Export map
+BG_OPTIONS="$BG_OPTIONS -mLa"						# Map Affine
+BG_OPTIONS="$BG_OPTIONS -mRa"						# Tile reudciton needs this to stop from that stupid flip tile reduciotn
+BG_OPTIONS="$BG_OPTIONS -pS" 						# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"						# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O giBackgroundAffShared"	# Shared pallet name
+
+echo "Creating affine background for game intro tiles / pal / map"
+grit \
+	$ASSETS/game_intro/giEmpty.png \
+	$ASSETS/game_intro/giCityTop.png \
+	$BG_OPTIONS
 
 SP_OPTIONS=""
 SP_OPTIONS="$SP_OPTIONS -ftc"

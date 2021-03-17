@@ -12,6 +12,7 @@
 #define TERMINAL_VY GRAVITY * 20
 
 #define GBA_WIDTH 240
+#define GBA_HEIGHT 160
 
 #define X_SCROLL_GAIN (FIXED)(0.01f * (FIX_SCALEF))
 #define X_SCROLL_MAX (FIXED)(3.5f * (FIX_SCALEF))
@@ -25,8 +26,6 @@ typedef struct scene_t
 	void (*update)(void);
 	void (*hide)(void);
 } scene_t;
-
-extern const scene_t main_game, title_screen;
 
 extern FIXED _scroll_x;
 

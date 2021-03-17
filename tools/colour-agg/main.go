@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"image"
 	"image/color"
 	"image/png"
 	_ "image/png"
 	"os"
-	"sort"
-	"strconv"
 )
 
 func findColours(img image.Image) map[color.Color]bool {
@@ -21,26 +18,6 @@ func findColours(img image.Image) map[color.Color]bool {
 	}
 
 	return result
-}
-
-func toColourSlice(cMap map[color.Color]bool) []color.Color {
-	var colours []color.Color
-
-	for k := range cMap {
-		colours = append(colours, k)
-	}
-
-	sort.SliceStable(colours, func(i, j int) bool {
-		r, g, b, _ := colours[i].RGBA()
-		left, _ := strconv.Atoi(fmt.Sprintf("%d%d%d", r, g, b))
-
-		r, g, b, _ = colours[j].RGBA()
-		right, _ := strconv.Atoi(fmt.Sprintf("%d%d%d", r, g, b))
-
-		return left > right
-	})
-
-	return colours
 }
 
 func createColourFile(outfile string, colours []color.Color) {
@@ -66,8 +43,9 @@ func createColourFile(outfile string, colours []color.Color) {
 
 }
 
-func getAllColours(files []string) map[color.Color]bool {
-	result := make(map[color.Color]bool)
+func getAllColours(files []string) []color.Color {
+	var result []color.Color
+	cMap := make(map[color.Color]bool)
 
 	for _, v := range files {
 		file, err := os.Open(v)
@@ -81,7 +59,10 @@ func getAllColours(files []string) map[color.Color]bool {
 		}
 
 		for k, v := range findColours(img) {
-			result[k] = v
+			if _, ok := cMap[k]; !ok {
+				result = append(result, k)
+			}
+			cMap[k] = v
 		}
 	}
 
@@ -89,7 +70,6 @@ func getAllColours(files []string) map[color.Color]bool {
 }
 
 func main() {
-	cMap := getAllColours(os.Args[2:])
-	colours := toColourSlice(cMap)
+	colours := getAllColours(os.Args[2:])
 	createColourFile(os.Args[1], colours)
 }

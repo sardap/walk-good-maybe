@@ -1,20 +1,22 @@
 #include <tonc.h>
-#include <maxmod.h>    
+#include <maxmod.h>
+#include "soundbank_bin.h"
 
 #include "debug.h"
 #include "common.h"
 #include "graphics.h"
 #include "ent.h"
-#include "soundbank_bin.h"
+#include "scenes/title_screen.h"
 
-void game_loop() {
+void game_loop()
+{
 	irq_init(NULL);
 	irq_enable(II_VBLANK);
 
 	irq_add(II_VBLANK, mmVBlank);
-    mmInitDefault((mm_addr)soundbank_bin, 8);
+	mmInitDefault((mm_addr)soundbank_bin, 8);
 
-	while(1)
+	while (1)
 	{
 		VBlankIntrWait();
 
@@ -27,7 +29,8 @@ void game_loop() {
 	}
 }
 
-void start_game() {
+void start_game()
+{
 	scene_set(title_screen);
 	game_loop();
 }
@@ -43,7 +46,8 @@ int main()
 
 	start_game();
 
-    while(1);
+	while (1)
+		;
 
-    return 0;
+	return 0;
 }

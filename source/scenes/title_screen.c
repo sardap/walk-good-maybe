@@ -1,7 +1,9 @@
+#include "title_screen.h"
+
 #include <tonc.h>
 #include <stdio.h>
 
-#include "../common.h"
+#include "game_intro.h"
 #include "../graphics.h"
 #include "../assets/backgroundSky.h"
 #include "../assets/title_text.h"
@@ -9,7 +11,7 @@
 #include "../assets/backgroundSky.h"
 #include "../debug.h"
 
-static const int shared_cb = 0;      // tile gfx
+static const int shared_cb = 0; // tile gfx
 
 static const int cloud_sb = 30; // entries
 static const int foreground_sb = 29;
@@ -18,7 +20,8 @@ static const int shared_cloud_tile_start = 72;
 
 static u16 _bkg_x;
 
-static void show(void) {
+static void show(void)
+{
 	// Load palette
 	dma3_cpy(pal_bg_mem, titleScreenSharedPal, titleScreenSharedPalLen);
 	// Load tiles into shared_cb
@@ -28,12 +31,10 @@ static void show(void) {
 
 	//Fill cloud layer
 	dma3_cpy(se_mem[cloud_sb], backgroundSkyMap, backgroundSkyMapLen);
-	
-	init_seed(652374291);
+
 	place_n_clouds(
 		shared_cloud_tile_start, cloud_sb, 32,
-		gba_rand_range(3, 5)
-	);
+		gba_rand_range(3, 5));
 
 	// Set RegX scroll to 0
 	REG_BG0HOFS = 0;
@@ -44,30 +45,34 @@ static void show(void) {
 	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(cloud_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(foreground_sb) | BG_CBB(shared_cb) | BG_REG_32x32;
 
-	REG_DISPCNT =  DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1;
+	REG_DISPCNT = DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1;
 }
 
-static void update(void) {
-	if(frame_count() % 3 == 0){
+static void update(void)
+{
+	if (frame_count() % 3 == 0)
+	{
 		_bkg_x++;
 
 		REG_BG0HOFS = _bkg_x;
 	}
 
-	if(key_hit(KEY_A)) {
-		for(int i = 0; i < frame_count(); i++) {
+	if (key_hit(KEY_A))
+	{
+		for (int i = 0; i < frame_count(); i++)
+		{
 			qran();
 		}
-		scene_set(main_game);
+		scene_set(game_intro);
 	}
 }
 
-static void hide(void) {
+static void hide(void)
+{
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0;
 }
 
 const scene_t title_screen = {
 	.show = show,
 	.update = update,
-	.hide = hide
-};
+	.hide = hide};

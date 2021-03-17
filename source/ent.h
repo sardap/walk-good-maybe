@@ -13,14 +13,23 @@
 
 //Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
 #define ENT_COUNT 25
+#define ENT_VISUAL_COUNT 5
 
 typedef enum ent_types_t
 {
-	TYPE_NONE,
-	TYPE_PLAYER,
-	TYPE_BULLET,
-	TYPE_ENEMY
+	TYPE_NONE = 0,
+	TYPE_PLAYER = 1,
+	TYPE_BULLET = 2,
+	TYPE_ENEMY = 4,
+	TYPE_SPEED_UP = 8,
+	TYPE_SPEED_LINE = 16,
 } ent_types_t;
+
+typedef enum ent_visual_types_t
+{
+	TYPE_VISUAL_NONE = 0,
+	TYPE_VISUAL_SPEED_LINE = 1,
+} ent_visual_types_t;
 
 typedef enum movement_state_t
 {
@@ -43,13 +52,14 @@ typedef enum
 
 typedef struct ent_t
 {
+	int tid;
+	int att_idx;
 	FIXED x, y;
 	FIXED vx, vy;
-	int tid;
 	int w, h;
-	int att_idx;
 	int ent_cols;
 	ent_types_t ent_type;
+
 	//Ent speifc vars
 	union
 	{
@@ -64,24 +74,32 @@ typedef struct ent_t
 		struct
 		{
 			bullet_type_t bullet_type;
-			bool active;
 		};
 		//Enemy
 		struct
 		{
-			int anime_cycle;
 		};
 	};
 
 } ent_t;
+
+typedef struct ent_visual_t
+{
+	FIXED x, y;
+	FIXED vx, vy;
+	ent_visual_types_t type;
+} ent_visual_t;
 
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 def ent_t _ents[ENT_COUNT];
 
 void init_obj_atts();
-int allocate_att(int count);
-void free_att(int idx, int count);
+int allocate_ent(int count);
+void free_ent(int idx, int count);
+
+int allocate_ent_visual(int count);
+void free_ent_visual(int idx, int count);
 
 inline OBJ_ATTR *get_ent_att(ent_t *e)
 {
@@ -115,9 +133,11 @@ void push_up_from_ground(ent_t *e);
 
 bool did_hit_x(ent_t *e, FIXED dx);
 bool ent_move_x(ent_t *e, FIXED dx);
+void ent_move_x_dirty(ent_t *e);
 
 bool did_hit_y(ent_t *e, FIXED dy);
 bool ent_move_y(ent_t *e, FIXED dy);
+void ent_move_y_dirty(ent_t *e);
 
 bool apply_gravity(ent_t *e);
 

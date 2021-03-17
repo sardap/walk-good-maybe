@@ -52,6 +52,12 @@ add_objects "./assets/weapons"
 gen_png "./assets/enemy"
 add_objects "./assets/enemy"
 
+gen_png "./assets/obstacles"
+add_objects "./assets/obstacles"
+
+gen_png "./assets/game_intro"
+
+
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
 # colour-agg.exe ./assets/objects_out.png $OBJECTS
@@ -60,19 +66,6 @@ rm -rf $OUTPATH
 mkdir -p $OUTPATH
 
 cd $OUTPATH
-
-SPRITE_8x8=""
-SPRITE_8x8="$SPRITE_8x8 -ftc"       # output to C files
-SPRITE_8x8="$SPRITE_8x8 -gt"        # output tiled graphics
-SPRITE_8x8="$SPRITE_8x8 -gB4"       # output 4bpp graphics
-SPRITE_8x8="$SPRITE_8x8 -gu32"       # output data as byte array
-SPRITE_8x8="$SPRITE_8x8 -gT ff00f7" # transparent colour
-# SPRITE_8x8="$SPRITE_8x8 -pe 16"     # up to 16 colours in the palette
-
-SPRITE_16x16="$SPRITE_8x8 -Mw 2 -Mh 2"
-SPRITE_32x32="$SPRITE_8x8 -Mw 4 -Mh 4"
-SPRITE_32x64="$SPRITE_8x8 -Mw 4 -Mh 8"
-SPRITE_64x64="$SPRITE_8x8 -Mw 8 -Mh 8"
 
 SP_OPTIONS=""
 SP_OPTIONS="$SP_OPTIONS -ftc"
@@ -106,6 +99,8 @@ grit \
 	$ASSETS/background/backgroundCity.png \
 	$ASSETS/background/building0TileSet.png \
 	$ASSETS/background/building1TileSet.png \
+	$ASSETS/background/building2TileSet.png \
+	$ASSETS/background/building3TileSet.png \
 	$ASSETS/background/lava0TileSet.png \
 	$ASSETS/background/buildingtileset.png \
 	$BG_OPTIONS
@@ -129,6 +124,65 @@ grit \
 	$ASSETS/title_screen/title_text.png \
 	$ASSETS/background/cloud.png \
 	$ASSETS/background/backgroundSky.png $BG_OPTIONS
+
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -ga 240" 				# start pallet at 240
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -ma 450"				# Tiles start at 450
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -ps 240" 				# start pallet at 240
+BG_OPTIONS="$BG_OPTIONS -ps 249" 				# start pallet at 240
+BG_OPTIONS="$BG_OPTIONS -pn 15" 				# start pallet at 240
+BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O giBackgroundShared"	# Shared pallet name
+
+echo "Creating reg background for game intro tiles / pal / map"
+grit \
+	$ASSETS/game_intro/giEmpty.png \
+	$ASSETS/game_intro/ready.png \
+	$ASSETS/game_intro/set.png \
+	$ASSETS/game_intro/go.png \
+	$ASSETS/game_intro/giSky.png $BG_OPTIONS
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"						# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 				# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"						# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 						# use short
+BG_OPTIONS="$BG_OPTIONS -m"							# Export map
+BG_OPTIONS="$BG_OPTIONS -mLa"						# Map Affine
+BG_OPTIONS="$BG_OPTIONS -mRa"						# Tile reudciton needs this to stop from that stupid flip tile reduciotn
+BG_OPTIONS="$BG_OPTIONS -pS" 						# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"						# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O giBackgroundAffShared"	# Shared pallet name
+
+echo "Creating affine background for game intro tiles / pal / map"
+grit \
+	$ASSETS/game_intro/giEmpty.png \
+	$ASSETS/game_intro/giCityTop.png \
+	$BG_OPTIONS
+
+SP_OPTIONS=""
+SP_OPTIONS="$SP_OPTIONS -ftc"
+SP_OPTIONS="$SP_OPTIONS -gt"        			# output tiled graphics
+SP_OPTIONS="$SP_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+SP_OPTIONS="$SP_OPTIONS -gB8"       			# output 4bpp graphics
+SP_OPTIONS="$SP_OPTIONS -gu32"       			# output data as byte array
+SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
+SP_OPTIONS="$SP_OPTIONS -O giSpriteShared"		# Shared pallet name
+# SP_OPTIONS="$SP_OPTIONS -Mw 2 -Mh 2"			# SPRITE_16x16
+
+echo "Creating objects for game_intro"
+grit \
+	$ASSETS/game_intro/whaleLarge.png \
+	$SP_OPTIONS
+
 
 echo "compelte creating assets"
 cd ${PWD_OLD}

@@ -13,8 +13,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: fix perm
-        run: chmod +x ./build.sh
       - name: Build conatiner
         run: docker build . -t gba_build:latest
       - name: Build Rom

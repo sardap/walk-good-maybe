@@ -5,8 +5,8 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "game boy launch", 
-			"type":"clr",
+			"name": "game boy launch",
+			"type": "clr",
 			"request": "launch",
 			"program": "mGBA.exe",
 			"preLaunchTask": "build-rom",
@@ -17,8 +17,8 @@
 			]
 		},
 		{
-			"name": "music test launch", 
-			"type":"clr",
+			"name": "music test launch",
+			"type": "clr",
 			"request": "launch",
 			"program": "mGBA.exe",
 			"preLaunchTask": "build-rom",
@@ -27,7 +27,7 @@
 			]
 		},
 		{
-			"name": "Launch Package",
+			"name": "Launch color agg",
 			"type": "go",
 			"request": "launch",
 			"mode": "debug",
@@ -37,6 +37,27 @@
 				"example.png"
 			]
 		},
-		
+		{
+			"name": "Launch builder",
+			"type": "go",
+			"request": "launch",
+			"mode": "debug",
+			"program": "${workspaceFolder}/tools/builder",
+			"cwd": "${workspaceFolder}",
+			"args": [
+				"build",
+			]
+		},
+		{
+			"name": "Launch cool background gen",
+			"type": "go",
+			"request": "launch",
+			"mode": "debug",
+			"program": "${workspaceFolder}/tools/cool-background-gen",
+			"cwd": "${workspaceFolder}/tools/cool-background-gen",
+			"args": [
+				"test.png",
+			]
+		},
 	]
 }

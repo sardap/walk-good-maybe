@@ -7,12 +7,15 @@
 #define PLAYER_LIFE_START 3
 
 #define PLAYER_AIR_CYCLE_COUNT 3
-extern const unsigned int *air_anime_cycle[];
+#define PLAYER_WALK_CYCLE_COUNT 5
 
 void init_player();
 
 void unload_player();
 
 void update_player();
+
+//This really shouldn't be here
+int speed_up_active();
 
 #endif

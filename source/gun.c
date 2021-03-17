@@ -35,7 +35,6 @@ void create_bullet(
 	bul->h = 5;
 	bul->vx = vx;
 	bul->vy = vy;
-	bul->active = true;
 	bul->ent_type = TYPE_BULLET;
 
 	switch (type)
@@ -59,7 +58,7 @@ void update_bullet(ent_t *bul)
 
 	if (fx2int(bul->x) > SCREEN_WIDTH || fx2int(bul->x) < 0 || hit_x || bul->ent_cols & (TYPE_ENEMY))
 	{
-		free_att(bul->att_idx, 1);
+		free_ent(bul->att_idx, 1);
 		bul->ent_type = TYPE_NONE;
 		return;
 	}

@@ -29,22 +29,31 @@
 #include "assets/whale_air_1.h"
 #include "assets/whale_air_2.h"
 
-static const FIXED SPEED = (int)(2.0f * (FIX_SCALE));
-
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
 static POINT _player_mos;
 static int _invincible_frames;
+static FIXED _player_speed = (int)(2.0f * (FIX_SCALE));
+static int _speed_up;
 
 ent_t _player = {};
 
-const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+static const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+static const uint *walk_anime_cycle[] = {
+	whale_walk_0Tiles,
+	whale_walk_1Tiles,
+	whale_walk_2Tiles,
+	whale_walk_3Tiles,
+	whale_walk_4Tiles,
+	whale_smallTiles,
+};
 
 void load_player_tile()
 {
 	_tile_start_idx = allocate_obj_tile_idx(whale_smallTilesLen / 64);
 	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
+	//This really shouldn't happen here
 	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 }
 
@@ -76,7 +85,7 @@ void init_player()
 
 void unload_player()
 {
-	free_att(_player.att_idx, 1);
+	free_ent(_player.att_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
 }
 
@@ -107,12 +116,44 @@ static void apply_player_damage(int ammount)
 	_invincible_frames = 60;
 }
 
+static void player_shoot()
+{
+	//Play sound
+	mm_sound_effect shoot_sound = {
+		{SFX_LASER_4},
+		(int)(1.0f * (1 << 10)),
+		0,
+		120,
+		127,
+	};
+	mmEffectEx(&shoot_sound);
+
+	int att_idx = allocate_ent(1);
+	FIXED vx, x;
+	if (_player.facing == FACING_RIGHT)
+	{
+		vx = 2.5 * FIX_SCALE;
+		x = _player.x + 16 * FIX_SCALE;
+	}
+	else
+	{
+		vx = -2.5 * FIX_SCALE;
+		x = _player.x + -16 * FIX_SCALE;
+	}
+
+	create_bullet(
+		&_ents[att_idx], att_idx,
+		BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
+		vx, 0, _player.facing == FACING_LEFT);
+}
+
 void update_player()
 {
 	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
 		_player_mos.x--;
+		//update to be in global space
 		REG_MOSAIC = MOS_BUILD(0, 0, _player_mos.x >> 3, _player_mos.y >> 3);
 
 		if (_player_mos.x-- <= 0)
@@ -139,40 +180,18 @@ void update_player()
 
 	// Player movement
 	if (key_held(KEY_LEFT))
-	{
-		_player.vx = -SPEED;
-	}
+		_player.vx = -_player_speed;
 	else if (key_held(KEY_RIGHT))
-	{
-		_player.vx = SPEED;
-	}
+		_player.vx = _player_speed;
 
 	//Shoot
 	if (key_hit(KEY_B))
-	{
-		int att_idx = allocate_att(1);
-		FIXED vx, x;
-		if (_player.facing == FACING_RIGHT)
-		{
-			vx = 2.5 * FIX_SCALE;
-			x = _player.x + 16 * FIX_SCALE;
-		}
-		else
-		{
-			vx = -2.5 * FIX_SCALE;
-			x = _player.x + -16 * FIX_SCALE;
-		}
-
-		create_bullet(
-			&_ents[att_idx], att_idx,
-			BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
-			vx, 0, _player.facing == FACING_LEFT);
-	}
+		player_shoot();
 
 	// Stops player from going offscreen to the right
 	if (fx2int(_player.x) > GBA_WIDTH - 20)
 	{
-		_player.vx += -SPEED;
+		_player.vx += -_player_speed;
 	}
 
 	// Update velocity
@@ -224,45 +243,32 @@ void update_player()
 		_invincible_frames--;
 	}
 
+	//Check colsion with other
+	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP))
+	{
+		_speed_up = 120;
+		_scroll_x += 0.5f * FIX_SCALEF;
+		_player_speed += 0.5f * FIX_SCALEF;
+	}
+	else if (_speed_up > 0)
+	{
+		_speed_up--;
+		if (_speed_up == 0)
+		{
+			_scroll_x -= 0.5f * FIX_SCALEF;
+			_player_speed == 0.25f * FIX_SCALEF;
+		}
+	}
+
 	//Handles player anime
 	switch (_player.move_state)
 	{
 	case MOVEMENT_GROUNDED:
 		if (abs(_player.vx) > _scroll_x)
 		{
-			const int walk_cycle_count = 25;
-			if (_player_anime_cycle <= 0)
-			{
-				_player_anime_cycle = walk_cycle_count;
-			}
-
-			if (_player_anime_cycle == walk_cycle_count)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_0Tiles, whale_walk_0TilesLen);
-			}
-			else if (_player_anime_cycle == 20)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_1Tiles, whale_walk_1TilesLen);
-			}
-			else if (_player_anime_cycle == 15)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_2Tiles, whale_walk_2TilesLen);
-			}
-			else if (_player_anime_cycle == 10)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_3Tiles, whale_walk_3TilesLen);
-			}
-			else if (_player_anime_cycle == 5)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_walk_4Tiles, whale_walk_4TilesLen);
-			}
-			else if (_player_anime_cycle <= 0)
-			{
-				dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
-				_player_anime_cycle = walk_cycle_count;
-			}
-
-			_player_anime_cycle--;
+			step_anime(
+				walk_anime_cycle, whale_smallTilesLen, PLAYER_WALK_CYCLE_COUNT,
+				&_player_anime_cycle, _tile_start_idx);
 		}
 		else
 		{
@@ -338,4 +344,9 @@ void update_player()
 	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
 
 	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
+}
+
+int speed_up_active()
+{
+	return _speed_up;
 }

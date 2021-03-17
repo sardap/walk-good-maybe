@@ -131,6 +131,7 @@ BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
 BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
 BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
 BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -ga 240" 				# start pallet at 240
 BG_OPTIONS="$BG_OPTIONS -m"						# Export map
 BG_OPTIONS="$BG_OPTIONS -ma 450"				# Tiles start at 450
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit

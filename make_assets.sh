@@ -180,7 +180,10 @@ SP_OPTIONS="$SP_OPTIONS -O giSpriteShared"		# Shared pallet name
 
 echo "Creating objects for game_intro"
 grit \
-	$ASSETS/game_intro/whaleLarge.png \
+	$ASSETS/game_intro/giWhale_air_0.png \
+	$ASSETS/game_intro/giWhale_air_1.png \
+	$ASSETS/game_intro/giWhale_air_2.png \
+	$ASSETS/game_intro/giWhale_air_3.png \
 	$SP_OPTIONS
 
 

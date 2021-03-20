@@ -9,6 +9,7 @@
 #include "main_game.h"
 #include "../graphics.h"
 #include "../debug.h"
+#include "../anime.h"
 
 #include "../assets/ready.h"
 #include "../assets/set.h"
@@ -29,7 +30,6 @@ static const int _text_ssb = 24;
 static const int _sky_ssb = 26;
 static const mm_sfxhand _intro_handler = 1;
 static const int _m7_d = 128;
-static const int _whale_att = 0;
 //1.65 seconds 60 frames per second
 static const int _starting_countdown = 1.65 * 60;
 static const FIXED _whale_start_scale = 512 * FIX_SCALE;
@@ -42,7 +42,6 @@ static gi_states_t _state;
 static OBJ_AFFINE *obj_aff_buffer = (OBJ_AFFINE *)_obj_buffer;
 static FIXED _whale_scale;
 static int _countdown;
-static int _whale_dist;
 static int _anime_cycle;
 
 // --- Type A ---

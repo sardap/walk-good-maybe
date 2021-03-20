@@ -13,12 +13,14 @@
 #include "assets/building1TileSet.h"
 #include "assets/building2TileSet.h"
 #include "assets/building3TileSet.h"
+#include "assets/building4TileSet.h"
 
 static int _lava_0_idx;
 static int _building_0_idx;
 static int _building_1_idx;
 static int _building_2_idx;
 static int _building_3_idx;
+static int _building_4_idx;
 
 int get_lava_tile_offset()
 {
@@ -34,7 +36,7 @@ int get_buildings_tile_offset()
 int get_buildings_tile_offset_end()
 {
 	//Issue this is fucked need to track which building is loaded first
-	return (_building_3_idx / 2) + building3TileSetTilesLen / 64 - 1;
+	return (_building_4_idx / 2) + building4TileSetTilesLen / 64 - 1;
 }
 
 void load_lava_0(int cb)
@@ -314,6 +316,117 @@ int spawn_building_3(int start_x)
 	create_speed_up(
 		&_ents[ent_idx], ent_idx,
 		int2fx(att_x), int2fx(y * 8 - 10));
+
+	return width;
+}
+
+void load_building_4(int cb)
+{
+	_building_4_idx = allocate_bg_tile_idx(building4TileSetTilesLen / 64 - 1);
+	dma3_cpy(&tile_mem[cb][_building_4_idx], building4TileSetTiles + 32, building4TileSetTilesLen - 64);
+}
+
+void unload_building_4()
+{
+	free_bg_tile_idx(_building_4_idx, building4TileSetTilesLen / 64 - 1);
+}
+
+int spawn_building_4(int start_x)
+{
+	int x_base = start_x;
+	int x;
+	int y = gba_rand_range(CITY_BUILDING_Y_TILE_SPAWN - 6, CITY_BUILDING_Y_TILE_SPAWN - 3);
+
+	int tile = _building_4_idx / 2;
+	//LEFT SECTION
+	set_level_at(x_base, y, BUILDING_4_ROOF_LEFT + tile);
+	set_level_col(x_base, y + 1, BUILDING_4_LEFT_BOT + tile);
+
+	int width = gba_rand_range(5, 7);
+
+	//MIDDLE SECTION
+	int blue_sign = 0;
+	for (int i = 1; i < width; ++i)
+	{
+		x = level_wrap_x(x_base + i);
+		set_level_at(x, y, BUILDING_4_ROOF_MIDDLE + tile);
+
+		for (int j = y + 1; j < 30; j += 2)
+		{
+			if (i == 1 || i == width - 1)
+			{
+				switch (gba_rand() % 6)
+				{
+				case 1:
+					set_level_at(x, j, BUILDING_4_SIGN_YELLOW_TOP + tile);
+					set_level_at(x, j + 1, BUILDING_4_SIGN_YELLOW_BOT + tile);
+					break;
+				case 2:
+					set_level_at(x, j, BUILDING_4_SIGN_ORANGE_TOP + tile);
+					set_level_at(x, j + 1, BUILDING_4_SIGN_ORANGE_BOT + tile);
+					break;
+				case 3:
+					set_level_at(x, j, BUILDING_4_SIGN_GREEN_TOP + tile);
+					set_level_at(x, j + 1, BUILDING_4_SIGN_GREEN_BOT + tile);
+					break;
+				case 4:
+				{
+					if (gba_rand() % 2 == 0)
+					{
+						set_level_at(x, j, BUILDING_4_SIGN_RED + tile);
+						set_level_at(x, j + 1, BUILDING_4_SIGN_BLUE + tile);
+					}
+					else
+					{
+						set_level_at(x, j, BUILDING_4_SIGN_RED + tile);
+						set_level_at(x, j + 1, BUILDING_4_MIDDLE_BLANK + tile);
+					}
+					break;
+				}
+				case 5:
+				{
+					if (gba_rand() % 2 == 0)
+					{
+						set_level_at(x, j, BUILDING_4_SIGN_BLUE + tile);
+						set_level_at(x, j + 1, BUILDING_4_SIGN_RED + tile);
+					}
+					else
+					{
+						set_level_at(x, j, BUILDING_4_SIGN_BLUE + tile);
+						set_level_at(x, j + 1, BUILDING_4_MIDDLE_BLANK + tile);
+					}
+					break;
+				}
+				default:
+					set_level_at(x, j, BUILDING_4_MIDDLE_BLANK + tile);
+					set_level_at(x, j + 1, BUILDING_4_MIDDLE_BLANK + tile);
+					break;
+				}
+			}
+			else
+			{
+				set_level_at(x, j, BUILDING_4_MIDDLE_WINDOW + tile);
+				set_level_at(x, j + 1, BUILDING_4_MIDDLE_BLANK + tile);
+			}
+		}
+	}
+
+	//RIGHT SECTION
+	x = level_wrap_x(x_base + width);
+	set_level_at(x, y, BUILDING_4_ROOF_RIGHT + tile);
+	set_level_col(x, y + 1, BUILDING_4_RIGHT_BOT + tile);
+
+	FIXED att_x = level_to_screen(start_x + width / 2);
+	//early return to avoid that awesome wraping bug
+	if (att_x < 0 || gba_rand() % 100 > 50)
+		return width;
+
+	int ent_idx = allocate_ent(1);
+	create_toast_enemy(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 32));
+
+	return width;
 
 	return width;
 }

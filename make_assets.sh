@@ -57,10 +57,20 @@ add_objects "./assets/obstacles"
 
 gen_png "./assets/game_intro"
 
+gen_png "./assets/title_screen"
+
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
 # colour-agg.exe ./assets/objects_out.png $OBJECTS
+
+colour-agg.exe ./assets/title_screen/tsBackgroundAgg.png \
+	./assets/title_screen/tsEmpty.png \
+	./assets/title_screen/tsWater.png \
+	./assets/title_screen/tsCity.png \
+	./assets/title_screen/tsBeach.png \
+	./assets/title_screen/tsTitleText.png
+
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -121,11 +131,11 @@ BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 
 echo "Creating background tiles for title screen / pal / map"
 grit \
-	$ASSETS/backgrounds_out.png \
-	$ASSETS/title_screen/title_text.png \
-	$ASSETS/background/cloud.png \
-	$ASSETS/background/backgroundSky.png $BG_OPTIONS
-
+	$ASSETS/title_screen/tsEmpty.png \
+	$ASSETS/title_screen/tsWater.png \
+	$ASSETS/title_screen/tsCity.png \
+	$ASSETS/title_screen/tsBeach.png \
+	$ASSETS/title_screen/tsTitleText.png $BG_OPTIONS
 
 BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file

@@ -20,6 +20,4 @@ bool valid_cloud_address(int tile_offset, int sb, int width, int x, int y);
 
 void create_cloud(int tile_offset, int sb, int width, int x, int y);
 
-void place_n_clouds(int tile_offset, int sb, int width, int n);
-
 #endif

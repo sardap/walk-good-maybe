@@ -86,7 +86,6 @@ static void show(void)
 	REG_BG1VOFS = 0;
 
 	/* Load palettes */
-	GRIT_CPY(pal_bg_mem, giBackgroundSharedPal);
 	GRIT_CPY(pal_bg_mem, giBackgroundAffSharedPal);
 	GRIT_CPY(pal_obj_mem, giSpriteSharedPal);
 	/* Load background tiles into _shared_cb */

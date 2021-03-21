@@ -19,7 +19,6 @@
 #include "../gen.h"
 #include "../obstacles.h"
 
-#include "../assets/title_text.h"
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
 #include "../assets/mainGameShared.h"
@@ -32,7 +31,6 @@ static int _bg_2_scroll;
 
 static int _far_building_tiles_idx;
 static int _fog_tiles_idx;
-static int _ready_tile_start;
 
 static mg_states_t _state;
 static mg_states_t _old_state;
@@ -256,6 +254,13 @@ static void update(void)
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
 			_state = _old_state;
 		}
+		return;
+	}
+
+	//Back to title screen
+	if (key_held(KEY_START) && key_held(KEY_SELECT))
+	{
+		scene_set(title_screen);
 		return;
 	}
 

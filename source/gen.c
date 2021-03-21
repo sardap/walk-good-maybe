@@ -345,7 +345,6 @@ int spawn_building_4(int start_x)
 	int width = gba_rand_range(5, 7);
 
 	//MIDDLE SECTION
-	int blue_sign = 0;
 	for (int i = 1; i < width; ++i)
 	{
 		x = level_wrap_x(x_base + i);

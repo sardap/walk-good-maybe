@@ -14,7 +14,12 @@
 		"maxmod.h": "c",
 		"gibackgroundaffineshared.h": "c",
 		"gibackgroundshared.h": "c",
-		"gibackgroundaffshared.h": "c"
+		"gibackgroundaffshared.h": "c",
+		"whalelarge.h": "c",
+		"giwhale_air_0.h": "c",
+		"ready.h": "c",
+		"building3tileset.h": "c",
+		"tonc.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

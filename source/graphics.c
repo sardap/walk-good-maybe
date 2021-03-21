@@ -9,8 +9,6 @@
 static int _obj_tile_allc[OBJ_TILE_ALLC_SIZE];
 static int _bg_tile_allc[BG_TILE_ALLC_SIZE];
 
-static int _building_offset;
-
 void init_graphics()
 {
 	for (int i = 0; i < OBJ_TILE_ALLC_SIZE; i++)
@@ -121,28 +119,4 @@ void create_cloud(int tile_offset, int sb, int width, int x, int y)
 	se_mem[sb][address + 33] = tile_offset + 0x6;
 	se_mem[sb][address + 34] = tile_offset + 0x7;
 	se_mem[sb][address + 35] = tile_offset + 0x8;
-}
-
-void place_n_clouds(int tile_offset, int sb, int width, int n)
-{
-	for (int i = 0; i < n; i++)
-	{
-		int j = 0;
-		while (1)
-		{
-			int y = gba_rand_range(0, 10);
-			int x = gba_rand_range(0, 28);
-			j++;
-			if (valid_cloud_address(tile_offset, sb, width, x, y))
-			{
-				create_cloud(tile_offset, sb, width, x, y);
-				j = 6;
-			}
-
-			if (j > 5)
-			{
-				break;
-			}
-		}
-	}
 }

@@ -57,10 +57,21 @@ add_objects "./assets/obstacles"
 
 gen_png "./assets/game_intro"
 
+gen_png "./assets/title_screen"
+
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
 # colour-agg.exe ./assets/objects_out.png $OBJECTS
+
+colour-agg.exe ./assets/title_screen/tsBackgroundAgg.png \
+	./assets/title_screen/tsEmpty.png \
+	./assets/title_screen/tsWater.png \
+	./assets/title_screen/tsLava.png \
+	./assets/title_screen/tsCity.png \
+	./assets/title_screen/tsBeach.png \
+	./assets/title_screen/tsTitleText.png
+
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -101,6 +112,7 @@ grit \
 	$ASSETS/background/building1TileSet.png \
 	$ASSETS/background/building2TileSet.png \
 	$ASSETS/background/building3TileSet.png \
+	$ASSETS/background/building4TileSet.png \
 	$ASSETS/background/lava0TileSet.png \
 	$ASSETS/background/buildingtileset.png \
 	$BG_OPTIONS
@@ -120,11 +132,12 @@ BG_OPTIONS="$BG_OPTIONS -O titleScreenShared"	# Shared pallet name
 
 echo "Creating background tiles for title screen / pal / map"
 grit \
-	$ASSETS/backgrounds_out.png \
-	$ASSETS/title_screen/title_text.png \
-	$ASSETS/background/cloud.png \
-	$ASSETS/background/backgroundSky.png $BG_OPTIONS
-
+	$ASSETS/title_screen/tsEmpty.png \
+	$ASSETS/title_screen/tsWater.png \
+	$ASSETS/title_screen/tsLava.png \
+	$ASSETS/title_screen/tsCity.png \
+	$ASSETS/title_screen/tsBeach.png \
+	$ASSETS/title_screen/tsTitleText.png $BG_OPTIONS
 
 BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
@@ -180,7 +193,10 @@ SP_OPTIONS="$SP_OPTIONS -O giSpriteShared"		# Shared pallet name
 
 echo "Creating objects for game_intro"
 grit \
-	$ASSETS/game_intro/whaleLarge.png \
+	$ASSETS/game_intro/giWhale_air_0.png \
+	$ASSETS/game_intro/giWhale_air_1.png \
+	$ASSETS/game_intro/giWhale_air_2.png \
+	$ASSETS/game_intro/giWhale_air_3.png \
 	$SP_OPTIONS
 
 

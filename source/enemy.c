@@ -1,6 +1,9 @@
 #include "enemy.h"
 
 #include <tonc.h>
+#include <maxmod.h>
+#include "soundbank.h"
+#include "soundbank_bin.h"
 
 #include "common.h"
 #include "anime.h"
@@ -60,6 +63,19 @@ void update_enemy(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_BULLET))
 	{
+		if (ent->ent_cols & (TYPE_BULLET))
+		{
+			//Play sound
+			mm_sound_effect damage = {
+				{SFX_PD_ENEMY_0_DEATH_0},
+				(int)(1.0f * (1 << 10)),
+				0,
+				120,
+				127,
+			};
+			mmEffectEx(&damage);
+		}
+
 		free_ent(ent->att_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		return;

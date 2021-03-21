@@ -19,7 +19,6 @@
 #include "../gen.h"
 #include "../obstacles.h"
 
-#include "../assets/title_text.h"
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
 #include "../assets/mainGameShared.h"
@@ -32,7 +31,6 @@ static int _bg_2_scroll;
 
 static int _far_building_tiles_idx;
 static int _fog_tiles_idx;
-static int _ready_tile_start;
 
 static mg_states_t _state;
 static mg_states_t _old_state;
@@ -72,7 +70,7 @@ static void spawn_buildings()
 	switch (_mode)
 	{
 	case MG_MODE_CITY:
-		switch (gba_rand() % 4)
+		switch (gba_rand() % 5)
 		{
 		case 0:
 			width = spawn_building_0(start_x);
@@ -85,6 +83,9 @@ static void spawn_buildings()
 			break;
 		case 3:
 			width = spawn_building_3(start_x);
+			break;
+		case 4:
+			width = spawn_building_4(start_x);
 			break;
 		}
 	case MG_MODE_BEACH:
@@ -114,6 +115,7 @@ static void load_foreground_tiles()
 		load_building_1(MG_SHARED_CB);
 		load_building_2(MG_SHARED_CB);
 		load_building_3(MG_SHARED_CB);
+		load_building_4(MG_SHARED_CB);
 		break;
 	case MG_MODE_BEACH:
 		break;
@@ -130,6 +132,7 @@ static void unload_foreground_tiles()
 		unload_building_1();
 		unload_building_2();
 		unload_building_3();
+		unload_building_4();
 		break;
 	case MG_MODE_BEACH:
 		break;
@@ -251,6 +254,13 @@ static void update(void)
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
 			_state = _old_state;
 		}
+		return;
+	}
+
+	//Back to title screen
+	if (key_held(KEY_START) && key_held(KEY_SELECT))
+	{
+		scene_set(title_screen);
 		return;
 	}
 

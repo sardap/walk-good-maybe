@@ -7,21 +7,19 @@
 #include "../assets/tsCity.h"
 #include "../assets/tsBeach.h"
 #include "../assets/tsTitleText.h"
+#include "../assets/tsLava.h"
 
 static const u16 water_cycle[] = {0x7FFF, 0x7FC6, 0x7B80, 0x7FD0, 0x7FB2, 0x7FD7};
+static const u16 lava_cycle[] = {0x11D9, 0x1E3C, 0x20FF};
 
 static FIXED _bkg_x;
 static int _water_pal_idx;
+static int _lava_pal_idx;
 
 static void show(void)
 {
 	// Load palette
 	GRIT_CPY(pal_bg_mem, titleScreenSharedPal);
-
-	for (int i = 0; i < TS_PAL_WATER_LENGTH; i++)
-	{
-		pal_bg_mem[TS_PAL_WATER_START + i] = water_cycle[i];
-	}
 
 	// Load tiles into shared_cb
 	GRIT_CPY(&tile_mem[TS_SHARED_CB], titleScreenSharedTiles);
@@ -77,10 +75,19 @@ static void update(void)
 		for (int i = 0; i < TS_PAL_WATER_LENGTH; i++)
 		{
 			int pal_idx = wrap(_water_pal_idx + i, 0, TS_PAL_WATER_LENGTH - 1);
-
 			pal_bg_mem[TS_PAL_WATER_START + i] = water_cycle[pal_idx];
 		}
 		_water_pal_idx = wrap(_water_pal_idx + 1, 0, TS_PAL_WATER_LENGTH - 1);
+	}
+
+	if (frame_count() % 35 == 0)
+	{
+		for (int i = 0; i < TS_PAL_LAVA_LENGTH; i++)
+		{
+			int pal_idx = wrap(_lava_pal_idx + i, 0, TS_PAL_LAVA_LENGTH - 1);
+			pal_bg_mem[TS_PAL_LAVA_START + i] = lava_cycle[pal_idx];
+		}
+		_lava_pal_idx = wrap(_lava_pal_idx + 1, 0, TS_PAL_LAVA_LENGTH - 1);
 	}
 }
 

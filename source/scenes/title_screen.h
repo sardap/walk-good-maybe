@@ -12,6 +12,9 @@
 #define TS_PAL_WATER_START 4
 #define TS_PAL_WATER_LENGTH 6
 
+#define TS_PAL_LAVA_START 10
+#define TS_PAL_LAVA_LENGTH 3
+
 extern const scene_t title_screen;
 
 #endif

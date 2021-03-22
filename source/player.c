@@ -244,7 +244,7 @@ void update_player()
 	}
 
 	//Check colsion with other
-	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP))
+	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
 		_speed_up = 120;
 		_scroll_x += 0.5f * FIX_SCALEF;

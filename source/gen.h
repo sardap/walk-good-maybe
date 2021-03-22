@@ -86,6 +86,13 @@
 #define LAVA_TILE_RIGHT LAVA_OFFSET + 2
 #define LAVA_TILE_END LAVA_TILE_RIGHT
 
+typedef struct t_spawn_info
+{
+	int lava_chance;
+	int enemy_0_chance;
+	int speed_up_token;
+} t_spawn_info;
+
 int get_lava_tile_offset();
 int get_buildings_tile_offset();
 int get_buildings_tile_offset_end();

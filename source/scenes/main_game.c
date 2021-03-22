@@ -274,14 +274,11 @@ static void update(void)
 
 	if (check_game_over())
 	{
-		for (int i = 0; i < SB_SIZE; i++)
-		{
-			se_mem[MG_CITY_SB][i] = 0x0;
-		}
 		scene_set(title_screen);
 		return;
 	}
 
+	_scroll_x = clamp(_scroll_x, 0, MG_MAX_SCROLL_SPEED);
 	_bg_pos_x += _scroll_x;
 	_bg_0_scroll += _scroll_x;
 	_bg_2_scroll += _scroll_x;

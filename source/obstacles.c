@@ -32,12 +32,9 @@ void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->vy = 0;
 	ent->ent_idx = att_idx;
 
-	obj_set_attr(
-		get_ent_att(ent),
-		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
-		ATTR2_PRIO(1) | ATTR2_ID(_speed_up_tile_idx));
-
-	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_8x8;
+	ent->att.attr2 = ATTR2_PRIO(1) | ATTR2_ID(_speed_up_tile_idx);
 }
 
 void create_speed_line(ent_t *ent, int att_idx, FIXED x, FIXED y)
@@ -52,12 +49,9 @@ void create_speed_line(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->vy = 0;
 	ent->ent_idx = att_idx;
 
-	obj_set_attr(
-		get_ent_att(ent),
-		ATTR0_WIDE | ATTR0_8BPP, ATTR1_SIZE_32x8,
-		ATTR2_PRIO(2) | ATTR2_ID(_speed_lines_idx));
-
-	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
+	ent->att.attr0 = ATTR0_WIDE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_32x8;
+	ent->att.attr2 = ATTR2_PRIO(2) | ATTR2_ID(_speed_lines_idx);
 }
 
 void update_speed_up(ent_t *ent)
@@ -82,8 +76,6 @@ void update_speed_up(ent_t *ent)
 	ent_move_x_dirty(ent);
 	//Take back scroll for next loop
 	ent->vx += _scroll_x;
-
-	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
 }
 
 void update_speed_line(ent_t *ent)
@@ -96,6 +88,4 @@ void update_speed_line(ent_t *ent)
 	}
 
 	ent_move_x_dirty(ent);
-
-	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
 }

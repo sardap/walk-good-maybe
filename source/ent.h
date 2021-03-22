@@ -23,6 +23,8 @@ typedef enum ent_types_t
 	TYPE_ENEMY = 4,
 	TYPE_SPEED_UP = 8,
 	TYPE_SPEED_LINE = 16,
+	TYPE_SCORE = 32,
+	TYPE_LIFE = 64
 } ent_types_t;
 
 typedef enum ent_visual_types_t
@@ -52,13 +54,13 @@ typedef enum
 
 typedef struct ent_t
 {
-	int tid;
 	int ent_idx;
 	FIXED x, y;
 	FIXED vx, vy;
 	int w, h;
 	int ent_cols;
 	ent_types_t ent_type;
+	OBJ_ATTR att;
 
 	//Ent speifc vars
 	union
@@ -98,13 +100,10 @@ void init_obj_atts();
 int allocate_ent(int count);
 void free_ent(int idx, int count);
 
+void copy_ents_to_oam();
+
 int allocate_ent_visual(int count);
 void free_ent_visual(int idx, int count);
-
-inline OBJ_ATTR *get_ent_att(ent_t *e)
-{
-	return &_obj_buffer[e->ent_idx];
-}
 
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);
@@ -126,8 +125,6 @@ inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy)
 		e->w,
 		e->h);
 }
-
-int att_count();
 
 void push_up_from_ground(ent_t *e);
 

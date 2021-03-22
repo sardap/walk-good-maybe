@@ -210,6 +210,7 @@ static void show(void)
 
 	_next_building_spawn = 0;
 	_scroll_x = 0;
+	_bg_pos_x = 0;
 	_building_spawn_x = 0;
 	_state = MG_S_STARTING;
 
@@ -217,10 +218,10 @@ static void show(void)
 	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 
-	//These should be moved into level speifc stuff
 	load_enemy_toast();
 	load_number_tiles();
 	load_speed_up();
+
 	init_score();
 
 	while (_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
@@ -321,8 +322,7 @@ static void update(void)
 
 	update_player();
 	update_ents();
-
-	oam_copy(oam_mem, _obj_buffer, att_count());
+	copy_ents_to_oam();
 
 	switch (_state)
 	{

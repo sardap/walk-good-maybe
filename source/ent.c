@@ -8,12 +8,13 @@
 #include "obstacles.h"
 #include "gun.h"
 #include "enemy.h"
+#include "player.h"
+#include "life_display.h"
 
 OBJ_ATTR _obj_buffer[128] = {};
-FIXED _bg_pos_x = 0;
 ent_t _ents[ENT_COUNT];
-static int _att_count;
-static int _free_obj;
+
+static int _att_count = 0;
 
 static int _allocated_objs[128];
 
@@ -63,8 +64,6 @@ int allocate_ent(int count)
 
 void free_ent(int idx, int count)
 {
-	obj_set_attr(&_obj_buffer[idx], ATTR0_HIDE, 0, 0);
-
 	if (idx >= _att_count)
 	{
 		_att_count -= count;
@@ -74,16 +73,33 @@ void free_ent(int idx, int count)
 	{
 		_allocated_objs[i] = 0;
 	}
-
-	_free_obj++;
 }
 
-//THIS SHOULD ONLY BE CALLED ONCE A LOOP
-int att_count()
+void copy_ents_to_oam()
 {
-	int result = _free_obj + (_att_count + 1);
-	_free_obj = 0;
-	return result;
+	int obj_idx = 0;
+
+	ent_t *ent;
+
+	for (int i = 0; i < ENT_COUNT; i++)
+	{
+		ent = &_ents[i];
+
+		if (ent->ent_type == TYPE_NONE)
+			continue;
+
+		_obj_buffer[obj_idx] = ent->att;
+		obj_set_pos(&_obj_buffer[obj_idx], fx2int(ent->x), fx2int(ent->y));
+
+		++obj_idx;
+	}
+
+	for (int i = obj_idx; i < 128; i++)
+	{
+		obj_set_attr(&_obj_buffer[i], ATTR0_HIDE, 0, 0);
+	}
+
+	oam_copy(oam_mem, _obj_buffer, 128);
 }
 
 FIXED translate_x(ent_t *e)
@@ -255,6 +271,10 @@ void update_ents()
 			break;
 		case TYPE_SPEED_LINE:
 			update_speed_line(&_ents[i]);
+			break;
+		case TYPE_SCORE:
+		case TYPE_LIFE:
+			update_life_display(get_player_life());
 			break;
 		}
 	}

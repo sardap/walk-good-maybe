@@ -66,7 +66,6 @@ void init_player()
 	_player_anime_cycle = 0;
 	_player_life = PLAYER_LIFE_START;
 
-	_player.tid = _tile_start_idx;
 	_player.facing = FACING_RIGHT;
 	_player.jump_power = (int)(2.0f * (FIX_SCALE));
 	_player.w = 16;
@@ -77,10 +76,9 @@ void init_player()
 
 	_player.ent_type = TYPE_PLAYER;
 
-	obj_set_attr(
-		get_ent_att(&_player),
-		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_16x16,
-		ATTR2_PALBANK(0) | _player.tid);
+	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	_player.att.attr1 = ATTR1_SIZE_16x16;
+	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
 }
 
 void unload_player()
@@ -105,13 +103,8 @@ static void apply_player_damage(int ammount)
 
 	//Setup moasic effect
 	_player_mos.x = 32;
-	obj_set_attr(
-		get_ent_att(&_player),
-		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_MOSAIC,
-		get_ent_att(&_player)->attr1,
-		get_ent_att(&_player)->attr2);
+	_player.att.attr0 = _player.att.attr0 | ATTR0_MOSAIC;
 
-	update_life_display(_player_life);
 	//Half a second
 	_invincible_frames = 60;
 }
@@ -158,11 +151,8 @@ void update_player()
 
 		if (_player_mos.x-- <= 0)
 		{
-			obj_set_attr(
-				get_ent_att(&_player),
-				ATTR0_SQUARE | ATTR0_8BPP,
-				get_ent_att(&_player)->attr1,
-				get_ent_att(&_player)->attr2);
+			//Turn off moasic
+			_player.att.attr0 ^= ATTR0_MOSAIC;
 		}
 	}
 
@@ -170,12 +160,12 @@ void update_player()
 	if (_player.facing == FACING_RIGHT && key_hit(KEY_LEFT))
 	{
 		_player.facing = FACING_LEFT;
-		get_ent_att(&_player)->attr1 ^= ATTR1_HFLIP;
+		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
 	else if (_player.facing == FACING_LEFT && key_hit(KEY_RIGHT))
 	{
 		_player.facing = FACING_RIGHT;
-		get_ent_att(&_player)->attr1 ^= ATTR1_HFLIP;
+		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
 
 	// Player movement
@@ -338,12 +328,11 @@ void update_player()
 	{
 		_player.y = PLAYER_SPAWN_Y;
 	}
+}
 
-	//What the fuck does this do?
-	// increment/decrement starting tile with R/L
-	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
-
-	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
+int get_player_life()
+{
+	return _player_life;
 }
 
 int speed_up_active()

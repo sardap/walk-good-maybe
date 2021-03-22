@@ -41,12 +41,9 @@ void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->vy = 0;
 	ent->ent_idx = att_idx;
 
-	obj_set_attr(
-		get_ent_att(ent),
-		ATTR0_TALL | ATTR0_8BPP, ATTR1_SIZE_16x8,
-		ATTR2_PRIO(1) | ATTR2_ID(_enemy_tile_idx));
-
-	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
+	ent->att.attr0 = ATTR0_TALL | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_16x8;
+	ent->att.attr2 = ATTR2_PRIO(1) | ATTR2_ID(_enemy_tile_idx);
 }
 
 void step_enemy_global()
@@ -108,6 +105,4 @@ void update_enemy(ent_t *ent)
 	ent_move_x(ent, ent->vx);
 	//Take back scroll for next loop
 	ent->vx += _scroll_x;
-
-	obj_set_pos(get_ent_att(ent), fx2int(ent->x), fx2int(ent->y));
 }

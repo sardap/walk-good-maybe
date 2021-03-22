@@ -43,12 +43,9 @@ void create_bullet(
 		break;
 	}
 
-	obj_set_attr(
-		get_ent_att(bul),
-		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8 || flip ? ATTR1_HFLIP : 0,
-		ATTR2_ID(_gun_0_tile));
-
-	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
+	bul->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	bul->att.attr1 = ATTR1_SIZE_8x8 || flip ? ATTR1_HFLIP : 0;
+	bul->att.attr2 = ATTR2_ID(_gun_0_tile);
 }
 
 void update_bullet(ent_t *bul)
@@ -62,6 +59,4 @@ void update_bullet(ent_t *bul)
 		bul->ent_type = TYPE_NONE;
 		return;
 	}
-
-	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
 }

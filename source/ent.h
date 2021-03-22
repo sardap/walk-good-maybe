@@ -13,7 +13,7 @@
 
 //Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
 #define ENT_COUNT 25
-#define ENT_VISUAL_COUNT 5
+#define ENT_VISUAL_COUNT 30
 
 typedef enum ent_types_t
 {
@@ -31,6 +31,7 @@ typedef enum ent_visual_types_t
 {
 	TYPE_VISUAL_NONE = 0,
 	TYPE_VISUAL_SPEED_LINE = 1,
+	TYPE_VISUAL_LIFE = 2,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -85,20 +86,26 @@ typedef struct ent_t
 
 } ent_t;
 
-typedef struct ent_visual_t
+typedef struct visual_ent_t
 {
+	int ent_visual_idx;
 	FIXED x, y;
 	FIXED vx, vy;
 	ent_visual_types_t type;
-} ent_visual_t;
+	OBJ_ATTR att;
+} visual_ent_t;
 
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 def ent_t _ents[ENT_COUNT];
+def visual_ent_t _visual_ents[ENT_VISUAL_COUNT];
 
-void init_obj_atts();
+void init_all_ents();
 int allocate_ent(int count);
 void free_ent(int idx, int count);
+
+int allocate_visual_ent(int count);
+void free_visual_ent(int idx, int count);
 
 void copy_ents_to_oam();
 

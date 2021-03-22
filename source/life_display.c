@@ -10,22 +10,20 @@
 #include "assets/lifeAmmount1.h"
 
 static int _life_tile_start_idx;
-static int _ent_life_idx;
+static int _v_ent_life_idx;
 
 void load_life_display()
 {
 	_life_tile_start_idx = allocate_obj_tile_idx(4);
 	update_life_display(PLAYER_LIFE_START);
 
-	_ent_life_idx = allocate_ent(1);
+	_v_ent_life_idx = allocate_visual_ent(1);
 
-	ent_t *ent = &_ents[_ent_life_idx];
+	visual_ent_t *ent = &_visual_ents[_v_ent_life_idx];
 
-	ent->ent_type = TYPE_LIFE;
+	ent->type = TYPE_VISUAL_LIFE;
 
-	ent->vx = 0;
 	ent->x = (GBA_WIDTH - 16) * FIX_SCALE;
-	ent->vy = 0;
 	ent->y = 0;
 
 	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
@@ -51,5 +49,5 @@ void update_life_display(int life)
 void unload_life_display()
 {
 	free_obj_tile_idx(_life_tile_start_idx, 4);
-	free_ent(_ent_life_idx, 1);
+	free_ent(_v_ent_life_idx, 1);
 }

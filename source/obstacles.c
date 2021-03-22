@@ -30,7 +30,7 @@ void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->h = 0;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->att_idx = att_idx;
+	ent->ent_idx = att_idx;
 
 	obj_set_attr(
 		get_ent_att(ent),
@@ -50,7 +50,7 @@ void create_speed_line(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->h = 8;
 	ent->vx = _scroll_x + -3.5f * FIX_SCALEF;
 	ent->vy = 0;
-	ent->att_idx = att_idx;
+	ent->ent_idx = att_idx;
 
 	obj_set_attr(
 		get_ent_att(ent),
@@ -64,7 +64,7 @@ void update_speed_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || (ent->ent_cols & (TYPE_PLAYER) && !speed_up_active()))
 	{
-		free_ent(ent->att_idx, 1);
+		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		int count = gba_rand_range(3, 7);
 		int line_ent = allocate_ent(count);
@@ -90,7 +90,7 @@ void update_speed_line(ent_t *ent)
 {
 	if (ent->x < GBA_WIDTH * FIX_SCALE && !speed_up_active())
 	{
-		free_ent(ent->att_idx, 1);
+		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		return;
 	}

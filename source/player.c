@@ -62,7 +62,7 @@ void init_player()
 	load_player_tile();
 
 	//Reserved for player
-	_player.att_idx = 0;
+	_player.ent_idx = 0;
 	_player_anime_cycle = 0;
 	_player_life = PLAYER_LIFE_START;
 
@@ -85,7 +85,7 @@ void init_player()
 
 void unload_player()
 {
-	free_ent(_player.att_idx, 1);
+	free_ent(_player.ent_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
 }
 

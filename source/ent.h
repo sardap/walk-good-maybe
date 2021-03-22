@@ -53,7 +53,7 @@ typedef enum
 typedef struct ent_t
 {
 	int tid;
-	int att_idx;
+	int ent_idx;
 	FIXED x, y;
 	FIXED vx, vy;
 	int w, h;
@@ -103,7 +103,7 @@ void free_ent_visual(int idx, int count);
 
 inline OBJ_ATTR *get_ent_att(ent_t *e)
 {
-	return &_obj_buffer[e->att_idx];
+	return &_obj_buffer[e->ent_idx];
 }
 
 FIXED translate_x(ent_t *e);

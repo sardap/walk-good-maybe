@@ -39,7 +39,7 @@ void create_toast_enemy(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->h = 16;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->att_idx = att_idx;
+	ent->ent_idx = att_idx;
 
 	obj_set_attr(
 		get_ent_att(ent),
@@ -76,7 +76,7 @@ void update_enemy(ent_t *ent)
 			mmEffectEx(&damage);
 		}
 
-		free_ent(ent->att_idx, 1);
+		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		return;
 	}

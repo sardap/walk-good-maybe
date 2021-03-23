@@ -3,6 +3,7 @@
 #include "common.h"
 #include "player.h"
 #include "graphics.h"
+#include "ent.h"
 
 #include "assets/speedUp.h"
 #include "assets/speedLine.h"
@@ -40,9 +41,8 @@ void create_speed_line(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED y)
 {
 	v_ent->type = TYPE_VISUAL_SPEED_LINE;
 
-	v_ent->vx = _scroll_x + -3.5f * FIX_SCALEF;
+	v_ent->sl_vx = _scroll_x + -3.5f * FIX_SCALEF;
 	v_ent->x = x;
-	v_ent->vy = 0;
 	v_ent->y = y;
 	v_ent->ent_idx = ent_idx;
 
@@ -84,5 +84,5 @@ void update_speed_line(visual_ent_t *ent)
 		return;
 	}
 
-	visual_ent_move_x(ent);
+	ent->x += ent->sl_vx;
 }

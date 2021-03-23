@@ -39,7 +39,8 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_SPEED_LINE = 1,
 	TYPE_VISUAL_LIFE = 2,
 	TYPE_VISUAL_SCORE = 3,
-	TYPE_SPPED_LINE = 4,
+	TYPE_VISUAL_SPPED_LINE = 4,
+	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 5,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -83,9 +84,11 @@ typedef struct ent_t
 		{
 			bullet_type_t bullet_type;
 		};
-		//Enemy
+		//Enemy bisuct
 		struct
 		{
+			int eb_tile_id;
+			int eb_anime_cycle;
 		};
 	};
 
@@ -93,12 +96,25 @@ typedef struct ent_t
 
 typedef struct visual_ent_t
 {
-	int ent_visual_idx;
+	int visual_ent_idx;
 	int ent_idx;
 	FIXED x, y;
-	FIXED vx, vy;
 	ent_visual_types_t type;
 	OBJ_ATTR att;
+	union
+	{
+		//Speed line
+		struct
+		{
+			FIXED sl_vx;
+		};
+		//enemy bisuct death
+		struct
+		{
+			int eb_tile_id;
+			int eb_anime_cycle;
+		};
+	};
 } visual_ent_t;
 
 def OBJ_ATTR _obj_buffer[128];
@@ -116,7 +132,7 @@ void free_visual_ent(int idx, int count);
 void copy_ents_to_oam();
 
 int allocate_visual_ent(int count);
-void free_ent_visual(int idx, int count);
+void free_visual_ent(int idx, int count);
 
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);
@@ -148,9 +164,6 @@ void ent_move_x_dirty(ent_t *e);
 bool did_hit_y(ent_t *e, FIXED dy);
 bool ent_move_y(ent_t *e, FIXED dy);
 void ent_move_y_dirty(ent_t *e);
-
-void visual_ent_move_x(visual_ent_t *e);
-void visual_ent_move_Y(visual_ent_t *e);
 
 bool apply_gravity(ent_t *e);
 

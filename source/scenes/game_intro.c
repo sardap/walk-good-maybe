@@ -152,7 +152,7 @@ static void show(void)
 
 static void update(void)
 {
-	step_anime(
+	step_anime_bad(
 		air_anime_cycle, giWhale_air_0TilesLen, 3,
 		&_anime_cycle, 0);
 

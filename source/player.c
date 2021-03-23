@@ -247,7 +247,10 @@ void update_player()
 	}
 	else if (_speed_up > 0)
 	{
-		_speed_up--;
+		--_speed_up;
+		//Check ended and handle ended
+		if (_speed_up <= 0)
+			_scroll_x -= 0.5f * FIX_SCALEF;
 	}
 
 	//Handles player anime
@@ -256,7 +259,7 @@ void update_player()
 	case MOVEMENT_GROUNDED:
 		if (abs(_player.vx) > _scroll_x)
 		{
-			step_anime(
+			step_anime_bad(
 				walk_anime_cycle, whale_smallTilesLen, PLAYER_WALK_CYCLE_COUNT,
 				&_player_anime_cycle, _tile_start_idx);
 		}
@@ -297,7 +300,7 @@ void update_player()
 			_player_anime_cycle = PLAYER_LAND_TIME;
 		}
 
-		step_anime(
+		step_anime_bad(
 			air_anime_cycle, whale_air_0TilesLen, PLAYER_AIR_CYCLE_COUNT,
 			&_player_anime_cycle, _tile_start_idx);
 

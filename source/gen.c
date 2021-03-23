@@ -87,7 +87,7 @@ static bool spawn_enemy_biscuit(int start_x, int width, int y)
 	FIXED att_x = level_to_screen(start_x + width / 2);
 
 	int ent_idx = allocate_ent(1);
-	create_toast_enemy(
+	create_enemy_biscut(
 		&_ents[ent_idx], ent_idx,
 		int2fx(att_x), int2fx(y * 8 - 32));
 

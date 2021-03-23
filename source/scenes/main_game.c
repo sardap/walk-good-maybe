@@ -217,7 +217,6 @@ static void show(void)
 	init_player();
 	load_gun_0_tiles();
 
-	load_enemy_toast();
 	load_number_tiles();
 	load_speed_up();
 

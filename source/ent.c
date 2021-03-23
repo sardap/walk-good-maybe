@@ -246,16 +246,6 @@ bool apply_gravity(ent_t *e)
 	return false;
 }
 
-void visual_ent_move_x(visual_ent_t *e)
-{
-	e->x += e->vx;
-}
-
-void visual_ent_move_Y(visual_ent_t *e)
-{
-	e->y += e->vy;
-}
-
 void update_ents()
 {
 	//Add player to ent array
@@ -298,7 +288,7 @@ void update_ents()
 			update_bullet(&_ents[i]);
 			break;
 		case TYPE_ENEMY:
-			update_enemy(&_ents[i]);
+			update_enemy_biscut(&_ents[i]);
 			break;
 		case TYPE_PLAYER:
 			break;
@@ -309,8 +299,6 @@ void update_ents()
 			break;
 		}
 	}
-
-	step_enemy_global();
 }
 
 void update_visual_ents()
@@ -326,6 +314,9 @@ void update_visual_ents()
 			update_life_display(get_player_life());
 			break;
 		case TYPE_VISUAL_SCORE:
+			break;
+		case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
+			update_enemy_biscut_death(&_visual_ents[i]);
 			break;
 		}
 	}

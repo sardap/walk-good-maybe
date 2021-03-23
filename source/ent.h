@@ -30,9 +30,6 @@ typedef enum ent_types_t
 	TYPE_BULLET = 2,
 	TYPE_ENEMY = 4,
 	TYPE_SPEED_UP = 8,
-	TYPE_SPEED_LINE = 16,
-	TYPE_SCORE = 32,
-	TYPE_LIFE = 64
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them
@@ -80,9 +77,6 @@ typedef struct ent_t
 		//Player
 		struct
 		{
-			movement_state_t move_state;
-			facing_t facing;
-			FIXED jump_power;
 		};
 		//Bullet
 		struct

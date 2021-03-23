@@ -17,7 +17,6 @@ void update_player();
 
 int get_player_life();
 
-
 //This really shouldn't be here
 int speed_up_active();
 

@@ -215,7 +215,6 @@ static void show(void)
 	_state = MG_S_STARTING;
 
 	init_player();
-	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 
 	load_enemy_toast();

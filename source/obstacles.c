@@ -24,7 +24,6 @@ void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->ent_type = TYPE_SPEED_UP;
 
 	ent->x = x;
-	//This is inccorect so it fails fast for the col dect
 	ent->w = 0;
 	ent->y = y;
 	ent->h = 0;
@@ -34,24 +33,22 @@ void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
 
 	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
 	ent->att.attr1 = ATTR1_SIZE_8x8;
-	ent->att.attr2 = ATTR2_PRIO(1) | ATTR2_ID(_speed_up_tile_idx);
+	ent->att.attr2 = ATTR2_PRIO(2) | ATTR2_ID(_speed_up_tile_idx);
 }
 
-void create_speed_line(ent_t *ent, int att_idx, FIXED x, FIXED y)
+void create_speed_line(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED y)
 {
-	ent->ent_type = TYPE_SPEED_LINE;
+	v_ent->type = TYPE_VISUAL_SPEED_LINE;
 
-	ent->x = x;
-	ent->w = 32;
-	ent->y = y;
-	ent->h = 8;
-	ent->vx = _scroll_x + -3.5f * FIX_SCALEF;
-	ent->vy = 0;
-	ent->ent_idx = att_idx;
+	v_ent->vx = _scroll_x + -3.5f * FIX_SCALEF;
+	v_ent->x = x;
+	v_ent->vy = 0;
+	v_ent->y = y;
+	v_ent->ent_idx = ent_idx;
 
-	ent->att.attr0 = ATTR0_WIDE | ATTR0_8BPP;
-	ent->att.attr1 = ATTR1_SIZE_32x8;
-	ent->att.attr2 = ATTR2_PRIO(2) | ATTR2_ID(_speed_lines_idx);
+	v_ent->att.attr0 = ATTR0_WIDE | ATTR0_8BPP;
+	v_ent->att.attr1 = ATTR1_SIZE_32x8;
+	v_ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(_speed_lines_idx);
 }
 
 void update_speed_up(ent_t *ent)
@@ -61,11 +58,11 @@ void update_speed_up(ent_t *ent)
 		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		int count = gba_rand_range(3, 7);
-		int line_ent = allocate_ent(count);
+		int line_ent = allocate_visual_ent(count);
 		for (int i = 0; i < count; i++)
 		{
 			create_speed_line(
-				&_ents[line_ent + i], line_ent + i,
+				&_visual_ents[line_ent + i], line_ent + i,
 				GBA_WIDTH * FIX_SCALE + gba_rand_range(0, GBA_WIDTH * FIX_SCALE),
 				int2fx(gba_rand_range(0, GBA_HEIGHT)));
 		}
@@ -78,14 +75,14 @@ void update_speed_up(ent_t *ent)
 	ent->vx += _scroll_x;
 }
 
-void update_speed_line(ent_t *ent)
+void update_speed_line(visual_ent_t *ent)
 {
 	if (ent->x < GBA_WIDTH * FIX_SCALE && !speed_up_active())
 	{
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_visual_ent(ent->ent_idx, 1);
+		ent->type = TYPE_VISUAL_NONE;
 		return;
 	}
 
-	ent_move_x_dirty(ent);
+	visual_ent_move_x(ent);
 }

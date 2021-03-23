@@ -5,6 +5,7 @@
 
 #include "debug.h"
 #include "numbers.h"
+#include "ent.h"
 
 static int _frame_count;
 FIXED _scroll_x;
@@ -66,18 +67,18 @@ int gba_rand()
 void init_score()
 {
 	_score = 0;
-	_score_ent_start = allocate_ent(SCORE_DIGITS);
+	_score_ent_start = allocate_visual_ent(SCORE_DIGITS);
 
 	for (int i = 0; i < SCORE_DIGITS; i++)
 	{
-		_ents[_score_ent_start + i].ent_type = TYPE_LIFE;
+		_visual_ents[_score_ent_start + i].type = TYPE_VISUAL_SCORE;
 
-		_ents[_score_ent_start + i].att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
-		_ents[_score_ent_start + i].att.attr1 = ATTR1_SIZE_8x8;
-		_ents[_score_ent_start + i].att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start());
+		_visual_ents[_score_ent_start + i].x = int2fx(8 * i);
+		_visual_ents[_score_ent_start + i].y = 0;
 
-		_ents[_score_ent_start + i].x = int2fx(8 * i);
-		_ents[_score_ent_start + i].y = 0;
+		_visual_ents[_score_ent_start + i].att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+		_visual_ents[_score_ent_start + i].att.attr1 = ATTR1_SIZE_8x8;
+		_visual_ents[_score_ent_start + i].att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start());
 	}
 }
 
@@ -107,7 +108,7 @@ static void update_score()
 
 		i_score /= 10;
 
-		_ents[_score_ent_start + i].att.attr2 =
+		_visual_ents[_score_ent_start + i].att.attr2 =
 			ATTR2_PALBANK(0) |
 			ATTR2_PRIO(0) |
 			ATTR2_ID(get_number_tile_start() + offset * 2);
@@ -116,7 +117,7 @@ static void update_score()
 
 void clear_score()
 {
-	free_ent(_score_ent_start, SCORE_DIGITS);
+	free_visual_ent(_score_ent_start, SCORE_DIGITS);
 }
 
 void add_score(int x)

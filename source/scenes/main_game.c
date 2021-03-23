@@ -322,6 +322,7 @@ static void update(void)
 
 	update_player();
 	update_ents();
+	update_visual_ents();
 	copy_ents_to_oam();
 
 	switch (_state)

@@ -16,7 +16,7 @@ ent_t _ents[ENT_COUNT] = {};
 visual_ent_t _visual_ents[ENT_VISUAL_COUNT] = {};
 
 static int _allocated_ents[ENT_COUNT];
-static int _allocated_visual_ents[ENT_COUNT];
+static int _allocated_visual_ents[ENT_VISUAL_COUNT];
 
 void init_all_ents()
 {
@@ -25,6 +25,7 @@ void init_all_ents()
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		_allocated_ents[i] = 0;
+		_ents[i].ent_type = TYPE_NONE;
 	}
 	//Player? maybe I don't know
 	_allocated_ents[0] = 1;
@@ -32,6 +33,7 @@ void init_all_ents()
 	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
 	{
 		_allocated_visual_ents[i] = 0;
+		_visual_ents[i].type = TYPE_VISUAL_NONE;
 	}
 }
 
@@ -120,12 +122,12 @@ void copy_ents_to_oam()
 		++obj_idx;
 	}
 
-	for (int i = obj_idx; i < 128; i++)
+	for (int i = obj_idx; i < ENT_COUNT + ENT_VISUAL_COUNT; i++)
 	{
 		obj_set_attr(&_obj_buffer[i], ATTR0_HIDE, 0, 0);
 	}
 
-	oam_copy(oam_mem, _obj_buffer, 128);
+	oam_copy(oam_mem, _obj_buffer, ENT_COUNT + ENT_VISUAL_COUNT);
 }
 
 FIXED translate_x(ent_t *e)
@@ -244,6 +246,16 @@ bool apply_gravity(ent_t *e)
 	return false;
 }
 
+void visual_ent_move_x(visual_ent_t *e)
+{
+	e->x += e->vx;
+}
+
+void visual_ent_move_Y(visual_ent_t *e)
+{
+	e->y += e->vy;
+}
+
 void update_ents()
 {
 	//Add player to ent array
@@ -295,15 +307,26 @@ void update_ents()
 		case TYPE_SPEED_UP:
 			update_speed_up(&_ents[i]);
 			break;
-		case TYPE_SPEED_LINE:
-			update_speed_line(&_ents[i]);
-			break;
-		case TYPE_SCORE:
-		case TYPE_LIFE:
-			update_life_display(get_player_life());
-			break;
 		}
 	}
 
 	step_enemy_global();
+}
+
+void update_visual_ents()
+{
+	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
+	{
+		switch (_visual_ents[i].type)
+		{
+		case TYPE_VISUAL_SPEED_LINE:
+			update_speed_line(&_visual_ents[i]);
+			break;
+		case TYPE_VISUAL_LIFE:
+			update_life_display(get_player_life());
+			break;
+		case TYPE_VISUAL_SCORE:
+			break;
+		}
+	}
 }

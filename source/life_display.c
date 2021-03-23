@@ -49,5 +49,5 @@ void update_life_display(int life)
 void unload_life_display()
 {
 	free_obj_tile_idx(_life_tile_start_idx, 4);
-	free_ent(_v_ent_life_idx, 1);
+	free_visual_ent(_v_ent_life_idx, 1);
 }

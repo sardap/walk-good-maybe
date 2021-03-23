@@ -15,6 +15,14 @@
 #define ENT_COUNT 25
 #define ENT_VISUAL_COUNT 30
 
+/*
+	These need to be ^2 for col 
+	Player colides with bullet and enemy
+	00000000 00000000 00000000 00000110
+
+	enemy cloides with player and bullet
+	00000000 00000000 00000000 00000101
+*/
 typedef enum ent_types_t
 {
 	TYPE_NONE = 0,
@@ -27,11 +35,14 @@ typedef enum ent_types_t
 	TYPE_LIFE = 64
 } ent_types_t;
 
+//These don't need to be bit alligend since we never do cols with them
 typedef enum ent_visual_types_t
 {
 	TYPE_VISUAL_NONE = 0,
 	TYPE_VISUAL_SPEED_LINE = 1,
 	TYPE_VISUAL_LIFE = 2,
+	TYPE_VISUAL_SCORE = 3,
+	TYPE_SPPED_LINE = 4,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -89,6 +100,7 @@ typedef struct ent_t
 typedef struct visual_ent_t
 {
 	int ent_visual_idx;
+	int ent_idx;
 	FIXED x, y;
 	FIXED vx, vy;
 	ent_visual_types_t type;
@@ -109,7 +121,7 @@ void free_visual_ent(int idx, int count);
 
 void copy_ents_to_oam();
 
-int allocate_ent_visual(int count);
+int allocate_visual_ent(int count);
 void free_ent_visual(int idx, int count);
 
 FIXED translate_x(ent_t *e);
@@ -143,8 +155,13 @@ bool did_hit_y(ent_t *e, FIXED dy);
 bool ent_move_y(ent_t *e, FIXED dy);
 void ent_move_y_dirty(ent_t *e);
 
+void visual_ent_move_x(visual_ent_t *e);
+void visual_ent_move_Y(visual_ent_t *e);
+
 bool apply_gravity(ent_t *e);
 
 void update_ents();
+
+void update_visual_ents();
 
 #endif

@@ -28,8 +28,10 @@ typedef enum ent_types_t
 	TYPE_NONE = 0,
 	TYPE_PLAYER = 1,
 	TYPE_BULLET = 2,
-	TYPE_ENEMY = 4,
+	TYPE_ENEMY_BISCUT = 4,
 	TYPE_SPEED_UP = 8,
+	TYPE_ENEMY_BISCUT_UFO = 16,
+	TYPE_ENEMY_BULLET = 32,
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them
@@ -39,8 +41,7 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_SPEED_LINE = 1,
 	TYPE_VISUAL_LIFE = 2,
 	TYPE_VISUAL_SCORE = 3,
-	TYPE_VISUAL_SPPED_LINE = 4,
-	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 5,
+	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 4,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -89,6 +90,13 @@ typedef struct ent_t
 		{
 			int eb_tile_id;
 			int eb_anime_cycle;
+		};
+		//Enemy bisuct ufo
+		struct
+		{
+			int ebu_tile_id;
+			int ebu_anime_cycle;
+			int ebu_next_shoot;
 		};
 	};
 

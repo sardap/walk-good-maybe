@@ -89,7 +89,7 @@
 typedef struct t_spawn_info
 {
 	int lava_chance;
-	int enemy_0_chance;
+	int enemy_chance;
 	int speed_up_token;
 } t_spawn_info;
 

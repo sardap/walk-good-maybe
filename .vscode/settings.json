@@ -23,7 +23,8 @@
 		"player.h": "c",
 		"graphics.h": "c",
 		"enemybisuctdeath03.h": "c",
-		"anime.h": "c"
+		"anime.h": "c",
+		"enemybiscutufoidle00.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

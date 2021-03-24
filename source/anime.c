@@ -27,14 +27,17 @@ bool step_anime(
 	const unsigned int *anime[], int count,
 	int tile_idx, int tile_len)
 {
+	//Copy current frame into tile mem
 	dma3_cpy(
 		&tile_mem[4][tile_idx],
 		anime[(*cycle)],
 		tile_len);
 
+	//Next frame
 	++(*cycle);
 
-	if ((*cycle) > count)
+	//Check if need to wrap cycle
+	if ((*cycle) >= count)
 	{
 		(*cycle) = 0;
 		return true;

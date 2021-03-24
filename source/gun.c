@@ -53,7 +53,11 @@ void update_bullet(ent_t *bul)
 	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
 	ent_move_y(bul, bul->vy);
 
-	if (fx2int(bul->x) > SCREEN_WIDTH || fx2int(bul->x) < 0 || hit_x || bul->ent_cols & (TYPE_ENEMY))
+	if (
+		fx2int(bul->x) > SCREEN_WIDTH ||
+		fx2int(bul->x) < 0 ||
+		hit_x ||
+		bul->ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO))
 	{
 		free_ent(bul->ent_idx, 1);
 		bul->ent_type = TYPE_NONE;

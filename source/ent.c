@@ -284,18 +284,24 @@ void update_ents()
 	{
 		switch (_ents[i].ent_type)
 		{
+		case TYPE_NONE:
+			break;
 		case TYPE_BULLET:
 			update_bullet(&_ents[i]);
 			break;
-		case TYPE_ENEMY:
+		case TYPE_ENEMY_BISCUT:
 			update_enemy_biscut(&_ents[i]);
 			break;
 		case TYPE_PLAYER:
 			break;
-		case TYPE_NONE:
-			break;
 		case TYPE_SPEED_UP:
 			update_speed_up(&_ents[i]);
+			break;
+		case TYPE_ENEMY_BISCUT_UFO:
+			update_enemy_ufo_bisuct(&_ents[i]);
+			break;
+		case TYPE_ENEMY_BULLET:
+			update_enemy_bullet(&_ents[i]);
 			break;
 		}
 	}
@@ -307,6 +313,8 @@ void update_visual_ents()
 	{
 		switch (_visual_ents[i].type)
 		{
+		case TYPE_NONE:
+			break;
 		case TYPE_VISUAL_SPEED_LINE:
 			update_speed_line(&_visual_ents[i]);
 			break;

@@ -20,6 +20,10 @@
 #include "assets/enemyBisuctDeath01.h"
 #include "assets/enemyBisuctDeath02.h"
 #include "assets/enemyBisuctDeath03.h"
+#include "assets/enemyBiscutUFOIdle00.h"
+#include "assets/enemyBiscutUFOIdle01.h"
+#include "assets/enemyBiscutUFOIdle02.h"
+#include "assets/enemyBullet00.h"
 
 const uint *enemy_biscut_idle_cycle[] = {
 	toast_enemy_idle_01Tiles, toast_enemy_idle_01Tiles, toast_enemy_idle_02Tiles,
@@ -31,9 +35,23 @@ const uint *enemy_biscut_death_cycle[] = {
 	enemyBisuctDeath02Tiles,
 	enemyBisuctDeath03Tiles};
 
+const uint *enemy_biscut_ufo_idle_cycle[] = {
+	enemyBiscutUFOIdle00Tiles,
+	enemyBiscutUFOIdle01Tiles,
+	enemyBiscutUFOIdle02Tiles,
+};
+
+static int _enemy_bullet_0_tile_idx;
+
+void load_enemy_bullets_tiles()
+{
+	_enemy_bullet_0_tile_idx = allocate_obj_tile_idx(1);
+	GRIT_CPY(&tile_mem[4][_enemy_bullet_0_tile_idx], enemyBullet00Tiles);
+}
+
 void create_enemy_biscut(ent_t *ent, int att_idx, FIXED x, FIXED y)
 {
-	ent->ent_type = TYPE_ENEMY;
+	ent->ent_type = TYPE_ENEMY_BISCUT;
 
 	ent->x = x;
 	ent->w = 8;
@@ -139,7 +157,6 @@ void create_enemy_biscut_death(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED 
 
 void update_enemy_biscut_death(visual_ent_t *v_ent)
 {
-	//God I wish I wrote comments explaning this
 	if (frame_count() % 6 == 0)
 	{
 		bool anime_complete = step_anime(
@@ -157,4 +174,101 @@ void update_enemy_biscut_death(visual_ent_t *v_ent)
 	}
 
 	v_ent->x += -_scroll_x;
+}
+
+void create_enemy_ufo_bisuct(ent_t *ent, int ent_idx, FIXED x, FIXED y)
+{
+	ent->ent_type = TYPE_ENEMY_BISCUT_UFO;
+
+	ent->x = x;
+	ent->w = 16;
+	ent->y = y;
+	ent->h = 16;
+	ent->vx = 0;
+	ent->vy = 0;
+	ent->ent_idx = ent_idx;
+
+	//Load tiles
+	ent->ebu_tile_id = allocate_obj_tile_idx(4);
+	GRIT_CPY(&tile_mem[4][ent->ebu_tile_id], enemyBiscutUFOIdle00Tiles);
+
+	ent->ebu_anime_cycle = 0;
+
+	ent->ebu_next_shoot = gba_rand_range(10, 120);
+
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_16x16;
+	ent->att.attr2 = ATTR2_PRIO(1) | ATTR2_ID(ent->ebu_tile_id);
+}
+
+void update_enemy_ufo_bisuct(ent_t *ent)
+{
+	if (frame_count() % 6 == 0)
+	{
+		step_anime(
+			&ent->ebu_anime_cycle,
+			enemy_biscut_ufo_idle_cycle, ENEMY_BISCUT_UFO_IDLE_CYCLE,
+			ent->ebu_tile_id, enemyBiscutUFOIdle00TilesLen);
+	}
+
+	ent_move_y_dirty(ent);
+
+	ent->x += -_scroll_x;
+
+	if (ent->x + int2fx(ent->w) < 0 || ent->ent_cols & (TYPE_BULLET))
+	{
+		free_obj_tile_idx(ent->ebu_tile_id, 4);
+		free_ent(ent->ent_idx, 1);
+		ent->ent_type = TYPE_NONE;
+		return;
+	}
+
+	--ent->ebu_next_shoot;
+
+	if (ent->ebu_next_shoot <= 0)
+	{
+		ent->ebu_next_shoot = 60;
+
+		int bul_ent_idx = allocate_ent(1);
+		create_enemy_bullet(
+			&_ents[bul_ent_idx],
+			bul_ent_idx, ent->x + 6 * FIX_SCALE,
+			ent->y + 16 * FIX_SCALE, 0, 0.5 * FIX_SCALE);
+	}
+}
+
+void create_enemy_bullet(ent_t *ent, int ent_idx, FIXED x, FIXED y, FIXED vx, FIXED vy)
+{
+	ent->ent_type = TYPE_ENEMY_BULLET;
+
+	ent->x = x;
+	ent->w = 6;
+	ent->y = y;
+	ent->h = 5;
+	ent->vx = vx;
+	ent->vy = vy;
+	ent->ent_idx = ent_idx;
+
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_8x8;
+	ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(_enemy_bullet_0_tile_idx);
+}
+
+void update_enemy_bullet(ent_t *ent)
+{
+	int hit = ent->ent_cols & (TYPE_PLAYER);
+
+	ent->vx += -_scroll_x;
+	hit |= ent_move_x(ent, ent->vx);
+	//Take back scroll for next loop
+	ent->vx += _scroll_x;
+
+	hit |= ent_move_y(ent, ent->vy);
+
+	if (hit || fx2int(ent->x) + ent->w < 0)
+	{
+		free_ent(ent->ent_idx, 1);
+		ent->ent_type = TYPE_NONE;
+		return;
+	}
 }

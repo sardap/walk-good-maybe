@@ -228,7 +228,7 @@ void update_player()
 			apply_player_damage(1);
 		}
 		//Enemy Damage
-		if (_player.ent_cols & (TYPE_ENEMY))
+		if (_player.ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO | TYPE_ENEMY_BULLET))
 		{
 			apply_player_damage(1);
 		}

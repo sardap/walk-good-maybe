@@ -219,6 +219,7 @@ static void show(void)
 
 	load_number_tiles();
 	load_speed_up();
+	load_enemy_bullets_tiles();
 
 	init_score();
 

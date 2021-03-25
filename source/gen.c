@@ -15,11 +15,12 @@
 #include "assets/building3TileSet.h"
 #include "assets/building4TileSet.h"
 
+//Maybe do combo math here
 static t_spawn_info building_0 = {50, 75, 75};
 static t_spawn_info building_1 = {50, 75, 75};
 static t_spawn_info building_2 = {50, 75, 75};
 static t_spawn_info building_3 = {50, 75, 75};
-static t_spawn_info building_4 = {00, 75, 75};
+static t_spawn_info building_4 = {10, 75, 75};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -120,6 +121,10 @@ static bool spawn_speed_up_token(int start_x, int width, int y)
 
 static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 {
+	//early return to avoid that awesome wraping bug
+	if (level_to_screen(start_x + width) < 0)
+		return width;
+
 	if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
 	{
 		spawn_lava(width, start_x, y);
@@ -171,10 +176,6 @@ int spawn_building_0(int start_x)
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_0_BRICK + tile);
 	set_level_col(x, y, BUILDING_0_BRICK + tile);
-
-	//early return to avoid that awesome wraping bug
-	if (level_to_screen(start_x + width) < 0)
-		return width;
 
 	spawn_obstacles(start_x, width, y, &building_0);
 

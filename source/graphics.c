@@ -47,6 +47,19 @@ static int allocate_tile_idx(int *allc, int len, int size)
 		i += size;
 	}
 
+	char str[200];
+	sprintf(str, "FAILLED TO ALLOCATE s:%d l:%d", size, len);
+	write_to_log(LOG_LEVEL_DEBUG, str);
+
+	str[0] = '\0';
+	for (int i = 0; i < len; i++)
+	{
+		char b[50];
+		sprintf(b, "%d, ", allc[i]);
+		strcat(str, b);
+	}
+
+	write_to_log(LOG_LEVEL_DEBUG, str);
 	return -1;
 }
 

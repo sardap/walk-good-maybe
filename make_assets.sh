@@ -62,7 +62,7 @@ gen_png "./assets/title_screen"
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
-# colour-agg.exe ./assets/objects_out.png $OBJECTS
+version-img-gen ./assets/title_screen/tsTitleText.png
 
 colour-agg.exe ./assets/title_screen/tsBackgroundAgg.png \
 	./assets/title_screen/tsEmpty.png \

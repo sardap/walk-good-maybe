@@ -8,34 +8,20 @@ import (
 	"image/png"
 	"os"
 	"os/exec"
-	"strconv"
-	"strings"
 
 	"github.com/pbnjay/pixfont"
 )
 
 func getVersion() string {
-	descCmd := exec.Command("git", "describe", "--exact-match")
-	version, err := descCmd.CombinedOutput()
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
+	out, err := cmd.CombinedOutput()
 	if err != nil {
-		cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
-		out, err := cmd.CombinedOutput()
-		if err != nil {
-			fmt.Printf("error running make %v\n", err)
-			fmt.Printf("out %s", out)
-			os.Exit(2)
-		}
-
-		splits := strings.Split(string(out), ".")
-
-		bumpNum, _ := strconv.ParseInt(splits[1], 10, 64)
-
-		bumpNum++
-
-		version = []byte(fmt.Sprintf("%s.%d.%s", splits[0], bumpNum, splits[2]))
+		fmt.Printf("error running make %v\n", err)
+		fmt.Printf("out %s", out)
+		os.Exit(2)
 	}
 
-	return string(version)
+	return string(out)
 }
 
 func main() {

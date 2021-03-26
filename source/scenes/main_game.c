@@ -210,17 +210,17 @@ static void show(void)
 
 	_next_building_spawn = 0;
 	_scroll_x = 0;
+	_bg_pos_x = 0;
 	_building_spawn_x = 0;
 	_state = MG_S_STARTING;
 
 	init_player();
-	_player.move_state = MOVEMENT_AIR;
 	load_gun_0_tiles();
 
-	//These should be moved into level speifc stuff
-	load_enemy_toast();
 	load_number_tiles();
 	load_speed_up();
+	load_enemy_bullets_tiles();
+
 	init_score();
 
 	while (_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
@@ -274,14 +274,11 @@ static void update(void)
 
 	if (check_game_over())
 	{
-		for (int i = 0; i < SB_SIZE; i++)
-		{
-			se_mem[MG_CITY_SB][i] = 0x0;
-		}
 		scene_set(title_screen);
 		return;
 	}
 
+	_scroll_x = clamp(_scroll_x, 0, MG_MAX_SCROLL_SPEED);
 	_bg_pos_x += _scroll_x;
 	_bg_0_scroll += _scroll_x;
 	_bg_2_scroll += _scroll_x;
@@ -324,8 +321,8 @@ static void update(void)
 
 	update_player();
 	update_ents();
-
-	oam_copy(oam_mem, _obj_buffer, att_count());
+	update_visual_ents();
+	copy_ents_to_oam();
 
 	switch (_state)
 	{

@@ -13,22 +13,36 @@
 
 //Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
 #define ENT_COUNT 25
-#define ENT_VISUAL_COUNT 5
+#define ENT_VISUAL_COUNT 30
 
+/*
+	These need to be ^2 for col 
+	Player colides with bullet and enemy
+	00000000 00000000 00000000 00000110
+
+	enemy cloides with player and bullet
+	00000000 00000000 00000000 00000101
+*/
 typedef enum ent_types_t
 {
 	TYPE_NONE = 0,
 	TYPE_PLAYER = 1,
 	TYPE_BULLET = 2,
-	TYPE_ENEMY = 4,
+	TYPE_ENEMY_BISCUT = 4,
 	TYPE_SPEED_UP = 8,
-	TYPE_SPEED_LINE = 16,
+	TYPE_ENEMY_BISCUT_UFO = 16,
+	TYPE_ENEMY_BULLET = 32,
 } ent_types_t;
 
+//These don't need to be bit alligend since we never do cols with them
 typedef enum ent_visual_types_t
 {
 	TYPE_VISUAL_NONE = 0,
 	TYPE_VISUAL_SPEED_LINE = 1,
+	TYPE_VISUAL_LIFE = 2,
+	TYPE_VISUAL_SCORE = 3,
+	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 4,
+	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -52,13 +66,13 @@ typedef enum
 
 typedef struct ent_t
 {
-	int tid;
-	int att_idx;
+	int ent_idx;
 	FIXED x, y;
 	FIXED vx, vy;
 	int w, h;
 	int ent_cols;
 	ent_types_t ent_type;
+	OBJ_ATTR att;
 
 	//Ent speifc vars
 	union
@@ -66,45 +80,68 @@ typedef struct ent_t
 		//Player
 		struct
 		{
-			movement_state_t move_state;
-			facing_t facing;
-			FIXED jump_power;
 		};
 		//Bullet
 		struct
 		{
 			bullet_type_t bullet_type;
 		};
-		//Enemy
+		//Enemy bisuct
 		struct
 		{
+			int eb_tile_id;
+			int eb_anime_cycle;
+		};
+		//Enemy bisuct ufo
+		struct
+		{
+			int ebu_tile_id;
+			int ebu_anime_cycle;
+			int ebu_next_shoot;
 		};
 	};
 
 } ent_t;
 
-typedef struct ent_visual_t
+typedef struct visual_ent_t
 {
+	int visual_ent_idx;
+	int ent_idx;
 	FIXED x, y;
-	FIXED vx, vy;
 	ent_visual_types_t type;
-} ent_visual_t;
+	OBJ_ATTR att;
+	union
+	{
+		//Speed line
+		struct
+		{
+			FIXED sl_vx;
+		};
+		//enemy bisuct death
+		struct
+		{
+			int eb_tile_id;
+			int eb_anime_cycle;
+		};
+		};
+} visual_ent_t;
 
 def OBJ_ATTR _obj_buffer[128];
 def ent_t _player;
 def ent_t _ents[ENT_COUNT];
+def visual_ent_t _visual_ents[ENT_VISUAL_COUNT];
 
-void init_obj_atts();
+void init_all_ents();
 int allocate_ent(int count);
 void free_ent(int idx, int count);
 
-int allocate_ent_visual(int count);
-void free_ent_visual(int idx, int count);
+int allocate_visual_ent(int count);
+void free_visual_ent(int idx, int count);
 
-inline OBJ_ATTR *get_ent_att(ent_t *e)
-{
-	return &_obj_buffer[e->att_idx];
-}
+void copy_ents_to_oam();
+
+int allocate_visual_ent(int count);
+void free_visual_ent(int idx, int count);
 
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);
@@ -127,8 +164,6 @@ inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy)
 		e->h);
 }
 
-int att_count();
-
 void push_up_from_ground(ent_t *e);
 
 bool did_hit_x(ent_t *e, FIXED dx);
@@ -142,5 +177,7 @@ void ent_move_y_dirty(ent_t *e);
 bool apply_gravity(ent_t *e);
 
 void update_ents();
+
+void update_visual_ents();
 
 #endif

@@ -36,6 +36,9 @@ static POINT _player_mos;
 static int _invincible_frames;
 static FIXED _player_speed = (int)(2.0f * (FIX_SCALE));
 static int _speed_up;
+static movement_state_t _move_state;
+static facing_t _facing;
+static FIXED _jump_power;
 
 ent_t _player = {};
 
@@ -62,13 +65,10 @@ void init_player()
 	load_player_tile();
 
 	//Reserved for player
-	_player.att_idx = 0;
+	_player.ent_idx = 0;
 	_player_anime_cycle = 0;
 	_player_life = PLAYER_LIFE_START;
 
-	_player.tid = _tile_start_idx;
-	_player.facing = FACING_RIGHT;
-	_player.jump_power = (int)(2.0f * (FIX_SCALE));
 	_player.w = 16;
 	_player.h = 16;
 
@@ -77,15 +77,18 @@ void init_player()
 
 	_player.ent_type = TYPE_PLAYER;
 
-	obj_set_attr(
-		get_ent_att(&_player),
-		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_16x16,
-		ATTR2_PALBANK(0) | _player.tid);
+	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	_player.att.attr1 = ATTR1_SIZE_16x16;
+	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
+
+	_facing = FACING_RIGHT;
+	_jump_power = (int)(2.0f * (FIX_SCALE));
+	_move_state = MOVEMENT_AIR;
 }
 
 void unload_player()
 {
-	free_ent(_player.att_idx, 1);
+	free_ent(_player.ent_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
 }
 
@@ -105,13 +108,8 @@ static void apply_player_damage(int ammount)
 
 	//Setup moasic effect
 	_player_mos.x = 32;
-	obj_set_attr(
-		get_ent_att(&_player),
-		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_MOSAIC,
-		get_ent_att(&_player)->attr1,
-		get_ent_att(&_player)->attr2);
+	_player.att.attr0 = _player.att.attr0 | ATTR0_MOSAIC;
 
-	update_life_display(_player_life);
 	//Half a second
 	_invincible_frames = 60;
 }
@@ -130,7 +128,7 @@ static void player_shoot()
 
 	int att_idx = allocate_ent(1);
 	FIXED vx, x;
-	if (_player.facing == FACING_RIGHT)
+	if (_facing == FACING_RIGHT)
 	{
 		vx = 2.5 * FIX_SCALE;
 		x = _player.x + 16 * FIX_SCALE;
@@ -144,7 +142,7 @@ static void player_shoot()
 	create_bullet(
 		&_ents[att_idx], att_idx,
 		BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
-		vx, 0, _player.facing == FACING_LEFT);
+		vx, 0, _facing == FACING_LEFT);
 }
 
 void update_player()
@@ -158,24 +156,21 @@ void update_player()
 
 		if (_player_mos.x-- <= 0)
 		{
-			obj_set_attr(
-				get_ent_att(&_player),
-				ATTR0_SQUARE | ATTR0_8BPP,
-				get_ent_att(&_player)->attr1,
-				get_ent_att(&_player)->attr2);
+			//Turn off moasic
+			_player.att.attr0 ^= ATTR0_MOSAIC;
 		}
 	}
 
 	//Handles fliping the sprite if facing the other direction
-	if (_player.facing == FACING_RIGHT && key_hit(KEY_LEFT))
+	if (_facing == FACING_RIGHT && key_hit(KEY_LEFT))
 	{
-		_player.facing = FACING_LEFT;
-		get_ent_att(&_player)->attr1 ^= ATTR1_HFLIP;
+		_facing = FACING_LEFT;
+		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
-	else if (_player.facing == FACING_LEFT && key_hit(KEY_RIGHT))
+	else if (_facing == FACING_LEFT && key_hit(KEY_RIGHT))
 	{
-		_player.facing = FACING_RIGHT;
-		get_ent_att(&_player)->attr1 ^= ATTR1_HFLIP;
+		_facing = FACING_RIGHT;
+		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
 
 	// Player movement
@@ -195,7 +190,7 @@ void update_player()
 	}
 
 	// Update velocity
-	switch (_player.move_state)
+	switch (_move_state)
 	{
 	case MOVEMENT_AIR:
 		_player.vx /= 2;
@@ -229,11 +224,11 @@ void update_player()
 		{
 			_player.vy -= LAVA_BOUNCE;
 			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
-			_player.move_state = MOVEMENT_AIR;
+			_move_state = MOVEMENT_AIR;
 			apply_player_damage(1);
 		}
 		//Enemy Damage
-		if (_player.ent_cols & (TYPE_ENEMY))
+		if (_player.ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO | TYPE_ENEMY_BULLET))
 		{
 			apply_player_damage(1);
 		}
@@ -244,7 +239,7 @@ void update_player()
 	}
 
 	//Check colsion with other
-	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP))
+	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
 		_speed_up = 120;
 		_scroll_x += 0.5f * FIX_SCALEF;
@@ -252,21 +247,19 @@ void update_player()
 	}
 	else if (_speed_up > 0)
 	{
-		_speed_up--;
-		if (_speed_up == 0)
-		{
+		--_speed_up;
+		//Check ended and handle ended
+		if (_speed_up <= 0)
 			_scroll_x -= 0.5f * FIX_SCALEF;
-			_player_speed == 0.25f * FIX_SCALEF;
-		}
 	}
 
 	//Handles player anime
-	switch (_player.move_state)
+	switch (_move_state)
 	{
 	case MOVEMENT_GROUNDED:
 		if (abs(_player.vx) > _scroll_x)
 		{
-			step_anime(
+			step_anime_bad(
 				walk_anime_cycle, whale_smallTilesLen, PLAYER_WALK_CYCLE_COUNT,
 				&_player_anime_cycle, _tile_start_idx);
 		}
@@ -277,7 +270,7 @@ void update_player()
 		if (key_hit(KEY_A))
 		{
 			_player_anime_cycle = PLAYER_JUMP_TIME;
-			_player.move_state = MOVEMENT_JUMPING;
+			_move_state = MOVEMENT_JUMPING;
 		}
 		break;
 
@@ -292,9 +285,9 @@ void update_player()
 		}
 		else if (_player_anime_cycle <= 0)
 		{
-			_player.vy = -_player.jump_power;
+			_player.vy = -_jump_power;
 			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
-			_player.move_state = MOVEMENT_AIR;
+			_move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
 		_player_anime_cycle--;
@@ -303,11 +296,11 @@ void update_player()
 	case MOVEMENT_AIR:
 		if (hit_y)
 		{
-			_player.move_state = MOVEMENT_LANDED;
+			_move_state = MOVEMENT_LANDED;
 			_player_anime_cycle = PLAYER_LAND_TIME;
 		}
 
-		step_anime(
+		step_anime_bad(
 			air_anime_cycle, whale_air_0TilesLen, PLAYER_AIR_CYCLE_COUNT,
 			&_player_anime_cycle, _tile_start_idx);
 
@@ -326,7 +319,7 @@ void update_player()
 		else if (_player_anime_cycle <= 0)
 		{
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
-			_player.move_state = MOVEMENT_GROUNDED;
+			_move_state = MOVEMENT_GROUNDED;
 		}
 		_player_anime_cycle--;
 		break;
@@ -338,12 +331,11 @@ void update_player()
 	{
 		_player.y = PLAYER_SPAWN_Y;
 	}
+}
 
-	//What the fuck does this do?
-	// increment/decrement starting tile with R/L
-	_player.tid += bit_tribool(key_hit(KEY_START), KI_R, KI_L);
-
-	obj_set_pos(get_ent_att(&_player), fx2int(_player.x), fx2int(_player.y));
+int get_player_life()
+{
+	return _player_life;
 }
 
 int speed_up_active()

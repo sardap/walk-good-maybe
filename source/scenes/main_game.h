@@ -1,6 +1,8 @@
 #ifndef MAIN_GAME_H
 #define MAIN_GAME_H
 
+#include "../common.h"
+
 #define MG_SHARED_CB 0
 #define MG_TEXT_SB 22
 #define MG_CITY_SB 30
@@ -12,7 +14,7 @@
 #define MG_BG_X 64
 #define MG_BG_X_PIX (int)(MG_BG_X * 8 * (FIX_SCALE))
 
-#include "../common.h"
+#define MG_MAX_SCROLL_SPEED (int)(10 * FIX_SCALE)
 
 typedef enum mg_mode_t
 {

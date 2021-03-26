@@ -15,6 +15,13 @@
 #include "assets/building3TileSet.h"
 #include "assets/building4TileSet.h"
 
+//Maybe do combo math here
+static t_spawn_info building_0 = {50, 75, 75};
+static t_spawn_info building_1 = {50, 75, 75};
+static t_spawn_info building_2 = {50, 75, 75};
+static t_spawn_info building_3 = {50, 75, 75};
+static t_spawn_info building_4 = {10, 75, 75};
+
 static int _lava_0_idx;
 static int _building_0_idx;
 static int _building_1_idx;
@@ -76,6 +83,65 @@ static FIXED level_to_screen(int level_x)
 	return (level_x * 8) - fx2int(_bg_pos_x);
 }
 
+static bool spawn_enemy_biscuit(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x + width / 2);
+
+	int ent_idx = allocate_ent(1);
+	create_enemy_biscut(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 32));
+
+	return true;
+}
+
+static bool spawn_enemy_biscut_ufo(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x + width / 2);
+
+	int ent_idx = allocate_ent(1);
+	create_enemy_ufo_bisuct(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 45));
+
+	return true;
+}
+
+static bool spawn_speed_up_token(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
+
+	int ent_idx = allocate_ent(1);
+	create_speed_up(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 10));
+
+	return true;
+}
+
+static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
+{
+	//early return to avoid that awesome wraping bug
+	if (level_to_screen(start_x + width) < 0)
+		return width;
+
+	if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
+	{
+		spawn_lava(width, start_x, y);
+	}
+	else if (gba_rand_range(1, 100) > 100 - info->enemy_chance)
+	{
+		if (gba_rand() % 2 == 0)
+			spawn_enemy_biscut_ufo(start_x, width, y);
+		else
+			spawn_enemy_biscuit(start_x, width, y);
+	}
+	else if (gba_rand_range(1, 100) > 100 - info->speed_up_token)
+	{
+		spawn_speed_up_token(start_x, width, y);
+	}
+}
+
 void load_building_0(int cb)
 {
 	_building_0_idx = allocate_bg_tile_idx(building0TileSetTilesLen / 64 - 1);
@@ -111,21 +177,7 @@ int spawn_building_0(int start_x)
 	set_level_at(x, y, BUILDING_0_BRICK + tile);
 	set_level_col(x, y, BUILDING_0_BRICK + tile);
 
-	if (width > 3 && gba_rand() % 4 == 0)
-	{
-		spawn_lava(width, x_base, y);
-		return width;
-	}
-
-	FIXED att_x = level_to_screen(start_x + width / 2);
-	//early return to avoid that awesome wraping bug
-	if (att_x < 0 || gba_rand() % 100 > 75)
-		return width;
-
-	int ent_idx = allocate_ent(1);
-	create_toast_enemy(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 32));
+	spawn_obstacles(start_x, width, y, &building_0);
 
 	return width;
 }
@@ -166,21 +218,7 @@ int spawn_building_1(int start_x)
 	set_level_at(x, y, BUILDING_1_RIGHT_ROOF + tile);
 	set_level_col(x, y + 1, BUILDING_1_RIGHT_BOT + tile);
 
-	if (width > 3 && gba_rand() % 4 == 0)
-	{
-		spawn_lava(width, x_base, y);
-		return width;
-	}
-
-	FIXED att_x = level_to_screen(start_x + width / 2);
-	//early return to avoid that awesome wraping bug
-	if (att_x < 0 || gba_rand() % 100 > 75)
-		return width;
-
-	int ent_idx = allocate_ent(1);
-	create_toast_enemy(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 32));
+	spawn_obstacles(start_x, width, y, &building_1);
 
 	return width;
 }
@@ -238,21 +276,7 @@ int spawn_building_2(int start_x)
 	set_level_at(x, y, BUILDING_2_RIGHT_ROOF + tile);
 	set_level_col(x, y + 1, BUILDING_2_RIGHT_MIDDLE + tile);
 
-	if (width > 3 && gba_rand() % 6 == 0)
-	{
-		spawn_lava(width, x_base, y);
-		return width;
-	}
-
-	FIXED att_x = level_to_screen(start_x + width / 2);
-	//early return to avoid that awesome wraping bug
-	if (att_x < 0 || gba_rand() % 100 > 75)
-		return width;
-
-	int ent_idx = allocate_ent(1);
-	create_toast_enemy(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 32));
+	spawn_obstacles(start_x, width, y, &building_2);
 
 	return width;
 }
@@ -301,21 +325,7 @@ int spawn_building_3(int start_x)
 	set_level_at(x, y + 1, BUILDING_3_ROOF_RIGHT + tile);
 	set_level_col(x, y + 2, BUILDING_3_RIGHT + tile);
 
-	if (width > 3 && gba_rand() % 6 == 0)
-	{
-		spawn_lava(width, x_base, y);
-		return width;
-	}
-
-	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
-	//early return to avoid that awesome wraping bug
-	if (att_x < 0)
-		return width;
-
-	int ent_idx = allocate_ent(1);
-	create_speed_up(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 10));
+	spawn_obstacles(start_x, width, y, &building_3);
 
 	return width;
 }
@@ -335,7 +345,7 @@ int spawn_building_4(int start_x)
 {
 	int x_base = start_x;
 	int x;
-	int y = gba_rand_range(CITY_BUILDING_Y_TILE_SPAWN - 6, CITY_BUILDING_Y_TILE_SPAWN - 3);
+	int y = gba_rand_range(CITY_BUILDING_Y_TILE_SPAWN - 5, CITY_BUILDING_Y_TILE_SPAWN - 3);
 
 	int tile = _building_4_idx / 2;
 	//LEFT SECTION
@@ -415,17 +425,7 @@ int spawn_building_4(int start_x)
 	set_level_at(x, y, BUILDING_4_ROOF_RIGHT + tile);
 	set_level_col(x, y + 1, BUILDING_4_RIGHT_BOT + tile);
 
-	FIXED att_x = level_to_screen(start_x + width / 2);
-	//early return to avoid that awesome wraping bug
-	if (att_x < 0 || gba_rand() % 100 > 50)
-		return width;
-
-	int ent_idx = allocate_ent(1);
-	create_toast_enemy(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 32));
-
-	return width;
+	spawn_obstacles(start_x, width, y, &building_4);
 
 	return width;
 }

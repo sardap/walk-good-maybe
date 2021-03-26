@@ -5,11 +5,12 @@
 
 #include "debug.h"
 #include "numbers.h"
+#include "ent.h"
 
 static int _frame_count;
 FIXED _scroll_x;
 static int _score;
-static int _score_att_start;
+static int _score_ent_start;
 
 static void nothing(void) {}
 
@@ -63,6 +64,24 @@ int gba_rand()
 	return qran();
 }
 
+void init_score()
+{
+	_score = 0;
+	_score_ent_start = allocate_visual_ent(SCORE_DIGITS);
+
+	for (int i = 0; i < SCORE_DIGITS; i++)
+	{
+		_visual_ents[_score_ent_start + i].type = TYPE_VISUAL_SCORE;
+
+		_visual_ents[_score_ent_start + i].x = int2fx(8 * i);
+		_visual_ents[_score_ent_start + i].y = 0;
+
+		_visual_ents[_score_ent_start + i].att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+		_visual_ents[_score_ent_start + i].att.attr1 = ATTR1_SIZE_8x8;
+		_visual_ents[_score_ent_start + i].att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start());
+	}
+}
+
 static void update_score()
 {
 	int i_score = _score;
@@ -87,27 +106,18 @@ static void update_score()
 			offset = 0;
 		}
 
-		obj_set_attr(&_obj_buffer[_score_att_start + i],
-					 ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8,
-					 ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start() + offset * 2));
-
-		obj_set_pos(&_obj_buffer[_score_att_start + i], 8 * i, 0);
-
 		i_score /= 10;
+
+		_visual_ents[_score_ent_start + i].att.attr2 =
+			ATTR2_PALBANK(0) |
+			ATTR2_PRIO(0) |
+			ATTR2_ID(get_number_tile_start() + offset * 2);
 	}
-}
-
-void init_score()
-{
-	_score = 0;
-	_score_att_start = allocate_ent(SCORE_DIGITS);
-
-	update_score();
 }
 
 void clear_score()
 {
-	free_ent(_score_att_start, SCORE_DIGITS);
+	free_visual_ent(_score_ent_start, SCORE_DIGITS);
 }
 
 void add_score(int x)

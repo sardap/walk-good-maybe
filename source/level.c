@@ -7,6 +7,7 @@
 #include "gun.h"
 
 u16 _level[LEVEL_SIZE] = {};
+FIXED _bg_pos_x;
 
 void set_level_col(int x, int y, u16 tile)
 {

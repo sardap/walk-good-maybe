@@ -40,7 +40,7 @@ int main()
 #ifdef DEBUG
 	init_debug();
 #endif
-	init_obj_atts();
+	init_all_ents();
 
 	init_graphics();
 

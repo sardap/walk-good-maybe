@@ -52,6 +52,11 @@ func latestModify(path string) time.Time {
 }
 
 func main() {
+	if os.Args[1] == "assets" {
+		makeAssets()
+		return
+	}
+
 	//Hacked makefile lamo
 	if files, _ := ioutil.ReadDir("source/assets"); os.Args[1] != "clean" &&
 		(len(files) == 0 || latestModify("assets").After(latestModify("source/assets"))) {

@@ -27,7 +27,7 @@ void create_bullet(
 	ent_t *bul, int att_idx, bullet_type_t type,
 	FIXED x, FIXED y, FIXED vx, FIXED vy, int flip)
 {
-	bul->att_idx = att_idx;
+	bul->ent_idx = att_idx;
 	bul->bullet_type = type;
 	bul->x = x;
 	bul->w = 5;
@@ -43,12 +43,9 @@ void create_bullet(
 		break;
 	}
 
-	obj_set_attr(
-		get_ent_att(bul),
-		ATTR0_SQUARE | ATTR0_8BPP, ATTR1_SIZE_8x8 || flip ? ATTR1_HFLIP : 0,
-		ATTR2_ID(_gun_0_tile));
-
-	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
+	bul->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	bul->att.attr1 = ATTR1_SIZE_8x8 || flip ? ATTR1_HFLIP : 0;
+	bul->att.attr2 = ATTR2_ID(_gun_0_tile);
 }
 
 void update_bullet(ent_t *bul)
@@ -56,12 +53,14 @@ void update_bullet(ent_t *bul)
 	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
 	ent_move_y(bul, bul->vy);
 
-	if (fx2int(bul->x) > SCREEN_WIDTH || fx2int(bul->x) < 0 || hit_x || bul->ent_cols & (TYPE_ENEMY))
+	if (
+		fx2int(bul->x) > SCREEN_WIDTH ||
+		fx2int(bul->x) < 0 ||
+		hit_x ||
+		bul->ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO))
 	{
-		free_ent(bul->att_idx, 1);
+		free_ent(bul->ent_idx, 1);
 		bul->ent_type = TYPE_NONE;
 		return;
 	}
-
-	obj_set_pos(get_ent_att(bul), fx2int(bul->x), fx2int(bul->y));
 }

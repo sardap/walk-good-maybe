@@ -8,35 +8,44 @@
 #include "obstacles.h"
 #include "gun.h"
 #include "enemy.h"
+#include "player.h"
+#include "life_display.h"
 
 OBJ_ATTR _obj_buffer[128] = {};
-FIXED _bg_pos_x = 0;
-ent_t _ents[ENT_COUNT];
-static int _att_count;
-static int _free_obj;
+ent_t _ents[ENT_COUNT] = {};
+visual_ent_t _visual_ents[ENT_VISUAL_COUNT] = {};
 
-static int _allocated_objs[128];
+static int _allocated_ents[ENT_COUNT];
+static int _allocated_visual_ents[ENT_VISUAL_COUNT];
 
-void init_obj_atts()
+void init_all_ents()
 {
 	oam_init(_obj_buffer, 128);
 
-	for (int i = 0; i < 128; i++)
+	for (int i = 0; i < ENT_COUNT; i++)
 	{
-		_allocated_objs[i] = 0;
+		_allocated_ents[i] = 0;
+		_ents[i].ent_type = TYPE_NONE;
 	}
-	_allocated_objs[0] = 1;
+	//Player? maybe I don't know
+	_allocated_ents[0] = 1;
+
+	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
+	{
+		_allocated_visual_ents[i] = 0;
+		_visual_ents[i].type = TYPE_VISUAL_NONE;
+	}
 }
 
-int allocate_ent(int count)
+static int allocate(int *ary, int length, int count)
 {
-	for (int i = 0; i < 128;)
+	for (int i = 0; i < length;)
 	{
 		bool found = true;
 
-		for (int j = i; j - i < count && j < 128; j++)
+		for (int j = i; j - i < count && j < length; j++)
 		{
-			if (_allocated_objs[j])
+			if (ary[j])
 			{
 				found = false;
 				break;
@@ -47,11 +56,7 @@ int allocate_ent(int count)
 		{
 			for (int j = i; j - i < count; j++)
 			{
-				_allocated_objs[j] = 1;
-			}
-			if (i > _att_count)
-			{
-				_att_count = i + count;
+				ary[j] = 1;
 			}
 			return i;
 		}
@@ -61,29 +66,68 @@ int allocate_ent(int count)
 	return -1;
 }
 
-void free_ent(int idx, int count)
+int allocate_ent(int count)
 {
-	obj_set_attr(&_obj_buffer[idx], ATTR0_HIDE, 0, 0);
-
-	if (idx >= _att_count)
-	{
-		_att_count -= count;
-	}
-
-	for (int i = idx; i < idx + count; i++)
-	{
-		_allocated_objs[i] = 0;
-	}
-
-	_free_obj++;
+	return allocate(_allocated_ents, ENT_COUNT, count);
 }
 
-//THIS SHOULD ONLY BE CALLED ONCE A LOOP
-int att_count()
+void free_ent(int idx, int count)
 {
-	int result = _free_obj + (_att_count + 1);
-	_free_obj = 0;
-	return result;
+	for (int i = idx; i < idx + count; i++)
+	{
+		_allocated_ents[i] = 0;
+	}
+}
+
+int allocate_visual_ent(int count)
+{
+	return allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, count);
+}
+
+void free_visual_ent(int idx, int count)
+{
+	for (int i = idx; i < idx + count; i++)
+	{
+		_allocated_ents[i] = 0;
+	}
+}
+
+void copy_ents_to_oam()
+{
+	int obj_idx = 0;
+
+	for (int i = 0; i < ENT_COUNT; i++)
+	{
+		ent_t *ent = &_ents[i];
+
+		if (ent->ent_type == TYPE_NONE)
+			continue;
+
+		_obj_buffer[obj_idx] = ent->att;
+		obj_set_pos(&_obj_buffer[obj_idx], fx2int(ent->x), fx2int(ent->y));
+
+		++obj_idx;
+	}
+
+	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
+	{
+		visual_ent_t *ent = &_visual_ents[i];
+
+		if (ent->type == TYPE_VISUAL_NONE)
+			continue;
+
+		_obj_buffer[obj_idx] = ent->att;
+		obj_set_pos(&_obj_buffer[obj_idx], fx2int(ent->x), fx2int(ent->y));
+
+		++obj_idx;
+	}
+
+	for (int i = obj_idx; i < ENT_COUNT + ENT_VISUAL_COUNT; i++)
+	{
+		obj_set_attr(&_obj_buffer[i], ATTR0_HIDE, 0, 0);
+	}
+
+	oam_copy(oam_mem, _obj_buffer, ENT_COUNT + ENT_VISUAL_COUNT);
 }
 
 FIXED translate_x(ent_t *e)
@@ -240,24 +284,51 @@ void update_ents()
 	{
 		switch (_ents[i].ent_type)
 		{
+		case TYPE_NONE:
+			break;
 		case TYPE_BULLET:
 			update_bullet(&_ents[i]);
 			break;
-		case TYPE_ENEMY:
-			update_enemy(&_ents[i]);
+		case TYPE_ENEMY_BISCUT:
+			update_enemy_biscut(&_ents[i]);
 			break;
 		case TYPE_PLAYER:
-			break;
-		case TYPE_NONE:
 			break;
 		case TYPE_SPEED_UP:
 			update_speed_up(&_ents[i]);
 			break;
-		case TYPE_SPEED_LINE:
-			update_speed_line(&_ents[i]);
+		case TYPE_ENEMY_BISCUT_UFO:
+			update_enemy_ufo_bisuct(&_ents[i]);
+			break;
+		case TYPE_ENEMY_BULLET:
+			update_enemy_bullet(&_ents[i]);
 			break;
 		}
 	}
+}
 
-	step_enemy_global();
+void update_visual_ents()
+{
+	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
+	{
+		switch (_visual_ents[i].type)
+		{
+		case TYPE_NONE:
+			break;
+		case TYPE_VISUAL_SPEED_LINE:
+			update_speed_line(&_visual_ents[i]);
+			break;
+		case TYPE_VISUAL_LIFE:
+			update_life_display(get_player_life());
+			break;
+		case TYPE_VISUAL_SCORE:
+			break;
+		case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
+			update_enemy_biscut_death(&_visual_ents[i]);
+			break;
+		case TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH:
+			update_enemy_ufo_biscut_death(&_visual_ents[i]);
+			break;
+		}
+	}
 }

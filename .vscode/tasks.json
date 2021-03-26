@@ -31,6 +31,19 @@
 			}
 		},
 		{
+			"label": "build-assets",
+			"type": "shell",
+			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest assets",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			}
+		},
+		{
 			"label": "build-docker",
 			"type": "shell",
 			"command": "docker build . -t wgm-builder:latest",
@@ -44,6 +57,5 @@
 			},
 			"problemMatcher": []
 		}
-
 	]
 }

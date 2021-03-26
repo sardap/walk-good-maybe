@@ -16,13 +16,23 @@
 #include "assets/toast_enemy_idle_03.h"
 #include "assets/toast_enemy_idle_04.h"
 #include "assets/toast_enemy_idle_05.h"
+
 #include "assets/enemyBisuctDeath00.h"
 #include "assets/enemyBisuctDeath01.h"
 #include "assets/enemyBisuctDeath02.h"
 #include "assets/enemyBisuctDeath03.h"
+
 #include "assets/enemyBiscutUFOIdle00.h"
 #include "assets/enemyBiscutUFOIdle01.h"
 #include "assets/enemyBiscutUFOIdle02.h"
+
+#include "assets/enemyBiscutUFODeath00.h"
+#include "assets/enemyBiscutUFODeath01.h"
+#include "assets/enemyBiscutUFODeath02.h"
+#include "assets/enemyBiscutUFODeath03.h"
+#include "assets/enemyBiscutUFODeath04.h"
+#include "assets/enemyBiscutUFODeath05.h"
+
 #include "assets/enemyBullet00.h"
 
 const uint *enemy_biscut_idle_cycle[] = {
@@ -39,6 +49,21 @@ const uint *enemy_biscut_ufo_idle_cycle[] = {
 	enemyBiscutUFOIdle00Tiles,
 	enemyBiscutUFOIdle01Tiles,
 	enemyBiscutUFOIdle02Tiles,
+};
+
+const uint *enemy_biscut_ufo_death_cycle[] = {
+	enemyBiscutUFODeath00Tiles,
+	enemyBiscutUFODeath01Tiles,
+	enemyBiscutUFODeath02Tiles,
+	enemyBiscutUFODeath03Tiles,
+	enemyBiscutUFODeath03Tiles,
+	enemyBiscutUFODeath03Tiles,
+	enemyBiscutUFODeath04Tiles,
+	enemyBiscutUFODeath04Tiles,
+	enemyBiscutUFODeath04Tiles,
+	enemyBiscutUFODeath05Tiles,
+	enemyBiscutUFODeath05Tiles,
+	enemyBiscutUFODeath05Tiles,
 };
 
 static int _enemy_bullet_0_tile_idx;
@@ -217,9 +242,24 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 
 	if (ent->x + int2fx(ent->w) < 0 || ent->ent_cols & (TYPE_BULLET))
 	{
+		//Play sound
+		mm_sound_effect death = {
+			{SFX_ENEMY_BISCUT_UFO_DEATH_0},
+			(int)(1.0f * (1 << 10)),
+			0,
+			120,
+			127,
+		};
+		mmEffectEx(&death);
+
 		free_obj_tile_idx(ent->ebu_tile_id, 4);
 		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
+
+		int visual_ent_idx = allocate_visual_ent(1);
+		create_enemy_ufo_biscut_death(
+			&_visual_ents[visual_ent_idx], visual_ent_idx,
+			ent->x, ent->y);
 		return;
 	}
 
@@ -235,6 +275,47 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 			bul_ent_idx, ent->x + 6 * FIX_SCALE,
 			ent->y + 16 * FIX_SCALE, 0, 0.5 * FIX_SCALE);
 	}
+}
+
+void create_enemy_ufo_biscut_death(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED y)
+{
+	v_ent->type = TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH;
+
+	v_ent->x = x;
+	v_ent->y = y;
+	v_ent->ent_idx = ent_idx;
+
+	v_ent->eb_anime_cycle = 0;
+
+	//Load tiles
+	v_ent->eb_tile_id = allocate_obj_tile_idx(4);
+	GRIT_CPY(&tile_mem[4][v_ent->eb_tile_id], enemyBisuctDeath00Tiles);
+
+	v_ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	v_ent->att.attr1 = ATTR1_SIZE_16x16;
+	v_ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(v_ent->eb_tile_id);
+}
+
+void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
+{
+
+	if (frame_count() % 3 == 0)
+	{
+		bool anime_complete = step_anime(
+			&v_ent->eb_anime_cycle,
+			enemy_biscut_ufo_death_cycle, ENEMY_BISCUT_UFO_DEATH_CYCLE,
+			v_ent->eb_tile_id, enemyBiscutUFODeath00TilesLen);
+
+		if (anime_complete)
+		{
+			free_obj_tile_idx(v_ent->eb_tile_id, 2);
+			free_visual_ent(v_ent->visual_ent_idx, 1);
+			v_ent->type = TYPE_VISUAL_NONE;
+			return;
+		}
+	}
+
+	v_ent->x += -_scroll_x;
 }
 
 void create_enemy_bullet(ent_t *ent, int ent_idx, FIXED x, FIXED y, FIXED vx, FIXED vy)

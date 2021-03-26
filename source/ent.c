@@ -326,6 +326,9 @@ void update_visual_ents()
 		case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
 			update_enemy_biscut_death(&_visual_ents[i]);
 			break;
+		case TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH:
+			update_enemy_ufo_biscut_death(&_visual_ents[i]);
+			break;
 		}
 	}
 }

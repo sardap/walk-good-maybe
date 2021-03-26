@@ -42,6 +42,7 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_LIFE = 2,
 	TYPE_VISUAL_SCORE = 3,
 	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 4,
+	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -122,7 +123,7 @@ typedef struct visual_ent_t
 			int eb_tile_id;
 			int eb_anime_cycle;
 		};
-	};
+		};
 } visual_ent_t;
 
 def OBJ_ATTR _obj_buffer[128];

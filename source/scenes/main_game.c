@@ -215,6 +215,7 @@ static void show(void)
 	load_speed_up();
 	load_enemy_bullets_tiles();
 	load_speed_level_display();
+	load_jump_up();
 
 	init_score();
 

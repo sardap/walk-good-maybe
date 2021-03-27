@@ -14,6 +14,9 @@
 #define PLAYER_AIR_START_SLOWDOWN (int)(2.0f * (FIX_SCALE))
 #define PLAYER_AIR_SLOWDOWN_MIN (int)(1.0f * (FIX_SCALE))
 
+#define PLAYER_START_JUMP_POWER (int)(2.0f * FIX_SCALE)
+#define PLAYER_MAX_JUMP_POWER (int)(3.0f * FIX_SCALE)
+
 extern ent_t _player;
 
 void init_player();

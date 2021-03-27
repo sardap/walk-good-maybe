@@ -8,24 +8,32 @@
 #include "assets/speedUp.h"
 #include "assets/speedLine.h"
 #include "assets/healthUp.h"
+#include "assets/jumpUp.h"
 
 static int _speed_up_tile_idx;
 static int _speed_lines_idx;
 static int _health_up_tile_idx;
+static int _jump_up_tile_idx;
 
 void load_speed_up()
 {
 	_speed_up_tile_idx = allocate_obj_tile_idx(1);
-	dma3_cpy(&tile_mem[4][_speed_up_tile_idx], speedUpTiles, speedUpTilesLen);
+	GRIT_CPY(&tile_mem[4][_speed_up_tile_idx], speedUpTiles);
 
 	_speed_lines_idx = allocate_obj_tile_idx(4);
-	dma3_cpy(&tile_mem[4][_speed_lines_idx], speedLineTiles, speedLineTilesLen);
+	GRIT_CPY(&tile_mem[4][_speed_lines_idx], speedLineTiles);
 }
 
 void load_health_up()
 {
 	_health_up_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_health_up_tile_idx], healthUpTiles);
+}
+
+void load_jump_up()
+{
+	_jump_up_tile_idx = allocate_obj_tile_idx(1);
+	GRIT_CPY(&tile_mem[4][_jump_up_tile_idx], jumpUpTiles);
 }
 
 void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
@@ -115,7 +123,39 @@ void create_health_up(ent_t *ent, int ent_idx, FIXED x, FIXED y)
 
 void update_health_up(ent_t *ent)
 {
-	if (ent->x + ent->w < 0 || (ent->ent_cols & (TYPE_PLAYER) && !speed_up_active()))
+	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
+	{
+		free_ent(ent->ent_idx, 1);
+		ent->ent_type = TYPE_NONE;
+		return;
+	}
+
+	ent->vx += -_scroll_x;
+	ent_move_x_dirty(ent);
+	//Take back scroll for next loop
+	ent->vx += _scroll_x;
+}
+
+void create_jump_up(ent_t *ent, int ent_idx, FIXED x, FIXED y)
+{
+	ent->ent_type = TYPE_JUMP_UP;
+
+	ent->x = x;
+	ent->w = 0;
+	ent->y = y;
+	ent->h = 0;
+	ent->vx = 0;
+	ent->vy = 0;
+	ent->ent_idx = ent_idx;
+
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_8x8;
+	ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(_jump_up_tile_idx);
+}
+
+void update_jump_up(ent_t *ent)
+{
+	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
 		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;

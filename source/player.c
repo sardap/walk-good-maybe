@@ -39,7 +39,7 @@ static facing_t _facing;
 static POINT _player_mos;
 static FIXED _player_speed;
 static FIXED _player_air_slowdown;
-static FIXED _jump_power;
+static FIXED _player_jump_power;
 
 ent_t _player = {};
 
@@ -83,7 +83,7 @@ void init_player()
 	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
 
 	_facing = FACING_RIGHT;
-	_jump_power = (int)(2.0f * (FIX_SCALE));
+	_player_jump_power = PLAYER_START_JUMP_POWER;
 	_move_state = MOVEMENT_AIR;
 
 	_player_speed = (int)(2.0f * (FIX_SCALE));
@@ -261,9 +261,18 @@ void update_player()
 			_scroll_x -= 0.5f * FIX_SCALEF;
 	}
 
+	//Health up
 	if (_player.ent_cols & (TYPE_HEALTH_UP))
 	{
 		_player_life = clamp(_player_life + 1, 0, PLAYER_LIFE_START + 1);
+	}
+
+	//Jump up
+	if (_player.ent_cols & (TYPE_JUMP_UP))
+	{
+		_player_jump_power = clamp(
+			_player_jump_power + (int)(0.05f * FIX_SCALE),
+			PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
 	}
 
 	//Handles player anime
@@ -298,7 +307,7 @@ void update_player()
 		}
 		else if (_player_anime_cycle <= 0)
 		{
-			_player.vy = -_jump_power;
+			_player.vy = -_player_jump_power;
 			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
 			_move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);

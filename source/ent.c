@@ -9,6 +9,7 @@
 #include "gun.h"
 #include "enemy.h"
 #include "player.h"
+#include "ui_display.h"
 
 OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};
@@ -318,6 +319,9 @@ void update_ents()
 		case TYPE_HEALTH_UP:
 			update_health_up(&_ents[i]);
 			break;
+		case TYPE_JUMP_UP:
+			update_jump_up(&_ents[i]);
+			break;
 		}
 	}
 }
@@ -329,14 +333,14 @@ void update_visual_ents()
 		switch (_visual_ents[i].type)
 		{
 		case TYPE_NONE:
+		case TYPE_VISUAL_SPEED_LEVEL:
+		case TYPE_VISUAL_SCORE:
 			break;
 		case TYPE_VISUAL_SPEED_LINE:
 			update_speed_line(&_visual_ents[i]);
 			break;
 		case TYPE_VISUAL_LIFE:
 			update_life_display(get_player_life());
-			break;
-		case TYPE_VISUAL_SCORE:
 			break;
 		case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
 			update_enemy_biscut_death(&_visual_ents[i]);

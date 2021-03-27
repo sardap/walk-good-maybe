@@ -34,6 +34,7 @@ typedef enum ent_types_t
 	TYPE_ENEMY_BISCUT_UFO = 16,
 	TYPE_ENEMY_BULLET = 32,
 	TYPE_HEALTH_UP = 64,
+	TYPE_JUMP_UP = 128,
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them

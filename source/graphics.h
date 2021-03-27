@@ -5,8 +5,8 @@
 
 #define SKY_OFFSET 76
 
-#define OBJ_TILE_ALLC_SIZE 127 * 2
-#define BG_TILE_ALLC_SIZE 1024 * 2
+#define OBJ_TILE_ALLC_SIZE 127
+#define BG_TILE_ALLC_SIZE 1024
 
 void init_graphics();
 

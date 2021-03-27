@@ -3,9 +3,9 @@
 
 #include <tonc.h>
 
-#define LEVEL_SIZE LEVEL_WIDTH *LEVEL_HEIGHT
 #define LEVEL_HEIGHT 32
 #define LEVEL_WIDTH 64
+#define LEVEL_SIZE (LEVEL_WIDTH * LEVEL_HEIGHT)
 
 #define LEVEL_COL_EMPTY 0
 #define LEVEL_COL_GROUND 1

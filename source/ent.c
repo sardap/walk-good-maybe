@@ -15,8 +15,8 @@ OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};
 visual_ent_t _visual_ents[ENT_VISUAL_COUNT] = {};
 
-static int _allocated_ents[ENT_COUNT];
-static int _allocated_visual_ents[ENT_VISUAL_COUNT];
+static u8 _allocated_ents[ENT_COUNT];
+static u8 _allocated_visual_ents[ENT_VISUAL_COUNT];
 
 void init_all_ents()
 {
@@ -37,7 +37,7 @@ void init_all_ents()
 	}
 }
 
-static int allocate(int *ary, int length, int count)
+static int allocate(u8 *ary, int length, int count)
 {
 	for (int i = 0; i < length;)
 	{

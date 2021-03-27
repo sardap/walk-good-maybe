@@ -16,7 +16,7 @@
 #include "../numbers.h"
 #include "../gun.h"
 #include "../enemy.h"
-#include "../life_display.h"
+#include "../ui_display.h"
 #include "../gen.h"
 #include "../obstacles.h"
 
@@ -214,6 +214,7 @@ static void show(void)
 	load_number_tiles();
 	load_speed_up();
 	load_enemy_bullets_tiles();
+	load_speed_level_display();
 
 	init_score();
 

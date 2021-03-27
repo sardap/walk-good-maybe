@@ -11,8 +11,8 @@
 #include "debug.h"
 #include "graphics.h"
 #include "anime.h"
-#include "life_display.h"
 #include "gun.h"
+#include "ui_display.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -250,7 +250,8 @@ void update_player()
 		//Lower air slowdown spee
 		_player_air_slowdown = clamp(
 			_player_air_slowdown - (int)(0.2f * FIX_SCALEF),
-			1 * FIX_SCALE, PLAYER_AIR_START_SLOWDOWN);
+			PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
+		update_speed_level_display(_player_air_slowdown);
 	}
 	else if (_speed_up_active > 0)
 	{

@@ -9,7 +9,6 @@
 #include "gun.h"
 #include "enemy.h"
 #include "player.h"
-#include "life_display.h"
 
 OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};

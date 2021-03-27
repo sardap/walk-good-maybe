@@ -34,6 +34,7 @@ COPY ./tools/version-img-gen/*.go ./
 RUN go build -o main .
 
 ##################################################
+
 #Devkit pro image is out of date also deabain is fucked here for some reason
 FROM devkitpro/devkitarm:latest as GBA-builder
 

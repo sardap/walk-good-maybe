@@ -45,6 +45,7 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_SCORE = 3,
 	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 4,
 	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
+	TYPE_VISUAL_SPEED_LEVEL = 6,
 } ent_visual_types_t;
 
 typedef enum movement_state_t

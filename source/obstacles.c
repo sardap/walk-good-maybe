@@ -52,7 +52,7 @@ void update_speed_up(ent_t *ent)
 		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 
-		int count = gba_rand_range(3, 7);
+		int count = gba_rand_range(3, 5);
 		int line_ent = allocate_visual_ent(count);
 		for (int i = 0; i < count; i++)
 		{

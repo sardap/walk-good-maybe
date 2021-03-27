@@ -42,27 +42,40 @@ static int allocate(int *ary, int length, int count)
 	for (int i = 0; i < length;)
 	{
 		bool found = true;
-
 		for (int j = i; j - i < count && j < length; j++)
 		{
-			if (ary[j])
+			if (ary[j] > 0)
 			{
 				found = false;
 				break;
 			}
 		}
-
 		if (found)
 		{
-			for (int j = i; j - i < count; j++)
+			for (int j = 0; j < count; j++)
 			{
-				ary[j] = 1;
+				ary[i + j] = 1;
 			}
 			return i;
 		}
 		i += count;
 	}
 
+#ifdef DEBUG
+	char str[200];
+	sprintf(str, "FAILLED TO ENT ALLOCATE s:%d l:%d", count, length);
+	write_to_log(LOG_LEVEL_DEBUG, str);
+
+	str[0] = '\0';
+	for (int i = 0; i < length; i++)
+	{
+		char b[50];
+		sprintf(b, "%d, ", ary[i]);
+		strcat(str, b);
+	}
+
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	return -1;
 }
 

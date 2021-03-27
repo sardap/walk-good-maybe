@@ -47,8 +47,9 @@ static int allocate_tile_idx(int *allc, int len, int size)
 		i += size;
 	}
 
+#ifdef DEBUG
 	char str[200];
-	sprintf(str, "FAILLED TO ALLOCATE s:%d l:%d", size, len);
+	sprintf(str, "FAILLED TO GRAPHIC ALLOCATE s:%d l:%d", size, len);
 	write_to_log(LOG_LEVEL_DEBUG, str);
 
 	str[0] = '\0';
@@ -60,6 +61,7 @@ static int allocate_tile_idx(int *allc, int len, int size)
 	}
 
 	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	return -1;
 }
 

@@ -32,12 +32,13 @@
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
-static POINT _player_mos;
 static int _invincible_frames;
-static FIXED _player_speed = (int)(2.0f * (FIX_SCALE));
-static int _speed_up;
+static int _speed_up_active;
 static movement_state_t _move_state;
 static facing_t _facing;
+static POINT _player_mos;
+static FIXED _player_speed;
+static FIXED _player_air_slowdown;
 static FIXED _jump_power;
 
 ent_t _player = {};
@@ -84,6 +85,9 @@ void init_player()
 	_facing = FACING_RIGHT;
 	_jump_power = (int)(2.0f * (FIX_SCALE));
 	_move_state = MOVEMENT_AIR;
+
+	_player_speed = (int)(2.0f * (FIX_SCALE));
+	_player_air_slowdown = PLAYER_AIR_START_SLOWDOWN;
 }
 
 void unload_player()
@@ -193,7 +197,7 @@ void update_player()
 	switch (_move_state)
 	{
 	case MOVEMENT_AIR:
-		_player.vx /= 2;
+		_player.vx = fxdiv(_player.vx, _player_air_slowdown);
 		break;
 	case MOVEMENT_JUMPING:
 	case MOVEMENT_LANDED:
@@ -239,17 +243,20 @@ void update_player()
 	}
 
 	//Check colsion with other
-	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
+	if (_speed_up_active <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
-		_speed_up = 120;
+		_speed_up_active = 120;
 		_scroll_x += 0.5f * FIX_SCALEF;
-		_player_speed += 0.5f * FIX_SCALEF;
+		//Lower air slowdown spee
+		_player_air_slowdown = clamp(
+			_player_air_slowdown - (int)(0.2f * FIX_SCALEF),
+			1 * FIX_SCALE, PLAYER_AIR_START_SLOWDOWN);
 	}
-	else if (_speed_up > 0)
+	else if (_speed_up_active > 0)
 	{
-		--_speed_up;
+		--_speed_up_active;
 		//Check ended and handle ended
-		if (_speed_up <= 0)
+		if (_speed_up_active <= 0)
 			_scroll_x -= 0.5f * FIX_SCALEF;
 	}
 
@@ -340,5 +347,5 @@ int get_player_life()
 
 int speed_up_active()
 {
-	return _speed_up;
+	return _speed_up_active;
 }

@@ -9,6 +9,8 @@
 #define PLAYER_AIR_CYCLE_COUNT 3
 #define PLAYER_WALK_CYCLE_COUNT 5
 
+#define PLAYER_AIR_START_SLOWDOWN (int)(2.0f * (FIX_SCALE))
+
 void init_player();
 
 void unload_player();

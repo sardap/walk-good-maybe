@@ -24,7 +24,11 @@
 		"graphics.h": "c",
 		"enemybisuctdeath03.h": "c",
 		"anime.h": "c",
-		"enemybiscutufoidle00.h": "c"
+		"enemybiscutufoidle00.h": "c",
+		"array": "c",
+		"string_view": "c",
+		"initializer_list": "c",
+		"utility": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

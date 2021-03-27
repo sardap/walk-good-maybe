@@ -13,7 +13,7 @@
 
 //Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
 #define ENT_COUNT 25
-#define ENT_VISUAL_COUNT 30
+#define ENT_VISUAL_COUNT 50
 
 /*
 	These need to be ^2 for col 
@@ -123,7 +123,7 @@ typedef struct visual_ent_t
 			int eb_tile_id;
 			int eb_anime_cycle;
 		};
-		};
+	};
 } visual_ent_t;
 
 def OBJ_ATTR _obj_buffer[128];

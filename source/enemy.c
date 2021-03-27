@@ -192,7 +192,7 @@ void update_enemy_biscut_death(visual_ent_t *v_ent)
 		if (anime_complete)
 		{
 			free_obj_tile_idx(v_ent->eb_tile_id, 2);
-			free_visual_ent(v_ent->visual_ent_idx, 1);
+			free_visual_ent(v_ent->ent_idx, 1);
 			v_ent->type = TYPE_VISUAL_NONE;
 			return;
 		}
@@ -309,7 +309,7 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 		if (anime_complete)
 		{
 			free_obj_tile_idx(v_ent->eb_tile_id, 2);
-			free_visual_ent(v_ent->visual_ent_idx, 1);
+			free_visual_ent(v_ent->ent_idx, 1);
 			v_ent->type = TYPE_VISUAL_NONE;
 			return;
 		}

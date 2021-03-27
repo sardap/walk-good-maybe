@@ -11,9 +11,10 @@
 #define def extern
 #endif
 
-//Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
+//Making this above 90 causes linking errors since you run out of iwram
 #define ENT_COUNT 25
-#define ENT_VISUAL_COUNT 40
+#define ENT_VISUAL_COUNT 60
+#define OBJ_COUNT (ENT_COUNT + ENT_VISUAL_COUNT)
 
 /*
 	These need to be ^2 for col 
@@ -106,11 +107,15 @@ typedef struct ent_t
 
 typedef struct visual_ent_t
 {
-	int visual_ent_idx;
 	int ent_idx;
 	FIXED x, y;
 	ent_visual_types_t type;
 	OBJ_ATTR att;
+	/*
+		5Head time mother fuckers
+		So if you need more then an int you need to make it a pointer and 
+		malloc it to save iwram space
+	*/
 	union
 	{
 		//Speed line
@@ -127,7 +132,7 @@ typedef struct visual_ent_t
 	};
 } visual_ent_t;
 
-def OBJ_ATTR _obj_buffer[128];
+def OBJ_ATTR _obj_buffer[OBJ_COUNT];
 def ent_t _player;
 def ent_t _ents[ENT_COUNT];
 def visual_ent_t _visual_ents[ENT_VISUAL_COUNT];

@@ -11,7 +11,7 @@
 #include "player.h"
 #include "life_display.h"
 
-OBJ_ATTR _obj_buffer[128] = {};
+OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};
 visual_ent_t _visual_ents[ENT_VISUAL_COUNT] = {};
 
@@ -20,7 +20,7 @@ static int _allocated_visual_ents[ENT_VISUAL_COUNT];
 
 void init_all_ents()
 {
-	oam_init(_obj_buffer, 128);
+	oam_init(_obj_buffer, OBJ_COUNT);
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{

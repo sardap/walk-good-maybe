@@ -1,5 +1,7 @@
 #include "title_screen.h"
 
+#include <stdlib.h>
+
 #include "game_intro.h"
 #include "../debug.h"
 
@@ -22,7 +24,8 @@ static void show(void)
 	GRIT_CPY(pal_bg_mem, titleScreenSharedPal);
 
 	// Load tiles into shared_cb
-	GRIT_CPY(&tile_mem[TS_SHARED_CB], titleScreenSharedTiles);
+	LZ77UnCompVram(titleScreenSharedTiles, &tile_mem[TS_SHARED_CB]);
+
 	// Load maps
 	GRIT_CPY(&se_mem[TS_CITY_SSB], tsCityMap);
 	GRIT_CPY(&se_mem[TS_BEACH_SSB], tsBeachMap);

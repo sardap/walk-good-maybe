@@ -79,7 +79,7 @@ static void show(void)
 	GRIT_CPY(pal_obj_mem, giSpriteSharedPal);
 	/* Load background tiles into GI_SHARED_CB */
 	//afine background
-	GRIT_CPY(&tile_mem[GI_SHARED_CB], giBackgroundAffSharedTiles);
+	LZ77UnCompVram(giBackgroundAffSharedTiles, &tile_mem[GI_SHARED_CB]);
 	//reg background
 	GRIT_CPY(&tile_mem[GI_SHARED_CB][450 * 2], giBackgroundSharedTiles);
 	//Load object tiles

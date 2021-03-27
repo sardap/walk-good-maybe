@@ -1,6 +1,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include "ent.h"
+
 #define PLAYER_SPAWN_Y 0
 #define PLAYER_JUMP_TIME 10
 #define PLAYER_LAND_TIME 6
@@ -10,6 +12,8 @@
 #define PLAYER_WALK_CYCLE_COUNT 5
 
 #define PLAYER_AIR_START_SLOWDOWN (int)(2.0f * (FIX_SCALE))
+
+extern ent_t _player;
 
 void init_player();
 

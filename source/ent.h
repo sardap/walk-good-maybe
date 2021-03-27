@@ -13,7 +13,7 @@
 
 //Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
 #define ENT_COUNT 25
-#define ENT_VISUAL_COUNT 50
+#define ENT_VISUAL_COUNT 40
 
 /*
 	These need to be ^2 for col 
@@ -32,6 +32,7 @@ typedef enum ent_types_t
 	TYPE_SPEED_UP = 8,
 	TYPE_ENEMY_BISCUT_UFO = 16,
 	TYPE_ENEMY_BULLET = 32,
+	TYPE_HEALTH_UP = 64,
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them

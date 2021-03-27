@@ -316,6 +316,9 @@ void update_ents()
 		case TYPE_ENEMY_BULLET:
 			update_enemy_bullet(&_ents[i]);
 			break;
+		case TYPE_HEALTH_UP:
+			update_health_up(&_ents[i]);
+			break;
 		}
 	}
 }

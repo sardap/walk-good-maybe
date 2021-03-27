@@ -16,11 +16,11 @@
 #include "assets/building4TileSet.h"
 
 //Maybe do combo math here
-static t_spawn_info building_0 = {50, 75, 75};
-static t_spawn_info building_1 = {50, 75, 75};
-static t_spawn_info building_2 = {50, 75, 75};
-static t_spawn_info building_3 = {50, 75, 75};
-static t_spawn_info building_4 = {10, 75, 75};
+static t_spawn_info building_0 = {0, 0, 0, 100};
+static t_spawn_info building_1 = {25, 50, 75, 100};
+static t_spawn_info building_2 = {25, 50, 75, 100};
+static t_spawn_info building_3 = {25, 50, 75, 100};
+static t_spawn_info building_4 = {25, 50, 75, 100};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -119,11 +119,23 @@ static bool spawn_speed_up_token(int start_x, int width, int y)
 	return true;
 }
 
+static bool spawn_health_up_token(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
+
+	int ent_idx = allocate_ent(1);
+	create_health_up(
+		&_ents[ent_idx], ent_idx,
+		int2fx(att_x), int2fx(y * 8 - 10));
+
+	return true;
+}
+
 static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 {
 	//early return to avoid that awesome wraping bug
 	if (level_to_screen(start_x + width) < 0)
-		return width;
+		return;
 
 	if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
 	{
@@ -139,6 +151,10 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	else if (gba_rand_range(1, 100) > 100 - info->speed_up_token)
 	{
 		spawn_speed_up_token(start_x, width, y);
+	}
+	else if (gba_rand_range(1, 100) > 100 - info->health_up_token)
+	{
+		spawn_health_up_token(start_x, width, y);
 	}
 }
 

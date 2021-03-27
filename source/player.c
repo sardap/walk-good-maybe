@@ -242,7 +242,7 @@ void update_player()
 		_invincible_frames--;
 	}
 
-	//Check colsion with other
+	//Check colsion with speed_up
 	if (_speed_up_active <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
 		_speed_up_active = 120;
@@ -258,6 +258,11 @@ void update_player()
 		//Check ended and handle ended
 		if (_speed_up_active <= 0)
 			_scroll_x -= 0.5f * FIX_SCALEF;
+	}
+
+	if (_player.ent_cols & (TYPE_HEALTH_UP))
+	{
+		_player_life = clamp(_player_life + 1, 0, PLAYER_LIFE_START + 1);
 	}
 
 	//Handles player anime

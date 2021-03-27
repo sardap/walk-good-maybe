@@ -28,7 +28,11 @@
 		"array": "c",
 		"string_view": "c",
 		"initializer_list": "c",
-		"utility": "c"
+		"utility": "c",
+		"*.tcc": "c",
+		"memory": "c",
+		"shared_scene.h": "c",
+		"stdlib.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -31,4 +31,19 @@ typedef enum mg_states_t
 
 extern const scene_t main_game;
 
+typedef struct mg_data_t
+{
+	FIXED next_building_spawn;
+	int building_spawn_x;
+	int bg_0_scroll;
+	int bg_2_scroll;
+
+	int far_building_tiles_idx;
+	int fog_tiles_idx;
+
+	mg_states_t state;
+	mg_states_t old_state;
+	mg_mode_t mode;
+} mg_data_t;
+
 #endif

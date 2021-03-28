@@ -114,11 +114,6 @@ typedef struct visual_ent_t
 	FIXED x, y;
 	ent_visual_types_t type;
 	OBJ_ATTR att;
-	/*
-		5Head time mother fuckers
-		So if you need more then an int you need to make it a pointer and 
-		malloc it to save iwram space
-	*/
 	union
 	{
 		//Speed line
@@ -141,11 +136,9 @@ def ent_t _ents[ENT_COUNT];
 def visual_ent_t _visual_ents[ENT_VISUAL_COUNT];
 
 void init_all_ents();
-int allocate_ent(int count);
-void free_ent(int idx, int count);
 
-ent_t *allocate_ent_new();
-void free_ent_new(ent_t *ent);
+ent_t *allocate_ent();
+void free_ent(ent_t *ent);
 
 visual_ent_t *allocate_visual_ent();
 void free_visual_ent(visual_ent_t *ent);

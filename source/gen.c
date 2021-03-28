@@ -87,10 +87,7 @@ static bool spawn_enemy_biscuit(int start_x, int width, int y)
 {
 	FIXED att_x = level_to_screen(start_x + width / 2);
 
-	int ent_idx = allocate_ent(1);
-	create_enemy_biscut(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 32));
+	create_enemy_biscut(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 32));
 
 	return true;
 }
@@ -99,9 +96,8 @@ static bool spawn_enemy_biscut_ufo(int start_x, int width, int y)
 {
 	FIXED att_x = level_to_screen(start_x + width / 2);
 
-	int ent_idx = allocate_ent(1);
 	create_enemy_ufo_bisuct(
-		&_ents[ent_idx], ent_idx,
+		allocate_ent(),
 		int2fx(att_x), int2fx(y * 8 - 45));
 
 	return true;
@@ -111,10 +107,7 @@ static bool spawn_speed_up_token(int start_x, int width, int y)
 {
 	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
 
-	int ent_idx = allocate_ent(1);
-	create_speed_up(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 10));
+	create_speed_up(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 10));
 
 	return true;
 }
@@ -123,10 +116,7 @@ static bool spawn_health_up_token(int start_x, int width, int y)
 {
 	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
 
-	int ent_idx = allocate_ent(1);
-	create_health_up(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 10));
+	create_health_up(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 10));
 
 	return true;
 }
@@ -135,10 +125,7 @@ static bool spawn_jump_up_token(int start_x, int width, int y)
 {
 	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
 
-	int ent_idx = allocate_ent(1);
-	create_jump_up(
-		&_ents[ent_idx], ent_idx,
-		int2fx(att_x), int2fx(y * 8 - 10));
+	create_jump_up(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 10));
 
 	return true;
 }

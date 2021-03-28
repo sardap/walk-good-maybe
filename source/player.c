@@ -92,7 +92,6 @@ void init_player()
 
 void unload_player()
 {
-	free_ent(_player.ent_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
 }
 
@@ -130,7 +129,6 @@ static void player_shoot()
 	};
 	mmEffectEx(&shoot_sound);
 
-	int att_idx = allocate_ent(1);
 	FIXED vx, x;
 	if (_facing == FACING_RIGHT)
 	{
@@ -144,7 +142,7 @@ static void player_shoot()
 	}
 
 	create_bullet(
-		&_ents[att_idx], att_idx,
+		allocate_ent(),
 		BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
 		vx, 0, _facing == FACING_LEFT);
 }

@@ -36,7 +36,7 @@ void load_jump_up()
 	GRIT_CPY(&tile_mem[4][_jump_up_tile_idx], jumpUpTiles);
 }
 
-void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
+void create_speed_up(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_SPEED_UP;
 
@@ -46,7 +46,6 @@ void create_speed_up(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->h = 0;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->ent_idx = att_idx;
 
 	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
 	ent->att.attr1 = ATTR1_SIZE_8x8;
@@ -57,8 +56,7 @@ void update_speed_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || (ent->ent_cols & (TYPE_PLAYER) && !speed_up_active()))
 	{
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_ent(ent);
 
 		int count = gba_rand_range(3, 5);
 		for (int i = 0; i < count; i++)
@@ -102,7 +100,7 @@ void update_speed_line(visual_ent_t *ent)
 	ent->x += ent->sl_vx;
 }
 
-void create_health_up(ent_t *ent, int ent_idx, FIXED x, FIXED y)
+void create_health_up(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_HEALTH_UP;
 
@@ -112,7 +110,6 @@ void create_health_up(ent_t *ent, int ent_idx, FIXED x, FIXED y)
 	ent->h = 0;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->ent_idx = ent_idx;
 
 	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
 	ent->att.attr1 = ATTR1_SIZE_8x8;
@@ -123,8 +120,7 @@ void update_health_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_ent(ent);
 		return;
 	}
 
@@ -134,7 +130,7 @@ void update_health_up(ent_t *ent)
 	ent->vx += _scroll_x;
 }
 
-void create_jump_up(ent_t *ent, int ent_idx, FIXED x, FIXED y)
+void create_jump_up(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_JUMP_UP;
 
@@ -144,7 +140,6 @@ void create_jump_up(ent_t *ent, int ent_idx, FIXED x, FIXED y)
 	ent->h = 0;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->ent_idx = ent_idx;
 
 	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
 	ent->att.attr1 = ATTR1_SIZE_8x8;
@@ -155,8 +150,7 @@ void update_jump_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_ent(ent);
 		return;
 	}
 

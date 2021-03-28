@@ -74,7 +74,7 @@ void load_enemy_bullets_tiles()
 	GRIT_CPY(&tile_mem[4][_enemy_bullet_0_tile_idx], enemyBullet00Tiles);
 }
 
-void create_enemy_biscut(ent_t *ent, int att_idx, FIXED x, FIXED y)
+void create_enemy_biscut(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_ENEMY_BISCUT;
 
@@ -84,7 +84,6 @@ void create_enemy_biscut(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->h = 16;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->ent_idx = att_idx;
 
 	//Load tiles
 	ent->eb_tile_idx = allocate_obj_tile_idx(2);
@@ -127,8 +126,7 @@ void update_enemy_biscut(ent_t *ent)
 		}
 
 		free_obj_tile_idx(ent->eb_tile_idx, 2);
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_ent(ent);
 		return;
 	}
 
@@ -199,7 +197,7 @@ void update_enemy_biscut_death(visual_ent_t *v_ent)
 	v_ent->x += -_scroll_x;
 }
 
-void create_enemy_ufo_bisuct(ent_t *ent, int ent_idx, FIXED x, FIXED y)
+void create_enemy_ufo_bisuct(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_ENEMY_BISCUT_UFO;
 
@@ -209,7 +207,6 @@ void create_enemy_ufo_bisuct(ent_t *ent, int ent_idx, FIXED x, FIXED y)
 	ent->h = 16;
 	ent->vx = 0;
 	ent->vy = 0;
-	ent->ent_idx = ent_idx;
 
 	//Load tiles
 	ent->ebu_tile_id = allocate_obj_tile_idx(4);
@@ -251,8 +248,7 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 		mmEffectEx(&death);
 
 		free_obj_tile_idx(ent->ebu_tile_id, 4);
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_ent(ent);
 
 		visual_ent_t *v_ent = allocate_visual_ent();
 		create_enemy_ufo_biscut_death(v_ent, ent->x, ent->y);
@@ -265,10 +261,9 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 	{
 		ent->ebu_next_shoot = 60;
 
-		int bul_ent_idx = allocate_ent(1);
+		ent_t *bul_ent = allocate_ent();
 		create_enemy_bullet(
-			&_ents[bul_ent_idx],
-			bul_ent_idx, ent->x + 6 * FIX_SCALE,
+			bul_ent, ent->x + 6 * FIX_SCALE,
 			ent->y + 16 * FIX_SCALE, 0, 0.5 * FIX_SCALE);
 	}
 }
@@ -312,7 +307,7 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 	v_ent->x += -_scroll_x;
 }
 
-void create_enemy_bullet(ent_t *ent, int ent_idx, FIXED x, FIXED y, FIXED vx, FIXED vy)
+void create_enemy_bullet(ent_t *ent, FIXED x, FIXED y, FIXED vx, FIXED vy)
 {
 	ent->ent_type = TYPE_ENEMY_BULLET;
 
@@ -322,7 +317,6 @@ void create_enemy_bullet(ent_t *ent, int ent_idx, FIXED x, FIXED y, FIXED vx, FI
 	ent->h = 5;
 	ent->vx = vx;
 	ent->vy = vy;
-	ent->ent_idx = ent_idx;
 
 	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
 	ent->att.attr1 = ATTR1_SIZE_8x8;
@@ -342,8 +336,7 @@ void update_enemy_bullet(ent_t *ent)
 
 	if (hit || fx2int(ent->x) + ent->w < 0)
 	{
-		free_ent(ent->ent_idx, 1);
-		ent->ent_type = TYPE_NONE;
+		free_ent(ent);
 		return;
 	}
 }

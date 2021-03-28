@@ -79,27 +79,14 @@ static int allocate(u8 *ary, int length, int count)
 	return 0;
 }
 
-int allocate_ent(int count)
-{
-	return allocate(_allocated_ents, ENT_COUNT, count);
-}
-
-void free_ent(int idx, int count)
-{
-	for (int i = idx; i < idx + count; i++)
-	{
-		_allocated_ents[i] = 0;
-	}
-}
-
-ent_t *allocate_ent_new()
+ent_t *allocate_ent()
 {
 	int idx = allocate(_allocated_ents, ENT_COUNT, 1);
 	_ents[idx].ent_idx = idx;
 	return &_ents[idx];
 }
 
-void free_ent_new(ent_t *ent)
+void free_ent(ent_t *ent)
 {
 	_allocated_ents[ent->ent_idx] = 0;
 	ent->ent_idx = 0;
@@ -132,7 +119,7 @@ void free_all_ents()
 			break;
 		}
 
-		free_ent_new(ent);
+		free_ent(ent);
 	}
 }
 

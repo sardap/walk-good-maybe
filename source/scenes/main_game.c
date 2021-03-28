@@ -1,13 +1,13 @@
 #include "main_game.h"
 
 #include <tonc.h>
-#include <stdlib.h>
 
 #include <maxmod.h>
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
 #include "title_screen.h"
+#include "scene_shared.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -25,7 +25,7 @@
 #include "../assets/mainGameShared.h"
 #include "../assets/buildingtileset.h"
 
-static mg_data_t *_data;
+static mg_data_t *_data = &_shared_data.mg;
 
 static FIXED wrap_x(FIXED x)
 {
@@ -132,8 +132,6 @@ static void unload_foreground_tiles()
 
 static void show(void)
 {
-	_data = malloc(sizeof(mg_data_t));
-
 	_data->mode = MG_MODE_CITY;
 
 	// Load palette
@@ -368,8 +366,6 @@ static void hide(void)
 
 	free_all_ents();
 	free_all_visual_ents();
-
-	free(_data);
 }
 
 const scene_t main_game = {

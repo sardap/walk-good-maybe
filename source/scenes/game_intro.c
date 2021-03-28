@@ -1,6 +1,5 @@
 #include "game_intro.h"
 #include <stdio.h>
-#include <stdlib.h>
 
 #include <tonc.h>
 #include <maxmod.h>
@@ -8,6 +7,7 @@
 #include "soundbank_bin.h"
 
 #include "main_game.h"
+#include "scene_shared.h"
 #include "../graphics.h"
 #include "../debug.h"
 #include "../anime.h"
@@ -25,9 +25,9 @@
 #include "../assets/giWhale_air_2.h"
 #include "../assets/giWhale_air_3.h"
 
-const uint *air_anime_cycle[] = {giWhale_air_0Tiles, giWhale_air_0Tiles, giWhale_air_1Tiles, giWhale_air_3Tiles};
+static const uint *air_anime_cycle[] = {giWhale_air_0Tiles, giWhale_air_0Tiles, giWhale_air_1Tiles, giWhale_air_3Tiles};
 
-static gi_data_t *_data;
+static gi_data_t *_data = &_shared_data.gi;
 
 // --- Type A ---
 // By the numbers: everything nice and .8 fixed point. Result: blocky
@@ -66,8 +66,6 @@ static void m7_hbl()
 
 static void show(void)
 {
-	_data = malloc(sizeof(gi_data_t));
-
 	_data->obj_aff_buffer = (OBJ_AFFINE *)_obj_buffer;
 
 	// Set RegX scroll to 0
@@ -203,8 +201,6 @@ static void update(void)
 
 static void hide(void)
 {
-	free(_data);
-
 	REG_DISPCNT = 0;
 }
 

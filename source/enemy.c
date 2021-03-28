@@ -87,14 +87,14 @@ void create_enemy_biscut(ent_t *ent, int att_idx, FIXED x, FIXED y)
 	ent->ent_idx = att_idx;
 
 	//Load tiles
-	ent->eb_tile_id = allocate_obj_tile_idx(2);
-	GRIT_CPY(&tile_mem[4][ent->eb_tile_id], toast_enemy_idle_01Tiles);
+	ent->eb_tile_idx = allocate_obj_tile_idx(2);
+	GRIT_CPY(&tile_mem[4][ent->eb_tile_idx], toast_enemy_idle_01Tiles);
 
 	ent->eb_anime_cycle = 0;
 
 	ent->att.attr0 = ATTR0_TALL | ATTR0_8BPP;
 	ent->att.attr1 = ATTR1_SIZE_16x8;
-	ent->att.attr2 = ATTR2_PRIO(1) | ATTR2_ID(ent->eb_tile_id);
+	ent->att.attr2 = ATTR2_PRIO(1) | ATTR2_ID(ent->eb_tile_idx);
 }
 
 void update_enemy_biscut(ent_t *ent)
@@ -103,7 +103,7 @@ void update_enemy_biscut(ent_t *ent)
 	{
 		step_anime_bad(
 			enemy_biscut_idle_cycle, toast_enemy_idle_01TilesLen, ENEMY_BISCUT_IDLE_CYCLE,
-			&ent->eb_anime_cycle, ent->eb_tile_id);
+			&ent->eb_anime_cycle, ent->eb_tile_idx);
 	}
 
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_BULLET))
@@ -126,7 +126,7 @@ void update_enemy_biscut(ent_t *ent)
 				ent->x, ent->y);
 		}
 
-		free_obj_tile_idx(ent->eb_tile_id, 2);
+		free_obj_tile_idx(ent->eb_tile_idx, 2);
 		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 		return;
@@ -172,12 +172,12 @@ void create_enemy_biscut_death(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED 
 	v_ent->eb_anime_cycle = 0;
 
 	//Load tiles
-	v_ent->eb_tile_id = allocate_obj_tile_idx(2);
-	GRIT_CPY(&tile_mem[4][v_ent->eb_tile_id], enemyBisuctDeath00Tiles);
+	v_ent->eb_tile_idx = allocate_obj_tile_idx(2);
+	GRIT_CPY(&tile_mem[4][v_ent->eb_tile_idx], enemyBisuctDeath00Tiles);
 
 	v_ent->att.attr0 = ATTR0_TALL | ATTR0_8BPP;
 	v_ent->att.attr1 = ATTR1_SIZE_8x16;
-	v_ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(v_ent->eb_tile_id);
+	v_ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(v_ent->eb_tile_idx);
 }
 
 void update_enemy_biscut_death(visual_ent_t *v_ent)
@@ -187,11 +187,11 @@ void update_enemy_biscut_death(visual_ent_t *v_ent)
 		bool anime_complete = step_anime(
 			&v_ent->eb_anime_cycle,
 			enemy_biscut_death_cycle, ENEMY_BISCUT_DEATH_CYCLE,
-			v_ent->eb_tile_id, enemyBisuctDeath00TilesLen);
+			v_ent->eb_tile_idx, enemyBisuctDeath00TilesLen);
 
 		if (anime_complete)
 		{
-			free_obj_tile_idx(v_ent->eb_tile_id, 2);
+			free_obj_tile_idx(v_ent->eb_tile_idx, 2);
 			free_visual_ent(v_ent->ent_idx, 1);
 			v_ent->type = TYPE_VISUAL_NONE;
 			return;
@@ -288,12 +288,12 @@ void create_enemy_ufo_biscut_death(visual_ent_t *v_ent, int ent_idx, FIXED x, FI
 	v_ent->eb_anime_cycle = 0;
 
 	//Load tiles
-	v_ent->eb_tile_id = allocate_obj_tile_idx(4);
-	GRIT_CPY(&tile_mem[4][v_ent->eb_tile_id], enemyBisuctDeath00Tiles);
+	v_ent->eb_tile_idx = allocate_obj_tile_idx(4);
+	GRIT_CPY(&tile_mem[4][v_ent->eb_tile_idx], enemyBisuctDeath00Tiles);
 
 	v_ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
 	v_ent->att.attr1 = ATTR1_SIZE_16x16;
-	v_ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(v_ent->eb_tile_id);
+	v_ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(v_ent->eb_tile_idx);
 }
 
 void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
@@ -304,11 +304,11 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 		bool anime_complete = step_anime(
 			&v_ent->eb_anime_cycle,
 			enemy_biscut_ufo_death_cycle, ENEMY_BISCUT_UFO_DEATH_CYCLE,
-			v_ent->eb_tile_id, enemyBiscutUFODeath00TilesLen);
+			v_ent->eb_tile_idx, enemyBiscutUFODeath00TilesLen);
 
 		if (anime_complete)
 		{
-			free_obj_tile_idx(v_ent->eb_tile_id, 2);
+			free_obj_tile_idx(v_ent->eb_tile_idx, 2);
 			free_visual_ent(v_ent->ent_idx, 1);
 			v_ent->type = TYPE_VISUAL_NONE;
 			return;

@@ -271,8 +271,10 @@ void update_player()
 	if (_player.ent_cols & (TYPE_JUMP_UP))
 	{
 		_player_jump_power = clamp(
-			_player_jump_power + (int)(0.05f * FIX_SCALE),
+			_player_jump_power + (int)(0.07f * FIX_SCALE),
 			PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
+
+		update_jump_level_display(_player_jump_power);
 	}
 
 	//Handles player anime

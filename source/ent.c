@@ -92,6 +92,20 @@ void free_ent(int idx, int count)
 	}
 }
 
+ent_t *allocate_ent_new()
+{
+	int idx = allocate(_allocated_ents, ENT_COUNT, 1);
+	_ents[idx].ent_idx = idx;
+	return &_ents[idx];
+}
+
+void free_ent_new(ent_t *ent)
+{
+	_allocated_ents[ent->ent_idx] = 0;
+	ent->ent_idx = 0;
+	ent->ent_type = TYPE_NONE;
+}
+
 int allocate_visual_ent(int count)
 {
 	return allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, count);
@@ -102,6 +116,52 @@ void free_visual_ent(int idx, int count)
 	for (int i = idx; i < idx + count; i++)
 	{
 		_allocated_ents[i] = 0;
+	}
+}
+
+visual_ent_t *allocate_visual_ent_new()
+{
+	int idx = allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, 1);
+	_visual_ents[idx].ent_idx = idx;
+	return &_visual_ents[idx];
+}
+
+void free_visual_ent_new(visual_ent_t *ent)
+{
+	_allocated_visual_ents[ent->ent_idx] = 0;
+	ent->ent_idx = 0;
+	ent->type = TYPE_VISUAL_NONE;
+}
+
+void free_all_ents()
+{
+	for (int i = 0; i < ENT_COUNT; i++)
+	{
+		ent_t *ent = &_ents[i];
+
+		switch (ent->ent_type)
+		{
+		default:
+			break;
+		}
+
+		free_ent_new(ent);
+	}
+}
+
+void free_all_visual_ents()
+{
+	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
+	{
+		visual_ent_t *ent = &_visual_ents[i];
+
+		switch (ent->type)
+		{
+		default:
+			break;
+		}
+
+		free_visual_ent_new(ent);
 	}
 }
 
@@ -335,6 +395,7 @@ void update_visual_ents()
 		case TYPE_NONE:
 		case TYPE_VISUAL_SPEED_LEVEL:
 		case TYPE_VISUAL_SCORE:
+		case TYPE_VISUAL_JUMP_LEVEL:
 			break;
 		case TYPE_VISUAL_SPEED_LINE:
 			update_speed_line(&_visual_ents[i]);

@@ -47,6 +47,7 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 4,
 	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
 	TYPE_VISUAL_SPEED_LEVEL = 6,
+	TYPE_VISUAL_JUMP_LEVEL = 7,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -93,7 +94,7 @@ typedef struct ent_t
 		//Enemy bisuct
 		struct
 		{
-			int eb_tile_id;
+			int eb_tile_idx;
 			int eb_anime_cycle;
 		};
 		//Enemy bisuct ufo
@@ -128,7 +129,7 @@ typedef struct visual_ent_t
 		//enemy bisuct death
 		struct
 		{
-			int eb_tile_id;
+			int eb_tile_idx;
 			int eb_anime_cycle;
 		};
 	};
@@ -143,8 +144,17 @@ void init_all_ents();
 int allocate_ent(int count);
 void free_ent(int idx, int count);
 
+ent_t *allocate_ent_new();
+void free_ent_new(ent_t *ent);
+
 int allocate_visual_ent(int count);
 void free_visual_ent(int idx, int count);
+
+visual_ent_t *allocate_visual_ent_new();
+void free_visual_ent_new(visual_ent_t *ent);
+
+void free_all_ents();
+void free_all_visual_ents();
 
 void copy_ents_to_oam();
 

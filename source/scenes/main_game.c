@@ -216,6 +216,7 @@ static void show(void)
 	load_enemy_bullets_tiles();
 	load_speed_level_display();
 	load_jump_up();
+	init_jump_level_display();
 
 	init_score();
 
@@ -362,7 +363,11 @@ static void hide(void)
 	unload_foreground_tiles();
 	clear_score();
 	unload_gun_0_tiles();
+	free_jump_level_display();
 	unload_player();
+
+	free_all_ents();
+	free_all_visual_ents();
 
 	free(_data);
 }

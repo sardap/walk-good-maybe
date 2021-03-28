@@ -53,7 +53,8 @@
 		"system_error": "cpp",
 		"tuple": "cpp",
 		"speedlevel0.h": "c",
-		"speedlevel3.h": "c"
+		"speedlevel3.h": "c",
+		"jumplevel0.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -36,8 +36,9 @@
 #include "assets/enemyBullet00.h"
 
 const uint *enemy_biscut_idle_cycle[] = {
-	toast_enemy_idle_01Tiles, toast_enemy_idle_01Tiles, toast_enemy_idle_02Tiles,
-	toast_enemy_idle_03Tiles, toast_enemy_idle_04Tiles, toast_enemy_idle_05Tiles};
+	toast_enemy_idle_01Tiles, toast_enemy_idle_02Tiles,
+	toast_enemy_idle_03Tiles, toast_enemy_idle_04Tiles,
+	toast_enemy_idle_05Tiles};
 
 const uint *enemy_biscut_death_cycle[] = {
 	enemyBisuctDeath00Tiles,
@@ -98,11 +99,12 @@ void create_enemy_biscut(ent_t *ent, FIXED x, FIXED y)
 
 void update_enemy_biscut(ent_t *ent)
 {
-	if (frame_count() % 2)
+	if (frame_count() % 6 == 0)
 	{
-		step_anime_bad(
-			enemy_biscut_idle_cycle, toast_enemy_idle_01TilesLen, ENEMY_BISCUT_IDLE_CYCLE,
-			&ent->eb_anime_cycle, ent->eb_tile_idx);
+		step_anime(
+			&ent->eb_anime_cycle,
+			enemy_biscut_idle_cycle, ENEMY_BISCUT_IDLE_CYCLE,
+			ent->eb_tile_idx, toast_enemy_idle_01TilesLen);
 	}
 
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_BULLET))

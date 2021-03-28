@@ -16,7 +16,7 @@
 #include "assets/building4TileSet.h"
 
 //Maybe do combo math here
-static t_spawn_info building_0 = {00, 00, 100};
+static t_spawn_info building_0 = {25, 50, 100};
 static t_spawn_info building_1 = {25, 50, 100};
 static t_spawn_info building_2 = {25, 50, 100};
 static t_spawn_info building_3 = {25, 50, 100};

@@ -66,6 +66,8 @@ static int allocate_tile_idx(byte *allc, int len, int size)
 
 void free_tile_idx(byte *allc, int len, int idx, int size)
 {
+	//remeber that the idx returned from alloc is x2
+	idx /= 2;
 	for (int i = idx; i < idx + size; i++)
 	{
 		allc[i] = 0;

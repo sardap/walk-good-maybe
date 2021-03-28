@@ -3,7 +3,7 @@
 
 #include "ent.h"
 
-#define ENEMY_BISCUT_IDLE_CYCLE 6
+#define ENEMY_BISCUT_IDLE_CYCLE 5
 extern const unsigned int *enemy_biscut_idle_cycle[];
 #define ENEMY_BISCUT_DEATH_CYCLE 4
 extern const unsigned int *enemy_biscut_death_cycle[];

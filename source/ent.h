@@ -14,7 +14,7 @@
 //Making this above 90 causes linking errors since you run out of iwram
 #define ENT_COUNT 25
 #define ENT_VISUAL_COUNT 60
-#define OBJ_COUNT (ENT_COUNT + ENT_VISUAL_COUNT)
+#define OBJ_COUNT 128
 
 /*
 	These need to be ^2 for col 

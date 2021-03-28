@@ -76,7 +76,7 @@ static int allocate(u8 *ary, int length, int count)
 
 	write_to_log(LOG_LEVEL_DEBUG, str);
 #endif
-	return -1;
+	return 0;
 }
 
 int allocate_ent(int count)
@@ -106,27 +106,14 @@ void free_ent_new(ent_t *ent)
 	ent->ent_type = TYPE_NONE;
 }
 
-int allocate_visual_ent(int count)
-{
-	return allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, count);
-}
-
-void free_visual_ent(int idx, int count)
-{
-	for (int i = idx; i < idx + count; i++)
-	{
-		_allocated_ents[i] = 0;
-	}
-}
-
-visual_ent_t *allocate_visual_ent_new()
+visual_ent_t *allocate_visual_ent()
 {
 	int idx = allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, 1);
 	_visual_ents[idx].ent_idx = idx;
 	return &_visual_ents[idx];
 }
 
-void free_visual_ent_new(visual_ent_t *ent)
+void free_visual_ent(visual_ent_t *ent)
 {
 	_allocated_visual_ents[ent->ent_idx] = 0;
 	ent->ent_idx = 0;
@@ -161,7 +148,7 @@ void free_all_visual_ents()
 			break;
 		}
 
-		free_visual_ent_new(ent);
+		free_visual_ent(ent);
 	}
 }
 

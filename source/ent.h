@@ -147,19 +147,13 @@ void free_ent(int idx, int count);
 ent_t *allocate_ent_new();
 void free_ent_new(ent_t *ent);
 
-int allocate_visual_ent(int count);
-void free_visual_ent(int idx, int count);
-
-visual_ent_t *allocate_visual_ent_new();
-void free_visual_ent_new(visual_ent_t *ent);
+visual_ent_t *allocate_visual_ent();
+void free_visual_ent(visual_ent_t *ent);
 
 void free_all_ents();
 void free_all_visual_ents();
 
 void copy_ents_to_oam();
-
-int allocate_visual_ent(int count);
-void free_visual_ent(int idx, int count);
 
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);

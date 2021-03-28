@@ -120,9 +120,9 @@ void update_enemy_biscut(ent_t *ent)
 			};
 			mmEffectEx(&damage);
 
-			int visual_ent_idx = allocate_visual_ent(1);
+			visual_ent_t *visual_ent = allocate_visual_ent();
 			create_enemy_biscut_death(
-				&_visual_ents[visual_ent_idx], visual_ent_idx,
+				visual_ent,
 				ent->x, ent->y);
 		}
 
@@ -161,13 +161,12 @@ void update_enemy_biscut(ent_t *ent)
 	ent->vx += _scroll_x;
 }
 
-void create_enemy_biscut_death(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED y)
+void create_enemy_biscut_death(visual_ent_t *v_ent, FIXED x, FIXED y)
 {
 	v_ent->type = TYPE_VISUAL_ENEMY_BISUCT_DEATH;
 
 	v_ent->x = x;
 	v_ent->y = y;
-	v_ent->ent_idx = ent_idx;
 
 	v_ent->eb_anime_cycle = 0;
 
@@ -192,8 +191,7 @@ void update_enemy_biscut_death(visual_ent_t *v_ent)
 		if (anime_complete)
 		{
 			free_obj_tile_idx(v_ent->eb_tile_idx, 2);
-			free_visual_ent(v_ent->ent_idx, 1);
-			v_ent->type = TYPE_VISUAL_NONE;
+			free_visual_ent(v_ent);
 			return;
 		}
 	}
@@ -256,10 +254,8 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 		free_ent(ent->ent_idx, 1);
 		ent->ent_type = TYPE_NONE;
 
-		int visual_ent_idx = allocate_visual_ent(1);
-		create_enemy_ufo_biscut_death(
-			&_visual_ents[visual_ent_idx], visual_ent_idx,
-			ent->x, ent->y);
+		visual_ent_t *v_ent = allocate_visual_ent();
+		create_enemy_ufo_biscut_death(v_ent, ent->x, ent->y);
 		return;
 	}
 
@@ -277,13 +273,12 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 	}
 }
 
-void create_enemy_ufo_biscut_death(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED y)
+void create_enemy_ufo_biscut_death(visual_ent_t *v_ent, FIXED x, FIXED y)
 {
 	v_ent->type = TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH;
 
 	v_ent->x = x;
 	v_ent->y = y;
-	v_ent->ent_idx = ent_idx;
 
 	v_ent->eb_anime_cycle = 0;
 
@@ -309,8 +304,7 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 		if (anime_complete)
 		{
 			free_obj_tile_idx(v_ent->eb_tile_idx, 2);
-			free_visual_ent(v_ent->ent_idx, 1);
-			v_ent->type = TYPE_VISUAL_NONE;
+			free_visual_ent(v_ent);
 			return;
 		}
 	}

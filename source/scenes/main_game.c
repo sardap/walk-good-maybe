@@ -361,7 +361,7 @@ static void hide(void)
 	free_bg_tile_idx(0, BG_TILE_ALLC_SIZE);
 
 	unload_foreground_tiles();
-	clear_score();
+	free_score_display();
 	unload_gun_0_tiles();
 	free_jump_level_display();
 	unload_player();

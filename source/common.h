@@ -18,8 +18,6 @@
 #define X_SCROLL_MAX (FIXED)(3.5f * (FIX_SCALEF))
 #define X_SCROLL_RATE 120
 
-#define SCORE_DIGITS 4
-
 typedef struct scene_t
 {
 	void (*show)(void);

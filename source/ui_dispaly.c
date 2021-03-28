@@ -5,6 +5,7 @@
 #include "graphics.h"
 #include "player.h"
 #include "debug.h"
+#include "numbers.h"
 
 #include "assets/lifeAmmount3.h"
 #include "assets/lifeAmmount2.h"
@@ -23,22 +24,18 @@ static const u32 *_speed_level_tiles[] = {
 static const int _speed_level_tiles_length = 5;
 
 static int _life_tile_start_idx;
-static int _v_ent_life_idx;
 static int _speed_level_tile_idx;
-static int _v_ent_speed_level;
 static int _jump_level_tile_idx;
+static visual_ent_t *_score_digs[SCORE_DIGITS];
 
 void load_life_display()
 {
 	_life_tile_start_idx = allocate_obj_tile_idx(4);
 	update_life_display(PLAYER_LIFE_START);
 
-	_v_ent_life_idx = allocate_visual_ent(1);
-
-	visual_ent_t *ent = &_visual_ents[_v_ent_life_idx];
+	visual_ent_t *ent = allocate_visual_ent();
 
 	ent->type = TYPE_VISUAL_LIFE;
-	ent->ent_idx = _v_ent_life_idx;
 
 	ent->x = (GBA_WIDTH - 16) * FIX_SCALE;
 	ent->y = 0;
@@ -66,7 +63,6 @@ void update_life_display(int life)
 void unload_life_display()
 {
 	free_obj_tile_idx(_life_tile_start_idx, 4);
-	free_visual_ent(_v_ent_life_idx, 1);
 }
 
 void load_speed_level_display()
@@ -74,12 +70,9 @@ void load_speed_level_display()
 	_speed_level_tile_idx = allocate_obj_tile_idx(4);
 	update_speed_level_display(PLAYER_AIR_START_SLOWDOWN);
 
-	_v_ent_speed_level = allocate_visual_ent(1);
-
-	visual_ent_t *ent = &_visual_ents[_v_ent_speed_level];
+	visual_ent_t *ent = allocate_visual_ent();
 
 	ent->type = TYPE_VISUAL_SPEED_LEVEL;
-	ent->ent_idx = _v_ent_speed_level;
 
 	ent->x = (GBA_WIDTH - 16 * 2) * FIX_SCALE;
 	ent->y = 0;
@@ -108,7 +101,7 @@ void update_speed_level_display(FIXED speed)
 void init_jump_level_display()
 {
 
-	visual_ent_t *ent = allocate_visual_ent_new();
+	visual_ent_t *ent = allocate_visual_ent();
 
 	ent->type = TYPE_VISUAL_SPEED_LEVEL;
 
@@ -144,4 +137,62 @@ void update_jump_level_display(FIXED jump_power)
 void free_jump_level_display()
 {
 	free_obj_tile_idx(_jump_level_tile_idx, 4);
+}
+
+void init_score_display()
+{
+	for (int i = 0; i < SCORE_DIGITS; i++)
+	{
+		_score_digs[i] = allocate_visual_ent();
+
+		_score_digs[i]->type = TYPE_VISUAL_SCORE;
+
+		_score_digs[i]->x = int2fx(8 * i);
+		_score_digs[i]->y = 0;
+
+		_score_digs[i]->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+		_score_digs[i]->att.attr1 = ATTR1_SIZE_8x8;
+		_score_digs[i]->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(get_number_tile_start());
+	}
+}
+
+void update_score_display(int score)
+{
+	//Count number of digits
+	int w_score = score;
+	int digit_count = 0;
+	while (w_score != 0)
+	{
+		digit_count++;
+		w_score /= 10;
+	}
+
+	w_score = score;
+	for (int i = SCORE_DIGITS - 1; i >= 0; i--)
+	{
+		int offset;
+		if (((SCORE_DIGITS - 1) - i) < digit_count)
+		{
+			offset = (w_score % 10);
+		}
+		else
+		{
+			offset = 0;
+		}
+
+		w_score /= 10;
+
+		_score_digs[i]->att.attr2 =
+			ATTR2_PALBANK(0) |
+			ATTR2_PRIO(0) |
+			ATTR2_ID(get_number_tile_start() + offset * 2);
+	}
+}
+
+void free_score_display()
+{
+	for (int i = 0; i < SCORE_DIGITS; i++)
+	{
+		free_visual_ent(_score_digs[i]);
+	}
 }

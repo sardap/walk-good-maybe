@@ -61,11 +61,11 @@ void update_speed_up(ent_t *ent)
 		ent->ent_type = TYPE_NONE;
 
 		int count = gba_rand_range(3, 5);
-		int line_ent = allocate_visual_ent(count);
 		for (int i = 0; i < count; i++)
 		{
+			visual_ent_t *speed_line_ent = allocate_visual_ent();
 			create_speed_line(
-				&_visual_ents[line_ent + i], line_ent + i,
+				speed_line_ent,
 				GBA_WIDTH * FIX_SCALE + gba_rand_range(0, GBA_WIDTH * FIX_SCALE),
 				int2fx(gba_rand_range(0, GBA_HEIGHT)));
 		}
@@ -78,14 +78,13 @@ void update_speed_up(ent_t *ent)
 	ent->vx += _scroll_x;
 }
 
-void create_speed_line(visual_ent_t *v_ent, int ent_idx, FIXED x, FIXED y)
+void create_speed_line(visual_ent_t *v_ent, FIXED x, FIXED y)
 {
 	v_ent->type = TYPE_VISUAL_SPEED_LINE;
 
 	v_ent->sl_vx = _scroll_x + -3.5f * FIX_SCALEF;
 	v_ent->x = x;
 	v_ent->y = y;
-	v_ent->ent_idx = ent_idx;
 
 	v_ent->att.attr0 = ATTR0_WIDE | ATTR0_8BPP;
 	v_ent->att.attr1 = ATTR1_SIZE_32x8;
@@ -96,8 +95,7 @@ void update_speed_line(visual_ent_t *ent)
 {
 	if (ent->x < GBA_WIDTH * FIX_SCALE && !speed_up_active())
 	{
-		free_visual_ent(ent->ent_idx, 1);
-		ent->type = TYPE_VISUAL_NONE;
+		free_visual_ent(ent);
 		return;
 	}
 

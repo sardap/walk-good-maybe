@@ -11,8 +11,8 @@
 #include "debug.h"
 #include "graphics.h"
 #include "anime.h"
-#include "life_display.h"
 #include "gun.h"
+#include "ui_display.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -32,13 +32,14 @@
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
-static POINT _player_mos;
 static int _invincible_frames;
-static FIXED _player_speed = (int)(2.0f * (FIX_SCALE));
-static int _speed_up;
+static int _speed_up_active;
 static movement_state_t _move_state;
 static facing_t _facing;
-static FIXED _jump_power;
+static POINT _player_mos;
+static FIXED _player_speed;
+static FIXED _player_air_slowdown;
+static FIXED _player_jump_power;
 
 ent_t _player = {};
 
@@ -82,13 +83,15 @@ void init_player()
 	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
 
 	_facing = FACING_RIGHT;
-	_jump_power = (int)(2.0f * (FIX_SCALE));
+	_player_jump_power = PLAYER_START_JUMP_POWER;
 	_move_state = MOVEMENT_AIR;
+
+	_player_speed = (int)(2.0f * (FIX_SCALE));
+	_player_air_slowdown = PLAYER_AIR_START_SLOWDOWN;
 }
 
 void unload_player()
 {
-	free_ent(_player.ent_idx, 1);
 	free_obj_tile_idx(_tile_start_idx, 4);
 }
 
@@ -126,7 +129,6 @@ static void player_shoot()
 	};
 	mmEffectEx(&shoot_sound);
 
-	int att_idx = allocate_ent(1);
 	FIXED vx, x;
 	if (_facing == FACING_RIGHT)
 	{
@@ -140,7 +142,7 @@ static void player_shoot()
 	}
 
 	create_bullet(
-		&_ents[att_idx], att_idx,
+		allocate_ent(),
 		BULLET_TYPE_GUN_0, x, _player.y + 4 * FIX_SCALE,
 		vx, 0, _facing == FACING_LEFT);
 }
@@ -193,7 +195,7 @@ void update_player()
 	switch (_move_state)
 	{
 	case MOVEMENT_AIR:
-		_player.vx /= 2;
+		_player.vx = fxdiv(_player.vx, _player_air_slowdown);
 		break;
 	case MOVEMENT_JUMPING:
 	case MOVEMENT_LANDED:
@@ -238,19 +240,39 @@ void update_player()
 		_invincible_frames--;
 	}
 
-	//Check colsion with other
-	if (_speed_up <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
+	//Check colsion with speed_up
+	if (_speed_up_active <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
-		_speed_up = 120;
+		_speed_up_active = 120;
 		_scroll_x += 0.5f * FIX_SCALEF;
-		_player_speed += 0.5f * FIX_SCALEF;
+		//Lower air slowdown spee
+		_player_air_slowdown = clamp(
+			_player_air_slowdown - (int)(0.2f * FIX_SCALEF),
+			PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
+		update_speed_level_display(_player_air_slowdown);
 	}
-	else if (_speed_up > 0)
+	else if (_speed_up_active > 0)
 	{
-		--_speed_up;
+		--_speed_up_active;
 		//Check ended and handle ended
-		if (_speed_up <= 0)
+		if (_speed_up_active <= 0)
 			_scroll_x -= 0.5f * FIX_SCALEF;
+	}
+
+	//Health up
+	if (_player.ent_cols & (TYPE_HEALTH_UP))
+	{
+		_player_life = clamp(_player_life + 1, 0, PLAYER_LIFE_START + 1);
+	}
+
+	//Jump up
+	if (_player.ent_cols & (TYPE_JUMP_UP))
+	{
+		_player_jump_power = clamp(
+			_player_jump_power + (int)(0.07f * FIX_SCALE),
+			PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
+
+		update_jump_level_display(_player_jump_power);
 	}
 
 	//Handles player anime
@@ -285,7 +307,7 @@ void update_player()
 		}
 		else if (_player_anime_cycle <= 0)
 		{
-			_player.vy = -_jump_power;
+			_player.vy = -_player_jump_power;
 			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
 			_move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
@@ -340,5 +362,5 @@ int get_player_life()
 
 int speed_up_active()
 {
-	return _speed_up;
+	return _speed_up_active;
 }

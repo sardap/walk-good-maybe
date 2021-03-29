@@ -7,6 +7,7 @@
 #include "soundbank_bin.h"
 
 #include "title_screen.h"
+#include "scene_shared.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -15,7 +16,7 @@
 #include "../numbers.h"
 #include "../gun.h"
 #include "../enemy.h"
-#include "../life_display.h"
+#include "../ui_display.h"
 #include "../gen.h"
 #include "../obstacles.h"
 
@@ -24,17 +25,7 @@
 #include "../assets/mainGameShared.h"
 #include "../assets/buildingtileset.h"
 
-static FIXED _next_building_spawn;
-static int _building_spawn_x;
-static int _bg_0_scroll;
-static int _bg_2_scroll;
-
-static int _far_building_tiles_idx;
-static int _fog_tiles_idx;
-
-static mg_states_t _state;
-static mg_states_t _old_state;
-static mg_mode_t _mode;
+static mg_data_t *_data = &_shared_data.mg;
 
 static FIXED wrap_x(FIXED x)
 {
@@ -64,10 +55,10 @@ static void wrap_bkg()
 
 static void spawn_buildings()
 {
-	int start_x = _building_spawn_x;
+	int start_x = _data->building_spawn_x;
 
 	int width = 0;
-	switch (_mode)
+	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
 		switch (gba_rand() % 5)
@@ -94,9 +85,9 @@ static void spawn_buildings()
 
 	width += gba_rand_range(MIN_JUMP_WIDTH_TILES, MAX_JUMP_WIDTH_TILES);
 
-	_building_spawn_x = level_wrap_x(start_x + width);
+	_data->building_spawn_x = level_wrap_x(start_x + width);
 
-	_next_building_spawn = (int)((width * 8) * (FIX_SCALE));
+	_data->next_building_spawn = (int)((width * 8) * (FIX_SCALE));
 }
 
 static void clear_offscreen_level()
@@ -107,7 +98,7 @@ static void clear_offscreen_level()
 
 static void load_foreground_tiles()
 {
-	switch (_mode)
+	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
 		load_lava_0(MG_SHARED_CB);
@@ -124,7 +115,7 @@ static void load_foreground_tiles()
 
 static void unload_foreground_tiles()
 {
-	switch (_mode)
+	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
 		unload_lava_0();
@@ -141,26 +132,27 @@ static void unload_foreground_tiles()
 
 static void show(void)
 {
-	_mode = MG_MODE_CITY;
+	_data->mode = MG_MODE_CITY;
 
 	// Load palette
 	dma3_cpy(pal_bg_mem, mainGameSharedPal, mainGameSharedPalLen);
 
-	_bg_0_scroll = int2fx(gba_rand());
-	_bg_2_scroll = int2fx(gba_rand());
+	_data->bg_0_scroll = int2fx(gba_rand());
+	_data->bg_2_scroll = int2fx(gba_rand());
 
 	//Bad but cbf
 	allocate_bg_tile_idx(528);
 
-	_far_building_tiles_idx = 0;
-	dma3_cpy(&tile_mem[MG_SHARED_CB][_far_building_tiles_idx], backgroundCityTiles, backgroundCityTilesLen);
+	_data->far_building_tiles_idx = 0;
+	GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->far_building_tiles_idx], backgroundCityTiles);
 
-	_fog_tiles_idx = backgroundCityTilesLen / 32;
-	dma3_cpy(&tile_mem[MG_SHARED_CB][_fog_tiles_idx], fogTiles, fogTilesLen);
+	_data->fog_tiles_idx = backgroundCityTilesLen / 32;
+	GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx], fogTiles);
 
 	load_foreground_tiles();
 
 	load_life_display();
+	load_health_up();
 
 	//City BG
 	dma3_cpy(se_mem[MG_CITY_SB], backgroundCityMap, backgroundCityMapLen);
@@ -170,20 +162,20 @@ static void show(void)
 	//TODO: stop this double iteration bullshit
 	for (int i = 0; i < fogMapLen; i++)
 	{
-		se_mem[MG_CLOUD_SB][i] += _fog_tiles_idx / 2;
+		se_mem[MG_CLOUD_SB][i] += _data->fog_tiles_idx / 2;
 	}
 
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
 	//Set bg postions
-	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
+	REG_BG0HOFS = fx2int(_data->bg_0_scroll / 6);
 	REG_BG0VOFS = 0;
 
 	REG_BG1HOFS = 0;
 	REG_BG1VOFS = 0;
 
-	REG_BG2HOFS = fx2int(_bg_2_scroll / 12);
+	REG_BG2HOFS = fx2int(_data->bg_2_scroll / 12);
 	REG_BG2VOFS = 0;
 
 	// Set bkg reg
@@ -208,11 +200,11 @@ static void show(void)
 	REG_BLDALPHA = BLDA_BUILD(8, 6);
 	REG_BLDY = BLDY_BUILD(0);
 
-	_next_building_spawn = 0;
+	_data->next_building_spawn = 0;
 	_scroll_x = 0;
 	_bg_pos_x = 0;
-	_building_spawn_x = 0;
-	_state = MG_S_STARTING;
+	_data->building_spawn_x = 0;
+	_data->state = MG_S_STARTING;
 
 	init_player();
 	load_gun_0_tiles();
@@ -220,10 +212,13 @@ static void show(void)
 	load_number_tiles();
 	load_speed_up();
 	load_enemy_bullets_tiles();
+	load_speed_level_display();
+	load_jump_up();
+	init_jump_level_display();
 
 	init_score();
 
-	while (_building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
+	while (_data->building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
 	{
 		spawn_buildings();
 	}
@@ -247,12 +242,12 @@ static void update(void)
 	}
 
 	// Pausing!
-	if (_state == MG_S_PAUSED)
+	if (_data->state == MG_S_PAUSED)
 	{
 		if (key_hit(KEY_START))
 		{
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
-			_state = _old_state;
+			_data->state = _data->old_state;
 		}
 		return;
 	}
@@ -267,8 +262,8 @@ static void update(void)
 	if (key_hit(KEY_START))
 	{
 		write_to_log(LOG_LEVEL_INFO, "PAUSING");
-		_old_state = _state;
-		_state = MG_S_PAUSED;
+		_data->old_state = _data->state;
+		_data->state = MG_S_PAUSED;
 		return;
 	}
 
@@ -280,23 +275,23 @@ static void update(void)
 
 	_scroll_x = clamp(_scroll_x, 0, MG_MAX_SCROLL_SPEED);
 	_bg_pos_x += _scroll_x;
-	_bg_0_scroll += _scroll_x;
-	_bg_2_scroll += _scroll_x;
+	_data->bg_0_scroll += _scroll_x;
+	_data->bg_2_scroll += _scroll_x;
 
 	wrap_bkg();
 
-	REG_BG0HOFS = fx2int(_bg_0_scroll / 6);
+	REG_BG0HOFS = fx2int(_data->bg_0_scroll / 6);
 	REG_BG1HOFS = fx2int(_bg_pos_x);
-	REG_BG2HOFS = fx2int(_bg_2_scroll / 4);
+	REG_BG2HOFS = fx2int(_data->bg_2_scroll / 4);
 
-	_next_building_spawn -= _scroll_x;
+	_data->next_building_spawn -= _scroll_x;
 
 	if (frame_count() % 60 == 0)
 	{
 		add_score(fx2int(_scroll_x * 10));
 	}
 
-	if (_next_building_spawn < 0)
+	if (_data->next_building_spawn < 0)
 	{
 		spawn_buildings();
 	}
@@ -324,13 +319,13 @@ static void update(void)
 	update_visual_ents();
 	copy_ents_to_oam();
 
-	switch (_state)
+	switch (_data->state)
 	{
 	case MG_S_STARTING:
 		if (key_hit(KEY_RIGHT))
 		{
 			_scroll_x = (int)(0.25f * FIX_SCALE);
-			_state = MG_S_SCROLLING;
+			_data->state = MG_S_SCROLLING;
 			//Clear text layer
 			REG_DISPCNT ^= DCNT_BG3;
 		}
@@ -364,9 +359,13 @@ static void hide(void)
 	free_bg_tile_idx(0, BG_TILE_ALLC_SIZE);
 
 	unload_foreground_tiles();
-	clear_score();
+	free_score_display();
 	unload_gun_0_tiles();
+	free_jump_level_display();
 	unload_player();
+
+	free_all_ents();
+	free_all_visual_ents();
 }
 
 const scene_t main_game = {

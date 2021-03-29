@@ -24,18 +24,19 @@ int gun_0_tiles()
 }
 
 void create_bullet(
-	ent_t *bul, int att_idx, bullet_type_t type,
+	ent_t *bul, bullet_type_t type,
 	FIXED x, FIXED y, FIXED vx, FIXED vy, int flip)
 {
-	bul->ent_idx = att_idx;
-	bul->bullet_type = type;
+	bul->ent_type = TYPE_BULLET;
+
 	bul->x = x;
 	bul->w = 5;
 	bul->y = y;
 	bul->h = 5;
 	bul->vx = vx;
 	bul->vy = vy;
-	bul->ent_type = TYPE_BULLET;
+
+	bul->bullet_type = type;
 
 	switch (type)
 	{
@@ -59,7 +60,7 @@ void update_bullet(ent_t *bul)
 		hit_x ||
 		bul->ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO))
 	{
-		free_ent(bul->ent_idx, 1);
+		free_ent(bul);
 		bul->ent_type = TYPE_NONE;
 		return;
 	}

@@ -6,8 +6,8 @@
 #include "common.h"
 #include "debug.h"
 
-static int _obj_tile_allc[OBJ_TILE_ALLC_SIZE];
-static int _bg_tile_allc[BG_TILE_ALLC_SIZE];
+static byte _obj_tile_allc[OBJ_TILE_ALLC_SIZE];
+static byte _bg_tile_allc[BG_TILE_ALLC_SIZE];
 
 void init_graphics()
 {
@@ -22,9 +22,8 @@ void init_graphics()
 	}
 }
 
-static int allocate_tile_idx(int *allc, int len, int size)
+static int allocate_tile_idx(byte *allc, int len, int size)
 {
-	size = size * 2;
 	for (int i = 0; i < len;)
 	{
 		bool found = true;
@@ -42,13 +41,14 @@ static int allocate_tile_idx(int *allc, int len, int size)
 			{
 				allc[i + j] = 1;
 			}
-			return i;
+			return i * 2;
 		}
 		i += size;
 	}
 
+#ifdef DEBUG
 	char str[200];
-	sprintf(str, "FAILLED TO ALLOCATE s:%d l:%d", size, len);
+	sprintf(str, "FAILLED TO GRAPHIC ALLOCATE s:%d l:%d", size, len);
 	write_to_log(LOG_LEVEL_DEBUG, str);
 
 	str[0] = '\0';
@@ -60,12 +60,14 @@ static int allocate_tile_idx(int *allc, int len, int size)
 	}
 
 	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	return -1;
 }
 
-void free_tile_idx(int *allc, int len, int idx, int size)
+void free_tile_idx(byte *allc, int len, int idx, int size)
 {
-	size = size * 2;
+	//remeber that the idx returned from alloc is x2
+	idx /= 2;
 	for (int i = idx; i < idx + size; i++)
 	{
 		allc[i] = 0;

@@ -9,18 +9,18 @@
 #include "gun.h"
 #include "enemy.h"
 #include "player.h"
-#include "life_display.h"
+#include "ui_display.h"
 
-OBJ_ATTR _obj_buffer[128] = {};
+OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};
 visual_ent_t _visual_ents[ENT_VISUAL_COUNT] = {};
 
-static int _allocated_ents[ENT_COUNT];
-static int _allocated_visual_ents[ENT_VISUAL_COUNT];
+static u8 _allocated_ents[ENT_COUNT];
+static u8 _allocated_visual_ents[ENT_VISUAL_COUNT];
 
 void init_all_ents()
 {
-	oam_init(_obj_buffer, 128);
+	oam_init(_obj_buffer, OBJ_COUNT);
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
@@ -37,58 +37,105 @@ void init_all_ents()
 	}
 }
 
-static int allocate(int *ary, int length, int count)
+static int allocate(u8 *ary, int length, int count)
 {
 	for (int i = 0; i < length;)
 	{
 		bool found = true;
-
 		for (int j = i; j - i < count && j < length; j++)
 		{
-			if (ary[j])
+			if (ary[j] > 0)
 			{
 				found = false;
 				break;
 			}
 		}
-
 		if (found)
 		{
-			for (int j = i; j - i < count; j++)
+			for (int j = 0; j < count; j++)
 			{
-				ary[j] = 1;
+				ary[i + j] = 1;
 			}
 			return i;
 		}
 		i += count;
 	}
 
-	return -1;
-}
+#ifdef DEBUG
+	char str[200];
+	sprintf(str, "FAILLED TO ENT ALLOCATE s:%d l:%d", count, length);
+	write_to_log(LOG_LEVEL_DEBUG, str);
 
-int allocate_ent(int count)
-{
-	return allocate(_allocated_ents, ENT_COUNT, count);
-}
-
-void free_ent(int idx, int count)
-{
-	for (int i = idx; i < idx + count; i++)
+	str[0] = '\0';
+	for (int i = 0; i < length; i++)
 	{
-		_allocated_ents[i] = 0;
+		char b[50];
+		sprintf(b, "%d, ", ary[i]);
+		strcat(str, b);
+	}
+
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
+	return 0;
+}
+
+ent_t *allocate_ent()
+{
+	int idx = allocate(_allocated_ents, ENT_COUNT, 1);
+	_ents[idx].ent_idx = idx;
+	return &_ents[idx];
+}
+
+void free_ent(ent_t *ent)
+{
+	_allocated_ents[ent->ent_idx] = 0;
+	ent->ent_idx = 0;
+	ent->ent_type = TYPE_NONE;
+}
+
+visual_ent_t *allocate_visual_ent()
+{
+	int idx = allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, 1);
+	_visual_ents[idx].ent_idx = idx;
+	return &_visual_ents[idx];
+}
+
+void free_visual_ent(visual_ent_t *ent)
+{
+	_allocated_visual_ents[ent->ent_idx] = 0;
+	ent->ent_idx = 0;
+	ent->type = TYPE_VISUAL_NONE;
+}
+
+void free_all_ents()
+{
+	for (int i = 0; i < ENT_COUNT; i++)
+	{
+		ent_t *ent = &_ents[i];
+
+		switch (ent->ent_type)
+		{
+		default:
+			break;
+		}
+
+		free_ent(ent);
 	}
 }
 
-int allocate_visual_ent(int count)
+void free_all_visual_ents()
 {
-	return allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, count);
-}
-
-void free_visual_ent(int idx, int count)
-{
-	for (int i = idx; i < idx + count; i++)
+	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
 	{
-		_allocated_ents[i] = 0;
+		visual_ent_t *ent = &_visual_ents[i];
+
+		switch (ent->type)
+		{
+		default:
+			break;
+		}
+
+		free_visual_ent(ent);
 	}
 }
 
@@ -303,6 +350,12 @@ void update_ents()
 		case TYPE_ENEMY_BULLET:
 			update_enemy_bullet(&_ents[i]);
 			break;
+		case TYPE_HEALTH_UP:
+			update_health_up(&_ents[i]);
+			break;
+		case TYPE_JUMP_UP:
+			update_jump_up(&_ents[i]);
+			break;
 		}
 	}
 }
@@ -314,14 +367,15 @@ void update_visual_ents()
 		switch (_visual_ents[i].type)
 		{
 		case TYPE_NONE:
+		case TYPE_VISUAL_SPEED_LEVEL:
+		case TYPE_VISUAL_SCORE:
+		case TYPE_VISUAL_JUMP_LEVEL:
 			break;
 		case TYPE_VISUAL_SPEED_LINE:
 			update_speed_line(&_visual_ents[i]);
 			break;
 		case TYPE_VISUAL_LIFE:
 			update_life_display(get_player_life());
-			break;
-		case TYPE_VISUAL_SCORE:
 			break;
 		case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
 			update_enemy_biscut_death(&_visual_ents[i]);

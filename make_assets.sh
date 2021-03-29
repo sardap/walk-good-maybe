@@ -102,7 +102,7 @@ BG_OPTIONS="$BG_OPTIONS -m"						# Export map
 BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
-BG_OPTIONS="$BG_OPTIONS -O mainGameShared"	# Shared pallet name
+BG_OPTIONS="$BG_OPTIONS -O mainGameShared"		# Shared pallet name
 
 echo "Creating background tiles for main game / pal / map"
 grit \
@@ -122,7 +122,7 @@ BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
 BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
 BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
-BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -gzl" 					# LZ77 compressed
 BG_OPTIONS="$BG_OPTIONS -m"						# Export map
 BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
@@ -167,7 +167,7 @@ BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"						# Create C file
 BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 				# RGB 24 BIT
 BG_OPTIONS="$BG_OPTIONS -gB8"						# Bit depth 8
-BG_OPTIONS="$BG_OPTIONS -gu16" 						# use short
+BG_OPTIONS="$BG_OPTIONS -gzl" 						# LZ77 compressed
 BG_OPTIONS="$BG_OPTIONS -m"							# Export map
 BG_OPTIONS="$BG_OPTIONS -mLa"						# Map Affine
 BG_OPTIONS="$BG_OPTIONS -mRa"						# Tile reudciton needs this to stop from that stupid flip tile reduciotn

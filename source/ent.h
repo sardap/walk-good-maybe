@@ -11,9 +11,10 @@
 #define def extern
 #endif
 
-//Making this above 90 causes linking errors (maybe running out of ram? that's not how ram works?)
+//Making this above 90 causes linking errors since you run out of iwram
 #define ENT_COUNT 25
-#define ENT_VISUAL_COUNT 30
+#define ENT_VISUAL_COUNT 60
+#define OBJ_COUNT 128
 
 /*
 	These need to be ^2 for col 
@@ -32,6 +33,8 @@ typedef enum ent_types_t
 	TYPE_SPEED_UP = 8,
 	TYPE_ENEMY_BISCUT_UFO = 16,
 	TYPE_ENEMY_BULLET = 32,
+	TYPE_HEALTH_UP = 64,
+	TYPE_JUMP_UP = 128,
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them
@@ -43,6 +46,8 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_SCORE = 3,
 	TYPE_VISUAL_ENEMY_BISUCT_DEATH = 4,
 	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
+	TYPE_VISUAL_SPEED_LEVEL = 6,
+	TYPE_VISUAL_JUMP_LEVEL = 7,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -89,7 +94,7 @@ typedef struct ent_t
 		//Enemy bisuct
 		struct
 		{
-			int eb_tile_id;
+			int eb_tile_idx;
 			int eb_anime_cycle;
 		};
 		//Enemy bisuct ufo
@@ -105,7 +110,6 @@ typedef struct ent_t
 
 typedef struct visual_ent_t
 {
-	int visual_ent_idx;
 	int ent_idx;
 	FIXED x, y;
 	ent_visual_types_t type;
@@ -120,28 +124,29 @@ typedef struct visual_ent_t
 		//enemy bisuct death
 		struct
 		{
-			int eb_tile_id;
+			int eb_tile_idx;
 			int eb_anime_cycle;
 		};
-		};
+	};
 } visual_ent_t;
 
-def OBJ_ATTR _obj_buffer[128];
+def OBJ_ATTR _obj_buffer[OBJ_COUNT];
 def ent_t _player;
 def ent_t _ents[ENT_COUNT];
 def visual_ent_t _visual_ents[ENT_VISUAL_COUNT];
 
 void init_all_ents();
-int allocate_ent(int count);
-void free_ent(int idx, int count);
 
-int allocate_visual_ent(int count);
-void free_visual_ent(int idx, int count);
+ent_t *allocate_ent();
+void free_ent(ent_t *ent);
+
+visual_ent_t *allocate_visual_ent();
+void free_visual_ent(visual_ent_t *ent);
+
+void free_all_ents();
+void free_all_visual_ents();
 
 void copy_ents_to_oam();
-
-int allocate_visual_ent(int count);
-void free_visual_ent(int idx, int count);
 
 FIXED translate_x(ent_t *e);
 FIXED translate_y(ent_t *e);

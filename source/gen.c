@@ -14,13 +14,16 @@
 #include "assets/building2TileSet.h"
 #include "assets/building3TileSet.h"
 #include "assets/building4TileSet.h"
+#include "assets/building5TileSet.h"
 
-//Maybe do combo math here
-static t_spawn_info building_0 = {25, 50, 100};
-static t_spawn_info building_1 = {25, 50, 100};
-static t_spawn_info building_2 = {25, 50, 100};
-static t_spawn_info building_3 = {25, 50, 100};
-static t_spawn_info building_4 = {25, 50, 100};
+//Maybe do Probability math here
+//lava_chance, enemy_chance, token_chance
+static t_spawn_info _building_0 = {80, 10, 50};
+static t_spawn_info _building_1 = {80, 10, 50};
+static t_spawn_info _building_2 = {80, 10, 50};
+static t_spawn_info _building_3 = {80, 10, 50};
+static t_spawn_info _building_4 = {80, 10, 50};
+static t_spawn_info _building_5 = {0, 0, 100};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -28,6 +31,7 @@ static int _building_1_idx;
 static int _building_2_idx;
 static int _building_3_idx;
 static int _building_4_idx;
+static int _building_5_idx;
 
 int get_lava_tile_offset()
 {
@@ -199,7 +203,7 @@ int spawn_building_0(int start_x)
 	set_level_at(x, y, BUILDING_0_BRICK + tile);
 	set_level_col(x, y, BUILDING_0_BRICK + tile);
 
-	spawn_obstacles(start_x, width, y, &building_0);
+	spawn_obstacles(start_x, width, y, &_building_0);
 
 	return width;
 }
@@ -240,7 +244,7 @@ int spawn_building_1(int start_x)
 	set_level_at(x, y, BUILDING_1_RIGHT_ROOF + tile);
 	set_level_col(x, y + 1, BUILDING_1_RIGHT_BOT + tile);
 
-	spawn_obstacles(start_x, width, y, &building_1);
+	spawn_obstacles(start_x, width, y, &_building_1);
 
 	return width;
 }
@@ -298,7 +302,7 @@ int spawn_building_2(int start_x)
 	set_level_at(x, y, BUILDING_2_RIGHT_ROOF + tile);
 	set_level_col(x, y + 1, BUILDING_2_RIGHT_MIDDLE + tile);
 
-	spawn_obstacles(start_x, width, y, &building_2);
+	spawn_obstacles(start_x, width, y, &_building_2);
 
 	return width;
 }
@@ -347,7 +351,7 @@ int spawn_building_3(int start_x)
 	set_level_at(x, y + 1, BUILDING_3_ROOF_RIGHT + tile);
 	set_level_col(x, y + 2, BUILDING_3_RIGHT + tile);
 
-	spawn_obstacles(start_x, width, y, &building_3);
+	spawn_obstacles(start_x, width, y, &_building_3);
 
 	return width;
 }
@@ -447,7 +451,59 @@ int spawn_building_4(int start_x)
 	set_level_at(x, y, BUILDING_4_ROOF_RIGHT + tile);
 	set_level_col(x, y + 1, BUILDING_4_RIGHT_BOT + tile);
 
-	spawn_obstacles(start_x, width, y, &building_4);
+	spawn_obstacles(start_x, width, y, &_building_4);
+
+	return width;
+}
+
+void load_building_5(int cb)
+{
+	_building_5_idx = allocate_bg_tile_idx(building5TileSetTilesLen / 64 - 1);
+	dma3_cpy(&tile_mem[cb][_building_5_idx], building5TileSetTiles + 32, building5TileSetTilesLen - 64);
+}
+
+void free_building_5()
+{
+	free_bg_tile_idx(_building_5_idx, building5TileSetTilesLen / 64 - 1);
+}
+
+int spawn_building_5(int start_x)
+{
+	int x_base = start_x;
+	int x;
+	int y = gba_rand_range(CITY_BUILDING_Y_TILE_SPAWN - 4, CITY_BUILDING_Y_TILE_SPAWN - 3);
+
+	int tile = _building_5_idx / 2;
+	//LEFT SECTION
+	set_level_at(x_base, y, BUILDING_5_ROOF_LEFT + tile);
+	set_level_col(x_base, y + 1, BUILDING_5_MIDDLE_LEFT + tile);
+
+	set_level_at(level_wrap_x(x_base + 1), y, BUILDING_5_ROOF_MIDDLE + tile);
+	set_level_col(level_wrap_x(x_base + 1), y + 1, BUILDING_5_MIDDLE_WINDOW + tile);
+
+	int width = 5;
+	int y_start = y;
+
+	//MIDDLE SECTION
+	for (int i = 2; i < width; ++i)
+	{
+		x = level_wrap_x(x_base + i);
+		int roof = i + 4 > width ? BUILDING_5_ROOF_RIGHT : BUILDING_5_ROOF_MIDDLE;
+		set_level_at(x, y, roof + tile);
+		set_level_col(x, y + 1, BUILDING_5_MIDDLE_WINDOW + tile);
+
+		if (i + 4 > width)
+		{
+			y = clamp(y + 1, 0, CITY_BUILDING_Y_TILE_SPAWN + 1);
+		}
+	}
+
+	//RIGHT SECTION
+	x = level_wrap_x(x_base + width);
+	set_level_at(x, y, BUILDING_5_ROOF_RIGHT + tile);
+	set_level_col(x, y + 1, BUILDING_5_MIDDLE_RIGHT + tile);
+
+	spawn_obstacles(start_x, 1, y_start, &_building_5);
 
 	return width;
 }

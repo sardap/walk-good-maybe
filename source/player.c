@@ -292,6 +292,14 @@ void update_player()
 		if (key_hit(KEY_A))
 		{
 			_player_anime_cycle = PLAYER_JUMP_TIME;
+			mm_sound_effect jump_sound = {
+				{SFX_JUMP_2},
+				(int)(1.0f * (1 << 10)),
+				0,
+				120,
+				127,
+			};
+			mmEffectEx(&jump_sound);
 			_move_state = MOVEMENT_JUMPING;
 		}
 		break;

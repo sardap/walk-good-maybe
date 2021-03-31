@@ -56,6 +56,14 @@ static mm_sound_effect player_jump_sound = {
 	127,
 };
 
+static mm_sound_effect player_land_sound = {
+	{SFX_BONK_1},
+	(int)(1.0f * (1 << 10)),
+	PLAYER_SOUND_HANDLER,
+	120,
+	127,
+};
+
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
@@ -328,6 +336,7 @@ void update_player()
 	case MOVEMENT_AIR:
 		if (hit_y)
 		{
+			mmEffectEx(&player_land_sound);
 			_move_state = MOVEMENT_LANDED;
 			_player_anime_cycle = PLAYER_LAND_TIME;
 		}

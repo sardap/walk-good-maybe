@@ -84,6 +84,14 @@ static mm_sound_effect enemy_ufo_damge = {
 	127,
 };
 
+static mm_sound_effect enemy_shoot = {
+	{SFX_GUN_4},
+	(int)(1.0f * (1 << 10)),
+	ENEMY_SOUND_HANDLER,
+	50,
+	127,
+};
+
 static int _enemy_bullet_0_tile_idx;
 
 void load_enemy_bullets_tiles()
@@ -270,6 +278,8 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 		create_enemy_bullet(
 			bul_ent, ent->x + 6 * FIX_SCALE,
 			ent->y + 16 * FIX_SCALE, 0, 0.5 * FIX_SCALE);
+
+		mmEffectEx(&enemy_shoot);
 	}
 }
 

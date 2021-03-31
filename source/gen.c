@@ -17,12 +17,12 @@
 #include "assets/building5TileSet.h"
 
 //Maybe do Probability math here
-//lava_chance, enemy_chance, token_chance
-static t_spawn_info _building_0 = {80, 10, 50};
-static t_spawn_info _building_1 = {80, 10, 50};
-static t_spawn_info _building_2 = {80, 10, 50};
-static t_spawn_info _building_3 = {80, 10, 50};
-static t_spawn_info _building_4 = {80, 10, 50};
+//enemy_chance, lava_chance, token_chance
+static t_spawn_info _building_0 = {80, 30, 50};
+static t_spawn_info _building_1 = {80, 30, 50};
+static t_spawn_info _building_2 = {80, 30, 50};
+static t_spawn_info _building_3 = {80, 30, 50};
+static t_spawn_info _building_4 = {80, 30, 50};
 static t_spawn_info _building_5 = {0, 0, 100};
 
 static int _lava_0_idx;

@@ -13,6 +13,7 @@
 #include "anime.h"
 #include "gun.h"
 #include "ui_display.h"
+#include "sound.h"
 
 #include "assets/whale_small.h"
 #include "assets/whale_small_jump_0.h"
@@ -29,6 +30,32 @@
 #include "assets/whale_air_1.h"
 #include "assets/whale_air_2.h"
 
+static const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+static const uint *walk_anime_cycle[] = {
+	whale_walk_0Tiles,
+	whale_walk_1Tiles,
+	whale_walk_2Tiles,
+	whale_walk_3Tiles,
+	whale_walk_4Tiles,
+	whale_smallTiles,
+};
+
+static mm_sound_effect player_shoot_sound = {
+	{SFX_LASER_4},
+	(int)(1.0f * (1 << 10)),
+	PLAYER_SOUND_HANDLER,
+	120,
+	127,
+};
+
+static mm_sound_effect player_jump_sound = {
+	{SFX_JUMP_2},
+	(int)(1.0f * (1 << 10)),
+	PLAYER_SOUND_HANDLER,
+	120,
+	127,
+};
+
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
@@ -40,18 +67,7 @@ static POINT _player_mos;
 static FIXED _player_speed;
 static FIXED _player_air_slowdown;
 static FIXED _player_jump_power;
-
 ent_t _player = {};
-
-static const uint *air_anime_cycle[] = {whale_air_0Tiles, whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
-static const uint *walk_anime_cycle[] = {
-	whale_walk_0Tiles,
-	whale_walk_1Tiles,
-	whale_walk_2Tiles,
-	whale_walk_3Tiles,
-	whale_walk_4Tiles,
-	whale_smallTiles,
-};
 
 void load_player_tile()
 {
@@ -120,14 +136,7 @@ static void apply_player_damage(int ammount)
 static void player_shoot()
 {
 	//Play sound
-	mm_sound_effect shoot_sound = {
-		{SFX_LASER_4},
-		(int)(1.0f * (1 << 10)),
-		0,
-		120,
-		127,
-	};
-	mmEffectEx(&shoot_sound);
+	mmEffectEx(&player_shoot_sound);
 
 	FIXED vx, x;
 	if (_facing == FACING_RIGHT)
@@ -292,14 +301,7 @@ void update_player()
 		if (key_hit(KEY_A))
 		{
 			_player_anime_cycle = PLAYER_JUMP_TIME;
-			mm_sound_effect jump_sound = {
-				{SFX_JUMP_2},
-				(int)(1.0f * (1 << 10)),
-				0,
-				120,
-				127,
-			};
-			mmEffectEx(&jump_sound);
+			mmEffectEx(&player_jump_sound);
 			_move_state = MOVEMENT_JUMPING;
 		}
 		break;

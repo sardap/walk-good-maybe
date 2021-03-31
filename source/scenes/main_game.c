@@ -116,7 +116,7 @@ static void load_foreground_tiles()
 	}
 }
 
-static void unload_foreground_tiles()
+static void free_foreground_tiles()
 {
 	switch (_data->mode)
 	{
@@ -206,13 +206,14 @@ static void show(void)
 
 	_data->next_building_spawn = 0;
 	_scroll_x = 0;
-	_bg_pos_x = 0;
 	_data->building_spawn_x = 0;
 	_data->state = MG_S_STARTING;
 
-	init_player();
-	load_gun_0_tiles();
+	init_level();
 
+	init_player();
+
+	load_gun_0_tiles();
 	load_number_tiles();
 	load_speed_up();
 	load_enemy_bullets_tiles();
@@ -257,7 +258,7 @@ static void update(void)
 	}
 
 	//Back to title screen
-	if (key_held(KEY_START) && key_held(KEY_SELECT))
+	if (key_held(KEY_SELECT) && key_hit(KEY_START))
 	{
 		scene_set(title_screen);
 		return;
@@ -362,14 +363,29 @@ static void hide(void)
 
 	free_bg_tile_idx(0, BG_TILE_ALLC_SIZE);
 
-	unload_foreground_tiles();
+	free_foreground_tiles();
 	free_score_display();
 	unload_gun_0_tiles();
 	free_jump_level_display();
 	unload_player();
 
 	free_all_ents();
-	free_all_visual_ents();
+
+	mmStop();
+
+	OAM_CLEAR();
+	M4_CLEAR();
+
+	SBB_CLEAR(MG_TEXT_SB);
+	SBB_CLEAR(MG_CITY_SB);
+	SBB_CLEAR(MG_CLOUD_SB);
+	SBB_CLEAR(MG_BUILDING_SB);
+
+	CBB_CLEAR(MG_SHARED_CB);
+
+	REG_BLDCNT = 0;
+
+	SoftReset();
 }
 
 const scene_t main_game = {

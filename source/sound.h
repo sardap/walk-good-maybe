@@ -1,0 +1,9 @@
+#ifndef SOUND_H
+#define SOUND_H
+
+#define PLAYER_ACTION_SOUND_HANDLER 2
+#define PLAYER_WALK_SOUND_HANDLER 3
+#define ENEMY_SOUND_HANDLER 4
+#define TOKEN_SOUND_HANDLER 5
+
+#endif

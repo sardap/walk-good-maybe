@@ -14,6 +14,8 @@
 extern u16 _level[LEVEL_SIZE];
 extern FIXED _bg_pos_x;
 
+void init_level();
+
 inline u16 at_level(int x, int y)
 {
 	return _level[LEVEL_HEIGHT * x + y];

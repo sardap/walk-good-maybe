@@ -121,10 +121,7 @@ void free_all_ents()
 
 		free_ent(ent);
 	}
-}
 
-void free_all_visual_ents()
-{
 	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
 	{
 		visual_ent_t *ent = &_visual_ents[i];

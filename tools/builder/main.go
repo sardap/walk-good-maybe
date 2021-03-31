@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,16 +13,24 @@ import (
 const makeAssetsScriptPath = "make_assets.sh"
 
 func makeAssets() {
-	cmd := exec.Command("bash", makeAssetsScriptPath)
-	out, err := cmd.CombinedOutput()
+	fmt.Printf("making assets\n")
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(60)*time.Second)
+	defer cancel()
+	cmd := exec.CommandContext(ctx, "bash", makeAssetsScriptPath)
+
+	stdIn, _ := cmd.StdinPipe()
+	stdIn.Write([]byte("y"))
+	stdIn.Close()
+
+	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("error running make assets %v\n", err)
 		panic(err)
 	}
-	fmt.Printf("%s", out)
 }
 
 func runMake(arg string) {
+	fmt.Printf("running make\n")
 	cmd := exec.Command("make", arg)
 	out, err := cmd.CombinedOutput()
 	if err != nil {

@@ -144,7 +144,6 @@ visual_ent_t *allocate_visual_ent();
 void free_visual_ent(visual_ent_t *ent);
 
 void free_all_ents();
-void free_all_visual_ents();
 
 void copy_ents_to_oam();
 

@@ -9,6 +9,16 @@
 u16 _level[LEVEL_SIZE] = {};
 FIXED _bg_pos_x;
 
+void init_level()
+{
+	_bg_pos_x = 0;
+
+	for (int i = 0; i < LEVEL_SIZE; i++)
+	{
+		_level[i] = 0;
+	}
+}
+
 void set_level_col(int x, int y, u16 tile)
 {
 	for (; y < LEVEL_HEIGHT; y++)

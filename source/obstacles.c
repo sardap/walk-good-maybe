@@ -1,14 +1,43 @@
 #include "obstacles.h"
 
+#include <maxmod.h>
+#include "soundbank.h"
+#include "soundbank_bin.h"
+
 #include "common.h"
 #include "player.h"
 #include "graphics.h"
 #include "ent.h"
+#include "sound.h"
 
 #include "assets/speedUp.h"
 #include "assets/speedLine.h"
 #include "assets/healthUp.h"
 #include "assets/jumpUp.h"
+
+static mm_sound_effect health_pick_up_sound = {
+	{SFX_BY_COLLECT_4},
+	(int)(1.0f * (1 << 10)),
+	TOKEN_SOUND_HANDLER,
+	170,
+	127,
+};
+
+static mm_sound_effect jump_pick_up_sound = {
+	{SFX_BY_COLLECT_5},
+	(int)(1.0f * (1 << 10)),
+	TOKEN_SOUND_HANDLER,
+	120,
+	127,
+};
+
+static mm_sound_effect speed_pick_up_sound = {
+	{SFX_JDW_BLOW_1},
+	(int)(1.0f * (1 << 10)),
+	TOKEN_SOUND_HANDLER,
+	120,
+	127,
+};
 
 static int _speed_up_tile_idx;
 static int _speed_lines_idx;
@@ -56,6 +85,7 @@ void update_speed_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || (ent->ent_cols & (TYPE_PLAYER) && !speed_up_active()))
 	{
+		mmEffectEx(&speed_pick_up_sound);
 		free_ent(ent);
 
 		int count = gba_rand_range(3, 5);
@@ -120,6 +150,7 @@ void update_health_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
+		mmEffectEx(&health_pick_up_sound);
 		free_ent(ent);
 		return;
 	}
@@ -150,6 +181,7 @@ void update_jump_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
+		mmEffectEx(&jump_pick_up_sound);
 		free_ent(ent);
 		return;
 	}

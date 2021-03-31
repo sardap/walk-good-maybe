@@ -1,0 +1,20 @@
+name: dev build
+on:
+  push:
+    branches:
+      - '*'         # matches every branch that doesn't contain a '/'
+      - '*/*'       # matches every branch containing a single '/'
+      - '**'        # matches every branch
+      - '!master'   # excludes master
+
+jobs:
+  build:
+    name: dev build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build conatiner
+        run: docker build . -t gba_build:latest
+      - name: Build Rom
+        run: docker run -v ${PWD}:/app gba_build:latest

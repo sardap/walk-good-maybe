@@ -41,7 +41,7 @@ static const uint *walk_anime_cycle[] = {
 };
 
 static mm_sound_effect player_shoot_sound = {
-	{SFX_LASER_4},
+	{SFX_BY_LASER_4},
 	(int)(1.0f * (1 << 10)),
 	PLAYER_SOUND_HANDLER,
 	120,
@@ -49,7 +49,7 @@ static mm_sound_effect player_shoot_sound = {
 };
 
 static mm_sound_effect player_jump_sound = {
-	{SFX_JUMP_2},
+	{SFX_BY_JUMP_2},
 	(int)(1.0f * (1 << 10)),
 	PLAYER_SOUND_HANDLER,
 	120,
@@ -57,7 +57,7 @@ static mm_sound_effect player_jump_sound = {
 };
 
 static mm_sound_effect player_land_sound = {
-	{SFX_BONK_1},
+	{SFX_BY_BONK_1},
 	(int)(1.0f * (1 << 10)),
 	PLAYER_SOUND_HANDLER,
 	120,

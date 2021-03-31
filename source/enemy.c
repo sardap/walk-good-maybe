@@ -85,7 +85,7 @@ static mm_sound_effect enemy_ufo_damge = {
 };
 
 static mm_sound_effect enemy_shoot = {
-	{SFX_GUN_4},
+	{SFX_BY_GUN_4},
 	(int)(1.0f * (1 << 10)),
 	ENEMY_SOUND_HANDLER,
 	50,

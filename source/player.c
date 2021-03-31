@@ -43,7 +43,7 @@ static const uint *walk_anime_cycle[] = {
 static mm_sound_effect player_shoot_sound = {
 	{SFX_BY_LASER_4},
 	(int)(1.0f * (1 << 10)),
-	PLAYER_SOUND_HANDLER,
+	PLAYER_ACTION_SOUND_HANDLER,
 	120,
 	127,
 };
@@ -51,7 +51,7 @@ static mm_sound_effect player_shoot_sound = {
 static mm_sound_effect player_jump_sound = {
 	{SFX_BY_JUMP_2},
 	(int)(1.0f * (1 << 10)),
-	PLAYER_SOUND_HANDLER,
+	PLAYER_ACTION_SOUND_HANDLER,
 	120,
 	127,
 };
@@ -59,8 +59,24 @@ static mm_sound_effect player_jump_sound = {
 static mm_sound_effect player_land_sound = {
 	{SFX_BY_BONK_1},
 	(int)(1.0f * (1 << 10)),
-	PLAYER_SOUND_HANDLER,
+	PLAYER_ACTION_SOUND_HANDLER,
 	120,
+	127,
+};
+
+static mm_sound_effect player_walk_sound = {
+	{SFX_H6_FEET_27},
+	(int)(1.0f * (1 << 10)),
+	PLAYER_WALK_SOUND_HANDLER,
+	70,
+	127,
+};
+
+static mm_sound_effect player_flap_sound = {
+	{SFX_FLAP_0},
+	(int)(1.0f * (1 << 10)),
+	PLAYER_WALK_SOUND_HANDLER,
+	70,
 	127,
 };
 
@@ -194,9 +210,13 @@ void update_player()
 
 	// Player movement
 	if (key_held(KEY_LEFT))
+	{
 		_player.vx = -_player_speed;
+	}
 	else if (key_held(KEY_RIGHT))
+	{
 		_player.vx = _player_speed;
+	}
 
 	//Shoot
 	if (key_hit(KEY_B))
@@ -232,6 +252,24 @@ void update_player()
 		if (_player.vy < TERMINAL_VY)
 		{
 			_player.vy += GRAVITY;
+		}
+	}
+
+	//Player movmenet sound
+	if (!mmEffectActive(PLAYER_WALK_SOUND_HANDLER))
+	{
+		//Flapping sound
+		if (!hit_y)
+		{
+			char str[50];
+			sprintf(str, "%.2f", fx2float(_player.vy));
+			write_to_log(LOG_LEVEL_DEBUG, str);
+			mmEffectEx(&player_flap_sound);
+		}
+		//Walking sound
+		else if (_player.vx > 0 || _player.vx < -_scroll_x)
+		{
+			mmEffectEx(&player_walk_sound);
 		}
 	}
 
@@ -306,9 +344,11 @@ void update_player()
 		{
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
 		}
+
 		if (key_hit(KEY_A))
 		{
 			_player_anime_cycle = PLAYER_JUMP_TIME;
+			mmEffectCancel(PLAYER_WALK_SOUND_HANDLER);
 			mmEffectEx(&player_jump_sound);
 			_move_state = MOVEMENT_JUMPING;
 		}

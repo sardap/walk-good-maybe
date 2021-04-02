@@ -177,6 +177,8 @@ void update_enemy_biscut(ent_t *ent)
 	ent_move_x(ent, ent->vx);
 	//Take back scroll for next loop
 	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }
 
 void create_enemy_biscut_death(visual_ent_t *v_ent, FIXED x, FIXED y)
@@ -281,6 +283,8 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 
 		mmEffectEx(&enemy_shoot);
 	}
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }
 
 void create_enemy_ufo_biscut_death(visual_ent_t *v_ent, FIXED x, FIXED y)
@@ -354,4 +358,6 @@ void update_enemy_bullet(ent_t *ent)
 		free_ent(ent);
 		return;
 	}
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }

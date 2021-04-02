@@ -118,9 +118,10 @@ void init_player()
 
 	_player.ent_type = TYPE_PLAYER;
 
-	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
-	_player.att.attr1 = ATTR1_SIZE_16x16;
+	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF | ATTR0_AFF_DBL;
+	_player.att.attr1 = ATTR1_SIZE_16;
 	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
+	obj_aff_identity(&_player.aff);
 
 	_facing = FACING_RIGHT;
 	_player_jump_power = PLAYER_START_JUMP_POWER;
@@ -180,8 +181,22 @@ static void player_shoot()
 		vx, 0, _facing == FACING_LEFT);
 }
 
+static int scale = 1;
+
 void update_player()
 {
+	if (key_held(KEY_L) || key_held(KEY_R))
+	{
+		if (key_held(KEY_L))
+			scale += 128;
+		if (key_held(KEY_R))
+			scale -= 128;
+
+		char str[50];
+		sprintf(str, "scale:%d", scale);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+	}
+
 	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
@@ -196,16 +211,17 @@ void update_player()
 		}
 	}
 
-	//Handles fliping the sprite if facing the other direction
-	if (_facing == FACING_RIGHT && key_hit(KEY_LEFT))
+	/** Handles updating the facing direction
+		NOTE DO NOT USE HFLIP on Affine sprites
+	 	you need to invert the x scale or y scale to flip
+	*/
+	if (key_hit(KEY_LEFT))
 	{
 		_facing = FACING_LEFT;
-		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
-	else if (_facing == FACING_LEFT && key_hit(KEY_RIGHT))
+	else if (key_hit(KEY_RIGHT))
 	{
 		_facing = FACING_RIGHT;
-		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
 
 	// Player movement
@@ -412,6 +428,10 @@ void update_player()
 	{
 		_player.y = PLAYER_SPAWN_Y;
 	}
+
+	int sx = _facing == FACING_RIGHT ? 1 * FIX_SCALE : -(1 * FIX_SCALE);
+	obj_aff_rotscale(&_player.aff, sx, 1 * FIX_SCALE, scale);
+	obj_set_pos(&_player.att, fx2int(_player.x) - 16 / 2, fx2int(_player.y) - 16 / 2);
 }
 
 int get_player_life()

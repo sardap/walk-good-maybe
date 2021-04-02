@@ -104,6 +104,8 @@ void update_speed_up(ent_t *ent)
 	ent_move_x_dirty(ent);
 	//Take back scroll for next loop
 	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }
 
 void create_speed_line(visual_ent_t *v_ent, FIXED x, FIXED y)
@@ -159,6 +161,8 @@ void update_health_up(ent_t *ent)
 	ent_move_x_dirty(ent);
 	//Take back scroll for next loop
 	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }
 
 void create_jump_up(ent_t *ent, FIXED x, FIXED y)
@@ -190,4 +194,6 @@ void update_jump_up(ent_t *ent)
 	ent_move_x_dirty(ent);
 	//Take back scroll for next loop
 	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }

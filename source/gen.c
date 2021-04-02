@@ -15,6 +15,7 @@
 #include "assets/building3TileSet.h"
 #include "assets/building4TileSet.h"
 #include "assets/building5TileSet.h"
+#include "assets/building6TileSet.h"
 
 //Maybe do Probability math here
 //enemy_chance, lava_chance, token_chance
@@ -32,6 +33,7 @@ static int _building_2_idx;
 static int _building_3_idx;
 static int _building_4_idx;
 static int _building_5_idx;
+static int _building_6_idx;
 
 int get_lava_tile_offset()
 {
@@ -504,6 +506,47 @@ int spawn_building_5(int start_x)
 	set_level_col(x, y + 1, BUILDING_5_MIDDLE_RIGHT + tile);
 
 	spawn_obstacles(start_x, 1, y_start, &_building_5);
+
+	return width;
+}
+
+void load_building_6(int cb)
+{
+	_building_6_idx = allocate_bg_tile_idx(building6TileSetTilesLen / 64 - 1);
+	dma3_cpy(&tile_mem[cb][_building_6_idx], building6TileSetTiles + 32, building6TileSetTilesLen - 64);
+}
+
+void free_building_6()
+{
+	free_bg_tile_idx(_building_6_idx, building6TileSetTilesLen / 64 - 1);
+}
+
+int spawn_building_6(int start_x)
+{
+	int x_base = start_x;
+	int x;
+	int y = CITY_BUILDING_Y_TILE_SPAWN;
+
+	int tile = _building_6_idx / 2;
+	//LEFT SECTION
+	set_level_at(x_base, y, BUILDING_6_BLANK + tile);
+	set_level_col(x_base, y + 1, BUILDING_6_BLANK + tile);
+
+	int width = 5;
+	int y_start = y;
+
+	//MIDDLE SECTION
+	for (int i = 1; i < width; ++i)
+	{
+		x = level_wrap_x(x_base + i);
+		set_level_at(x, y, BUILDING_6_BLANK + tile);
+		set_level_col(x, y + 1, BUILDING_6_BLANK + tile);
+	}
+
+	//RIGHT SECTION
+	x = level_wrap_x(x_base + width);
+	set_level_at(x, y, BUILDING_6_ANGLE_LEFT + tile);
+	set_level_col(x, y + 1, BUILDING_6_BLANK + tile);
 
 	return width;
 }

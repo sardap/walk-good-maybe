@@ -185,17 +185,17 @@ static int scale = 1;
 
 void update_player()
 {
-	if (key_held(KEY_L) || key_held(KEY_R))
-	{
-		if (key_held(KEY_L))
-			scale += 128;
-		if (key_held(KEY_R))
-			scale -= 128;
+	// if (key_held(KEY_L) || key_held(KEY_R))
+	// {
+	// 	if (key_held(KEY_L))
+	// 		scale += 128;
+	// 	if (key_held(KEY_R))
+	// 		scale -= 128;
 
-		char str[50];
-		sprintf(str, "scale:%d", scale);
-		write_to_log(LOG_LEVEL_DEBUG, str);
-	}
+	// 	char str[50];
+	// 	sprintf(str, "scale:%d", scale);
+	// 	write_to_log(LOG_LEVEL_DEBUG, str);
+	// }
 
 	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)

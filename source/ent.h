@@ -178,8 +178,6 @@ bool did_hit_y(ent_t *e, FIXED dy);
 bool ent_move_y(ent_t *e, FIXED dy);
 void ent_move_y_dirty(ent_t *e);
 
-bool apply_gravity(ent_t *e);
-
 void update_ents();
 
 void update_visual_ents();

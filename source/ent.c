@@ -296,30 +296,17 @@ void ent_move_y_dirty(ent_t *e)
 	e->y += e->vy;
 }
 
-bool apply_gravity(ent_t *e)
-{
-	int flags = ent_level_collision_at(e, 0, GRAVITY);
-
-	if (flags & (LEVEL_COL_GROUND))
-	{
-		_player.vy = 0;
-		return true;
-	}
-
-	_player.vy += GRAVITY;
-	return false;
-}
-
 void update_ents()
 {
 	//Add player to ent array
-	_ents[ENT_COUNT - 1] = _player;
+	_ents[0] = _player;
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		if (_ents[i].ent_type == TYPE_NONE)
 			continue;
 
+		//reset col
 		_ents[i].ent_cols = TYPE_NONE;
 
 		for (int j = 0; j < ENT_COUNT; j++)
@@ -335,14 +322,13 @@ void update_ents()
 				_ents[i].y < _ents[j].y + int2fx(_ents[j].h) &&
 				_ents[i].y + int2fx(_ents[i].h) > _ents[j].y)
 			{
-				_ents[i]
-					.ent_cols |= _ents[j].ent_type;
+				_ents[i].ent_cols |= _ents[j].ent_type;
 			}
 		}
 	}
 
 	//Copy updated player ent back into player
-	_player = _ents[ENT_COUNT - 1];
+	_player = _ents[0];
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{

@@ -61,7 +61,7 @@ static void spawn_buildings()
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
-		switch (gba_rand_range(1, 6))
+		switch (gba_rand_range(1, 6000))
 		{
 		case 1:
 			width = spawn_building_0(start_x);
@@ -80,6 +80,10 @@ static void spawn_buildings()
 			break;
 		case 6:
 			width = spawn_building_5(start_x);
+			break;
+		default:
+			width = spawn_building_6(start_x);
+			break;
 		}
 	case MG_MODE_BEACH:
 		break;
@@ -110,6 +114,7 @@ static void load_foreground_tiles()
 		load_building_3(MG_SHARED_CB);
 		load_building_4(MG_SHARED_CB);
 		load_building_5(MG_SHARED_CB);
+		load_building_6(MG_SHARED_CB);
 		break;
 	case MG_MODE_BEACH:
 		break;
@@ -128,6 +133,7 @@ static void free_foreground_tiles()
 		unload_building_3();
 		unload_building_4();
 		free_building_5();
+		free_building_6();
 		break;
 	case MG_MODE_BEACH:
 		break;

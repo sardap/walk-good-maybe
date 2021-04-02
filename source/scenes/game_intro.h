@@ -28,6 +28,7 @@ typedef struct gi_data_t
 	gi_states_t state;
 	OBJ_AFFINE *obj_aff_buffer;
 	FIXED whale_scale;
+	FIXED whale_rotate;
 	int countdown;
 	int anime_cycle;
 } gi_data_t;

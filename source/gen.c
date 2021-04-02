@@ -136,6 +136,15 @@ static bool spawn_jump_up_token(int start_x, int width, int y)
 	return true;
 }
 
+static bool spawn_shrink_token(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
+
+	create_shrink_token(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 6));
+
+	return true;
+}
+
 static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 {
 	//early return to avoid that awesome wraping bug
@@ -155,7 +164,7 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	}
 	else if (gba_rand_range(1, 100) > 100 - info->token_chance)
 	{
-		switch (gba_rand_range(1, 3))
+		switch (gba_rand_range(1, 4000))
 		{
 		case 1:
 			spawn_jump_up_token(start_x, width, y);
@@ -165,6 +174,10 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 			break;
 		case 3:
 			spawn_health_up_token(start_x, width, y);
+			break;
+		case 4:
+		default:
+			spawn_shrink_token(start_x, width, y);
 			break;
 		}
 	}

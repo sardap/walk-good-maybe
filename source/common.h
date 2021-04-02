@@ -18,6 +18,9 @@
 #define X_SCROLL_MAX (FIXED)(3.5f * (FIX_SCALEF))
 #define X_SCROLL_RATE 120
 
+//Stolen https://stackoverflow.com/questions/2422712/rounding-integer-division-instead-of-truncating
+#define INT_DIV_CEIL(x, y) (x + y - 1) / y
+
 typedef struct scene_t
 {
 	void (*show)(void);

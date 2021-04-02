@@ -14,6 +14,7 @@
 #include "assets/speedLine.h"
 #include "assets/healthUp.h"
 #include "assets/jumpUp.h"
+#include "assets/shrinkToken.h"
 
 static mm_sound_effect health_pick_up_sound = {
 	{SFX_BY_COLLECT_4},
@@ -43,6 +44,7 @@ static int _speed_up_tile_idx;
 static int _speed_lines_idx;
 static int _health_up_tile_idx;
 static int _jump_up_tile_idx;
+static int _shrink_token_tile_idx;
 
 void load_speed_up()
 {
@@ -65,14 +67,20 @@ void load_jump_up()
 	GRIT_CPY(&tile_mem[4][_jump_up_tile_idx], jumpUpTiles);
 }
 
+void load_shrink_token()
+{
+	_shrink_token_tile_idx = allocate_obj_tile_idx(1);
+	GRIT_CPY(&tile_mem[4][_shrink_token_tile_idx], shrinkTokenTiles);
+}
+
 void create_speed_up(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_SPEED_UP;
 
 	ent->x = x;
-	ent->w = 0;
+	ent->w = 8;
 	ent->y = y;
-	ent->h = 0;
+	ent->h = 8;
 	ent->vx = 0;
 	ent->vy = 0;
 
@@ -85,7 +93,9 @@ void update_speed_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || (ent->ent_cols & (TYPE_PLAYER) && !speed_up_active()))
 	{
-		mmEffectEx(&speed_pick_up_sound);
+		if (ent->ent_cols & (TYPE_PLAYER))
+			mmEffectEx(&speed_pick_up_sound);
+
 		free_ent(ent);
 
 		int count = gba_rand_range(3, 5);
@@ -137,9 +147,9 @@ void create_health_up(ent_t *ent, FIXED x, FIXED y)
 	ent->ent_type = TYPE_HEALTH_UP;
 
 	ent->x = x;
-	ent->w = 0;
+	ent->w = 8;
 	ent->y = y;
-	ent->h = 0;
+	ent->h = 8;
 	ent->vx = 0;
 	ent->vy = 0;
 
@@ -152,7 +162,9 @@ void update_health_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
-		mmEffectEx(&health_pick_up_sound);
+		if (ent->ent_cols & (TYPE_PLAYER))
+			mmEffectEx(&health_pick_up_sound);
+
 		free_ent(ent);
 		return;
 	}
@@ -170,9 +182,9 @@ void create_jump_up(ent_t *ent, FIXED x, FIXED y)
 	ent->ent_type = TYPE_JUMP_UP;
 
 	ent->x = x;
-	ent->w = 0;
+	ent->w = 8;
 	ent->y = y;
-	ent->h = 0;
+	ent->h = 8;
 	ent->vx = 0;
 	ent->vy = 0;
 
@@ -185,7 +197,41 @@ void update_jump_up(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
-		mmEffectEx(&jump_pick_up_sound);
+		if (ent->ent_cols & (TYPE_PLAYER))
+			mmEffectEx(&jump_pick_up_sound);
+
+		free_ent(ent);
+		return;
+	}
+
+	ent->vx += -_scroll_x;
+	ent_move_x_dirty(ent);
+	//Take back scroll for next loop
+	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
+}
+
+void create_shrink_token(ent_t *ent, FIXED x, FIXED y)
+{
+	ent->ent_type = TYPE_SHRINK_TOKEN;
+
+	ent->x = x;
+	ent->w = 4;
+	ent->y = y;
+	ent->h = 4;
+	ent->vx = 0;
+	ent->vy = 0;
+
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_8x8;
+	ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(_shrink_token_tile_idx);
+}
+
+void update_shrink_token(ent_t *ent)
+{
+	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
+	{
 		free_ent(ent);
 		return;
 	}

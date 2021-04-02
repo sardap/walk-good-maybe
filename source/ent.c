@@ -284,6 +284,7 @@ bool ent_move_y(ent_t *e, FIXED dy)
 			e->y += sign;
 			dy -= sign;
 		}
+
 		return true;
 	}
 
@@ -358,6 +359,9 @@ void update_ents()
 			break;
 		case TYPE_JUMP_UP:
 			update_jump_up(&_ents[i]);
+			break;
+		case TYPE_SHRINK_TOKEN:
+			update_shrink_token(&_ents[i]);
 			break;
 		}
 	}

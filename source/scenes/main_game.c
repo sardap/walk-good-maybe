@@ -61,7 +61,7 @@ static void spawn_buildings()
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
-		switch (gba_rand_range(1, 6000))
+		switch (gba_rand_range(1, 6))
 		{
 		case 1:
 			width = spawn_building_0(start_x);
@@ -222,9 +222,10 @@ static void show(void)
 	load_gun_0_tiles();
 	load_number_tiles();
 	load_speed_up();
+	load_jump_up();
+	load_shrink_token();
 	load_enemy_bullets_tiles();
 	load_speed_level_display();
-	load_jump_up();
 	init_jump_level_display();
 
 	init_score();

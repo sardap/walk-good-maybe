@@ -35,6 +35,7 @@ typedef enum ent_types_t
 	TYPE_ENEMY_BULLET = 0b100000,
 	TYPE_HEALTH_UP = 0b1000000,
 	TYPE_JUMP_UP = 0b10000000,
+	TYPE_SHRINK_TOKEN = 0b100000000,
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them

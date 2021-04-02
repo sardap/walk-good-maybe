@@ -17,6 +17,11 @@
 #define PLAYER_START_JUMP_POWER (int)(2.0f * FIX_SCALE)
 #define PLAYER_MAX_JUMP_POWER (int)(3.0f * FIX_SCALE)
 
+#define PLAYER_SHRINKING_TIME 300
+#define PLAYER_SHRINK_SIZE 0.75 * FIX_SCALE
+#define PLAYER_FULL_SIZE 1 * FIX_SCALE
+#define PLAYER_SHRINK_STEP ((PLAYER_SHRINK_SIZE)*FIX_SCALE) / (48 * FIX_SCALE)
+
 extern ent_t _player;
 
 void init_player();

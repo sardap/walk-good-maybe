@@ -11,6 +11,7 @@ function gen_png {
 	echo "pnging $1"
 	for i in $(find $1 -type f -name "*.psd"); do
 		convert -quiet "${i%.*}.psd" -flatten "${i%.*}.png"
+		gba-colourer "${i%.*}.png"
 	done
 }
 
@@ -59,6 +60,8 @@ gen_png "./assets/game_intro"
 
 gen_png "./assets/title_screen"
 
+gen_png "./assets/credits"
+
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
@@ -72,6 +75,11 @@ colour-agg.exe ./assets/title_screen/tsBackgroundAgg.png \
 	./assets/title_screen/tsBeach.png \
 	./assets/title_screen/tsTitleText.png
 
+
+colour-agg.exe ./assets/credits/crColourAgg.png \
+	./assets/credits/crEmpty.png \
+	./assets/credits/crPaulFace.png \
+	./assets/credits/crSpace.png 
 
 rm -rf $OUTPATH
 mkdir -p $OUTPATH
@@ -139,7 +147,24 @@ grit \
 	$ASSETS/title_screen/tsLava.png \
 	$ASSETS/title_screen/tsCity.png \
 	$ASSETS/title_screen/tsBeach.png \
-	$ASSETS/title_screen/tsTitleText.png $BG_OPTIONS
+	$ASSETS/title_screen/tsGameText.png \
+	$ASSETS/title_screen/tsTitleText.png \
+	$ASSETS/title_screen/tsCredits.png \
+	$BG_OPTIONS
+
+SP_OPTIONS=""
+SP_OPTIONS="$SP_OPTIONS -ftc"
+SP_OPTIONS="$SP_OPTIONS -gt"        			# output tiled graphics
+SP_OPTIONS="$SP_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+SP_OPTIONS="$SP_OPTIONS -gB8"       			# output 8bpp graphics
+SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
+SP_OPTIONS="$SP_OPTIONS -O tsSpirteShared"		# Shared pallet name
+
+echo "Creating objects for title screen"
+grit \
+	$ASSETS/title_screen/tsArrow.png \
+	$ASSETS/title_screen/tsArrowRed.png \
+	$SP_OPTIONS
 
 BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
@@ -200,6 +225,47 @@ grit \
 	$ASSETS/game_intro/giWhale_air_2.png \
 	$ASSETS/game_intro/giWhale_air_3.png \
 	$SP_OPTIONS
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -ma 600"				# Tiles start at 600
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -p" 					# exculde pallet output
+BG_OPTIONS="$BG_OPTIONS -pe 10" 				# export up until 10
+
+echo "Creating space background for credits / pal / map"
+grit \
+	$ASSETS/credits/crSpace.png $BG_OPTIONS
+
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -ma 0"					# Tiles start at 0
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -p" 					# exculde pallet output
+BG_OPTIONS="$BG_OPTIONS -pe 120" 				# export up until 100
+BG_OPTIONS="$BG_OPTIONS -Zl" 					# compress all with lz77
+
+echo "Creating background tiles for credits / pal / map"
+grit \
+	$ASSETS/credits/crPaulFace.png \
+	$ASSETS/credits/crWhaleLargeStanding.png \
+	$ASSETS/credits/crBiscut.png \
+	$ASSETS/credits/crPaulMic.png \
+	$ASSETS/credits/crBuildings.png \
+	$ASSETS/credits/crRealBuildings.png \
+	$ASSETS/credits/crTunaPasta.png \
+	$ASSETS/credits/crEmpty.png \
+	$ASSETS/credits/crPatrickFace.png $BG_OPTIONS
 
 
 echo "compelte creating assets"

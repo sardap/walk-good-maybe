@@ -49,7 +49,7 @@ int get_buildings_tile_offset()
 int get_buildings_tile_offset_end()
 {
 	//Issue this is fucked need to track which building is loaded first
-	return (_building_4_idx / 2) + building4TileSetTilesLen / 64 - 1;
+	return (_building_5_idx / 2) + building5TileSetTilesLen / 64 - 1;
 }
 
 void load_lava_0(int cb)
@@ -164,7 +164,7 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	}
 	else if (gba_rand_range(1, 100) > 100 - info->token_chance)
 	{
-		switch (gba_rand_range(1, 4000))
+		switch (gba_rand_range(1, 4))
 		{
 		case 1:
 			spawn_jump_up_token(start_x, width, y);
@@ -176,7 +176,6 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 			spawn_health_up_token(start_x, width, y);
 			break;
 		case 4:
-		default:
 			spawn_shrink_token(start_x, width, y);
 			break;
 		}

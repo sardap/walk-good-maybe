@@ -15,6 +15,7 @@ OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};
 visual_ent_t _visual_ents[ENT_VISUAL_COUNT] = {};
 
+static OBJ_AFFINE _aff_buffer[ENT_COUNT] = {};
 static u8 _allocated_ents[ENT_COUNT];
 static u8 _allocated_visual_ents[ENT_VISUAL_COUNT];
 
@@ -139,7 +140,9 @@ void free_all_ents()
 void copy_ents_to_oam()
 {
 	int obj_idx = 0;
+	int aff_idx = 0;
 
+	//Don't update postions here since it fucks with affine sprites dbl size
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		ent_t *ent = &_ents[i];
@@ -147,8 +150,19 @@ void copy_ents_to_oam()
 		if (ent->ent_type == TYPE_NONE)
 			continue;
 
-		_obj_buffer[obj_idx] = ent->att;
-		obj_set_pos(&_obj_buffer[obj_idx], fx2int(ent->x), fx2int(ent->y));
+		OBJ_ATTR tmp = ent->att;
+
+		//Check if sprite is affine
+		if (tmp.attr0 & (ATTR0_AFF))
+		{
+			//Tells sprite which affine matrix to look at
+			tmp.attr1 |= ATTR1_AFF_ID(aff_idx);
+			//Copies the affine matrix from ent
+			_aff_buffer[aff_idx] = ent->aff;
+			++aff_idx;
+		}
+
+		_obj_buffer[obj_idx] = tmp;
 
 		++obj_idx;
 	}
@@ -171,7 +185,13 @@ void copy_ents_to_oam()
 		obj_set_attr(&_obj_buffer[i], ATTR0_HIDE, 0, 0);
 	}
 
-	oam_copy(oam_mem, _obj_buffer, ENT_COUNT + ENT_VISUAL_COUNT);
+	for (int i = aff_idx; i < ENT_COUNT; i++)
+	{
+		obj_aff_identity(&_aff_buffer[aff_idx]);
+	}
+
+	obj_copy(obj_mem, _obj_buffer, ENT_COUNT + ENT_VISUAL_COUNT);
+	obj_aff_copy(obj_aff_mem, _aff_buffer, ENT_COUNT);
 }
 
 FIXED translate_x(ent_t *e)
@@ -264,6 +284,7 @@ bool ent_move_y(ent_t *e, FIXED dy)
 			e->y += sign;
 			dy -= sign;
 		}
+
 		return true;
 	}
 
@@ -276,30 +297,17 @@ void ent_move_y_dirty(ent_t *e)
 	e->y += e->vy;
 }
 
-bool apply_gravity(ent_t *e)
-{
-	int flags = ent_level_collision_at(e, 0, GRAVITY);
-
-	if (flags & (LEVEL_COL_GROUND))
-	{
-		_player.vy = 0;
-		return true;
-	}
-
-	_player.vy += GRAVITY;
-	return false;
-}
-
 void update_ents()
 {
 	//Add player to ent array
-	_ents[ENT_COUNT - 1] = _player;
+	_ents[0] = _player;
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		if (_ents[i].ent_type == TYPE_NONE)
 			continue;
 
+		//reset col
 		_ents[i].ent_cols = TYPE_NONE;
 
 		for (int j = 0; j < ENT_COUNT; j++)
@@ -315,14 +323,13 @@ void update_ents()
 				_ents[i].y < _ents[j].y + int2fx(_ents[j].h) &&
 				_ents[i].y + int2fx(_ents[i].h) > _ents[j].y)
 			{
-				_ents[i]
-					.ent_cols |= _ents[j].ent_type;
+				_ents[i].ent_cols |= _ents[j].ent_type;
 			}
 		}
 	}
 
 	//Copy updated player ent back into player
-	_player = _ents[ENT_COUNT - 1];
+	_player = _ents[0];
 
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
@@ -352,6 +359,9 @@ void update_ents()
 			break;
 		case TYPE_JUMP_UP:
 			update_jump_up(&_ents[i]);
+			break;
+		case TYPE_SHRINK_TOKEN:
+			update_shrink_token(&_ents[i]);
 			break;
 		}
 	}

@@ -26,15 +26,16 @@
 */
 typedef enum ent_types_t
 {
-	TYPE_NONE = 0,
-	TYPE_PLAYER = 1,
-	TYPE_BULLET = 2,
-	TYPE_ENEMY_BISCUT = 4,
-	TYPE_SPEED_UP = 8,
-	TYPE_ENEMY_BISCUT_UFO = 16,
-	TYPE_ENEMY_BULLET = 32,
-	TYPE_HEALTH_UP = 64,
-	TYPE_JUMP_UP = 128,
+	TYPE_NONE = 0b0,
+	TYPE_PLAYER = 0b1,
+	TYPE_BULLET = 0b10,
+	TYPE_ENEMY_BISCUT = 0b100,
+	TYPE_SPEED_UP = 0b1000,
+	TYPE_ENEMY_BISCUT_UFO = 0b10000,
+	TYPE_ENEMY_BULLET = 0b100000,
+	TYPE_HEALTH_UP = 0b1000000,
+	TYPE_JUMP_UP = 0b10000000,
+	TYPE_SHRINK_TOKEN = 0b100000000,
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them
@@ -77,15 +78,15 @@ typedef struct ent_t
 	int w, h;
 	int ent_cols;
 	ent_types_t ent_type;
-	OBJ_ATTR att;
-
+	//Atrr and affine both have padding in them to make this okay
+	union
+	{
+		OBJ_ATTR att;
+		OBJ_AFFINE aff;
+	};
 	//Ent speifc vars
 	union
 	{
-		//Player
-		struct
-		{
-		};
 		//Bullet
 		struct
 		{
@@ -177,8 +178,6 @@ void ent_move_x_dirty(ent_t *e);
 bool did_hit_y(ent_t *e, FIXED dy);
 bool ent_move_y(ent_t *e, FIXED dy);
 void ent_move_y_dirty(ent_t *e);
-
-bool apply_gravity(ent_t *e);
 
 void update_ents();
 

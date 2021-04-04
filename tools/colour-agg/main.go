@@ -58,11 +58,11 @@ func getAllColours(files []string) []color.Color {
 			panic(err)
 		}
 
-		for k, v := range findColours(img) {
+		for k := range findColours(img) {
 			if _, ok := cMap[k]; !ok {
 				result = append(result, k)
 			}
-			cMap[k] = v
+			cMap[k] = false
 		}
 	}
 

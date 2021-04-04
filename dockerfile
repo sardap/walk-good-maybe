@@ -35,6 +35,18 @@ RUN go build -o main .
 
 ##################################################
 
+FROM golang:latest as gba-colourer-builder
+
+WORKDIR /app
+COPY ./tools/gba-colourer/go.mod . 
+RUN go mod download
+
+COPY ./tools/gba-colourer/*.go ./
+
+RUN go build -o main .
+
+##################################################
+
 #Devkit pro image is out of date also deabain is fucked here for some reason
 FROM devkitpro/devkitarm:latest as GBA-builder
 
@@ -52,6 +64,10 @@ RUN chmod +x /bin/builder
 #Copy version-img-gen-builder
 COPY --from=version-img-gen-builder /app/main /bin/version-img-gen
 RUN chmod +x /bin/version-img-gen
+
+#Copy gba-colourer
+COPY --from=gba-colourer-builder /app/main /bin/gba-colourer
+RUN chmod +x /bin/gba-colourer
 
 RUN mkdir /app
 

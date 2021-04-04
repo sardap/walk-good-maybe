@@ -80,6 +80,22 @@ static mm_sound_effect player_flap_sound = {
 	127,
 };
 
+static mm_sound_effect shrink_sound = {
+	{SFX_BY_R_COLLECT_7},
+	(int)(1.0f * (1 << 10)),
+	TOKEN_SOUND_HANDLER,
+	120,
+	127,
+};
+
+static mm_sound_effect grow_sound = {
+	{SFX_BY_COLLECT_7},
+	(int)(1.0f * (1 << 10)),
+	TOKEN_SOUND_HANDLER,
+	120,
+	127,
+};
+
 static int _player_anime_cycle;
 static int _tile_start_idx;
 static int _player_life;
@@ -91,6 +107,8 @@ static POINT _player_mos;
 static FIXED _player_speed;
 static FIXED _player_air_slowdown;
 static FIXED _player_jump_power;
+static FIXED _sx, _sy;
+static int _shrinking;
 ent_t _player = {};
 
 void load_player_tile()
@@ -118,9 +136,10 @@ void init_player()
 
 	_player.ent_type = TYPE_PLAYER;
 
-	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
-	_player.att.attr1 = ATTR1_SIZE_16x16;
+	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF;
+	_player.att.attr1 = ATTR1_SIZE_16;
 	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
+	obj_aff_identity(&_player.aff);
 
 	_facing = FACING_RIGHT;
 	_player_jump_power = PLAYER_START_JUMP_POWER;
@@ -128,6 +147,9 @@ void init_player()
 
 	_player_speed = (int)(2.0f * (FIX_SCALE));
 	_player_air_slowdown = PLAYER_AIR_START_SLOWDOWN;
+
+	_sx = 1 * FIX_SCALE;
+	_sy = 1 * FIX_SCALE;
 }
 
 void unload_player()
@@ -182,6 +204,19 @@ static void player_shoot()
 
 void update_player()
 {
+	// static int scale = 1;
+	// if (key_held(KEY_L) || key_held(KEY_R))
+	// {
+	// 	if (key_held(KEY_L))
+	// 		scale += 128;
+	// 	if (key_held(KEY_R))
+	// 		scale -= 128;
+
+	// 	char str[50];
+	// 	sprintf(str, "scale:%d", scale);
+	// 	write_to_log(LOG_LEVEL_DEBUG, str);
+	// }
+
 	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
@@ -196,16 +231,17 @@ void update_player()
 		}
 	}
 
-	//Handles fliping the sprite if facing the other direction
-	if (_facing == FACING_RIGHT && key_hit(KEY_LEFT))
+	/** Handles updating the facing direction
+		NOTE DO NOT USE HFLIP on Affine sprites
+	 	you need to invert the x scale or y scale to flip
+	*/
+	if (key_hit(KEY_LEFT))
 	{
 		_facing = FACING_LEFT;
-		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
-	else if (_facing == FACING_LEFT && key_hit(KEY_RIGHT))
+	else if (key_hit(KEY_RIGHT))
 	{
 		_facing = FACING_RIGHT;
-		_player.att.attr1 ^= ATTR1_HFLIP;
 	}
 
 	// Player movement
@@ -330,6 +366,33 @@ void update_player()
 		update_jump_level_display(_player_jump_power);
 	}
 
+	//Shrink Token
+	if (_player.ent_cols & (TYPE_SHRINK_TOKEN))
+	{
+		if (!_shrinking)
+			mmEffectEx(&shrink_sound);
+
+		_shrinking = PLAYER_SHRINKING_TIME;
+	}
+
+	FIXED size_step = PLAYER_SHRINK_STEP;
+	if (_shrinking)
+	{
+		size_step = -size_step;
+
+		--_shrinking;
+		if (_shrinking <= 0)
+		{
+			mmEffectEx(&grow_sound);
+			_shrinking = 0;
+		}
+	}
+
+	_sx = clamp(_sx + size_step, PLAYER_SHRINK_SIZE, PLAYER_FULL_SIZE);
+	_sy = clamp(_sy + size_step, PLAYER_SHRINK_SIZE, PLAYER_FULL_SIZE);
+	_player.w = fx2int(fxmul(_sx, 16 * FIX_SCALE));
+	_player.h = fx2int(fxmul(_sy, 16 * FIX_SCALE));
+
 	//Handles player anime
 	switch (_move_state)
 	{
@@ -412,6 +475,17 @@ void update_player()
 	{
 		_player.y = PLAYER_SPAWN_Y;
 	}
+
+	int sx = _facing == FACING_RIGHT ? _sx : -_sx;
+	obj_aff_rotscale(
+		&_player.aff,
+		//Invert sacle
+		((1 << 24) / sx) >> 8, ((1 << 24) / _sy) >> 8, 0);
+
+	obj_set_pos(
+		&_player.att,
+		fx2int(_player.x) + (16 - fx2int(fxmul(16 * FIX_SCALE, _sx))),
+		fx2int(_player.y) + (16 - fx2int(fxmul(16 * FIX_SCALE, _sy))));
 }
 
 int get_player_life()

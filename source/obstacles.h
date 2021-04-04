@@ -6,6 +6,7 @@
 void load_speed_up();
 void load_health_up();
 void load_jump_up();
+void load_shrink_token();
 
 void create_speed_up(ent_t *ent, FIXED x, FIXED y);
 void update_speed_up(ent_t *ent);
@@ -18,5 +19,8 @@ void update_health_up(ent_t *ent);
 
 void create_jump_up(ent_t *ent, FIXED x, FIXED y);
 void update_jump_up(ent_t *ent);
+
+void create_shrink_token(ent_t *ent, FIXED x, FIXED y);
+void update_shrink_token(ent_t *ent);
 
 #endif

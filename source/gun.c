@@ -49,19 +49,21 @@ void create_bullet(
 	bul->att.attr2 = ATTR2_ID(_gun_0_tile);
 }
 
-void update_bullet(ent_t *bul)
+void update_bullet(ent_t *ent)
 {
-	bool hit_x = ent_move_x(bul, bul->vx - _scroll_x);
-	ent_move_y(bul, bul->vy);
+	bool hit_x = ent_move_x(ent, ent->vx - _scroll_x);
+	ent_move_y(ent, ent->vy);
 
 	if (
-		fx2int(bul->x) > SCREEN_WIDTH ||
-		fx2int(bul->x) < 0 ||
+		fx2int(ent->x) > SCREEN_WIDTH ||
+		fx2int(ent->x) < 0 ||
 		hit_x ||
-		bul->ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO))
+		ent->ent_cols & (TYPE_ENEMY_BISCUT | TYPE_ENEMY_BISCUT_UFO))
 	{
-		free_ent(bul);
-		bul->ent_type = TYPE_NONE;
+		free_ent(ent);
+		ent->ent_type = TYPE_NONE;
 		return;
 	}
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }

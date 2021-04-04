@@ -90,6 +90,12 @@
 
 #define BUILDING_5_MIDDLE_WINDOW BUILDING_5_OFFSET + 5
 
+// BUILDING 5
+#define BUILDING_6_OFFSET 0
+
+#define BUILDING_6_BLANK BUILDING_6_OFFSET
+#define BUILDING_6_ANGLE_LEFT BUILDING_6_OFFSET + 1
+
 // LAVA
 #define LAVA_OFFSET 0
 
@@ -135,5 +141,9 @@ int spawn_building_4(int start_x);
 void load_building_5(int cb);
 void free_building_5();
 int spawn_building_5(int start_x);
+
+void load_building_6(int cb);
+void free_building_6();
+int spawn_building_6(int start_x);
 
 #endif

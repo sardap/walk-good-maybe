@@ -55,7 +55,17 @@
 		"speedlevel0.h": "c",
 		"speedlevel3.h": "c",
 		"jumplevel0.h": "c",
-		"healthup.h": "c"
+		"healthup.h": "c",
+		"crpaulface.h": "c",
+		"creditsscreenshared.h": "c",
+		"crshared.h": "c",
+		"crspace.h": "c",
+		"crpatrickface.h": "c",
+		"crwhalelargestanding.h": "c",
+		"crrealbuildings.h": "c",
+		"crempty.h": "c",
+		"tsarrow.h": "c",
+		"tsspirteshared.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

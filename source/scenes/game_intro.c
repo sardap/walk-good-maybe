@@ -114,8 +114,8 @@ static void show(void)
 	obj_set_attr(
 		&_obj_buffer[0],
 		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF | ATTR0_AFF_DBL_BIT,
-		ATTR1_SIZE_64x64,
-		ATTR2_PRIO(1) | ATTR1_AFF_ID(0));
+		ATTR1_SIZE_64x64 | ATTR1_AFF_ID(0),
+		ATTR2_PRIO(1));
 
 	obj_set_pos(&_obj_buffer[0], GBA_WIDTH / 2 - 64, GBA_HEIGHT / 2 - 64);
 	obj_aff_identity(&_data->obj_aff_buffer[0]);
@@ -134,6 +134,7 @@ static void show(void)
 
 	_data->countdown = GI_STARTING_COUNTDOWN;
 	_data->whale_scale = GI_WHALE_START_SCALE;
+	_data->whale_rotate = 0;
 	_data->anime_cycle = 3;
 }
 
@@ -144,15 +145,20 @@ static void update(void)
 		&_data->anime_cycle, 0);
 
 	--_data->countdown;
+	//This is a magic number that makes it roate fast
+	_data->whale_rotate -= 128 * 5;
 	_data->cam_pos.y -= 1.8f * FIX_SCALE;
 	_data->whale_scale -= fxdiv(GI_WHALE_START_SCALE, GI_STARTING_COUNTDOWN * FIX_SCALE);
 
-	obj_aff_scale_inv(
+	obj_aff_rotscale(
 		&_data->obj_aff_buffer[0],
-		fx2int(_data->whale_scale), fx2int(_data->whale_scale));
+		//This fucky math inverts it
+		((1 << 24) / fx2int(_data->whale_scale)) >> 8,
+		((1 << 24) / fx2int(_data->whale_scale)) >> 8,
+		_data->whale_rotate);
 
-	obj_copy(obj_mem, _obj_buffer, 2);
-	obj_aff_copy(obj_aff_mem, _data->obj_aff_buffer, 3);
+	obj_copy(obj_mem, _obj_buffer, 1);
+	obj_aff_copy(obj_aff_mem, _data->obj_aff_buffer, 1);
 
 	switch (_data->state)
 	{

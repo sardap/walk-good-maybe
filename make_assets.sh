@@ -62,6 +62,8 @@ gen_png "./assets/title_screen"
 
 gen_png "./assets/credits"
 
+gen_png "./assets/sound_test"
+
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
@@ -73,7 +75,8 @@ colour-agg.exe ./assets/title_screen/tsBackgroundAgg.png \
 	./assets/title_screen/tsLava.png \
 	./assets/title_screen/tsCity.png \
 	./assets/title_screen/tsBeach.png \
-	./assets/title_screen/tsTitleText.png
+	./assets/title_screen/tsTitleText.png \
+	./assets/title_screen/tsSoundTestText.png
 
 
 colour-agg.exe ./assets/credits/crColourAgg.png \
@@ -150,6 +153,7 @@ grit \
 	$ASSETS/title_screen/tsGameText.png \
 	$ASSETS/title_screen/tsTitleText.png \
 	$ASSETS/title_screen/tsCredits.png \
+	$ASSETS/title_screen/tsSoundTestText.png \
 	$BG_OPTIONS
 
 SP_OPTIONS=""
@@ -230,7 +234,7 @@ BG_OPTIONS=""
 BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
 BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
 BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
-BG_OPTIONS="$BG_OPTIONS -gu8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu8"					# export as bytes
 BG_OPTIONS="$BG_OPTIONS -m"						# Export map
 BG_OPTIONS="$BG_OPTIONS -ma 600"				# Tiles start at 600
 BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
@@ -266,6 +270,38 @@ grit \
 	$ASSETS/credits/crTunaPasta.png \
 	$ASSETS/credits/crEmpty.png \
 	$ASSETS/credits/crPatrickFace.png $BG_OPTIONS
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu8"					# export as bytes
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O stSharedBackground"	# Shared pallet name
+BG_OPTIONS="$BG_OPTIONS -Zl" 					# compress all with lz77
+
+echo "Creating background tiles for sound test / pal / map"
+grit \
+	$ASSETS/sound_test/stBackground.png \
+	$BG_OPTIONS
+
+SP_OPTIONS=""
+SP_OPTIONS="$SP_OPTIONS -ftc"
+SP_OPTIONS="$SP_OPTIONS -gt"        			# output tiled graphics
+SP_OPTIONS="$SP_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+SP_OPTIONS="$SP_OPTIONS -gB8"       			# output 8bpp graphics
+SP_OPTIONS="$SP_OPTIONS -pS" 					# Share pallet
+SP_OPTIONS="$SP_OPTIONS -O stSpirteShared"		# Shared pallet name
+
+echo "Creating objects for sound test"
+grit \
+	$ASSETS/sound_test/stArrow.png \
+	$ASSETS/sound_test/stArrowRed.png \
+	$SP_OPTIONS
 
 
 echo "compelte creating assets"

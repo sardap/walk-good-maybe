@@ -26,7 +26,7 @@ typedef struct ts_menu_options_t
 	const int lx, rx;
 } ts_menu_options_t;
 
-#define TS_OPTIONS_LENGTH 2
+#define TS_OPTIONS_LENGTH 3
 extern const ts_menu_options_t _options[TS_OPTIONS_LENGTH];
 
 extern const scene_t title_screen;

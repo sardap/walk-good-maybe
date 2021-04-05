@@ -4,6 +4,7 @@
 
 #include "game_intro.h"
 #include "credits.h"
+#include "sound_test.h"
 #include "../debug.h"
 #include "../graphics.h"
 
@@ -17,11 +18,12 @@
 #include "../assets/tsArrow.h"
 #include "../assets/tsArrowRed.h"
 #include "../assets/tsSpirteShared.h"
+#include "../assets/tsSoundTestText.h"
 
 const ts_menu_options_t _options[] = {
 	{&game_intro, tsGameTextMap, tsGameTextMapLen, 51, 160},
-	{&credits_screen, tsCreditsMap, tsCreditsMapLen, 23, 190},
-};
+	{&credits_screen, tsCreditsMap, tsCreditsMapLen, 23, 185},
+	{&sound_test_scene, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175}};
 
 static const u16 water_cycle[] = {0x7FFF, 0x7FC6, 0x7B80, 0x7FD0, 0x7FB2, 0x7FD7};
 static const u16 lava_cycle[] = {0x11D9, 0x1E3C, 0x20FF};

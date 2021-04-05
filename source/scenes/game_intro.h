@@ -7,7 +7,6 @@
 #define GI_COOL_BACKGROUND_SSB 8
 #define GI_TEXT_SSB 24
 #define GI_SKY_SSB 26
-#define GI_INTRO_HANDLER (mm_sfxhand)1
 #define GI_M7_D 128
 #define GI_STARTING_COUNTDOWN 1.65 * 60
 //1.65 seconds 60 frames per second

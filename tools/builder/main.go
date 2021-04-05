@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -22,11 +24,18 @@ func makeAssets() {
 	stdIn.Write([]byte("y"))
 	stdIn.Close()
 
+	var stdBuffer bytes.Buffer
+	mw := io.MultiWriter(os.Stdout, &stdBuffer)
+
+	cmd.Stdout = mw
+
 	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("error running make assets %v\n", err)
 		panic(err)
 	}
+
+	fmt.Println(stdBuffer.String())
 }
 
 func runMake(arg string) {

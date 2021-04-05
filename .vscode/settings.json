@@ -65,7 +65,8 @@
 		"crrealbuildings.h": "c",
 		"crempty.h": "c",
 		"tsarrow.h": "c",
-		"tsspirteshared.h": "c"
+		"tsspirteshared.h": "c",
+		"spriteshared.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -9,6 +9,7 @@
 
 #include "../debug.h"
 #include "../anime.h"
+#include "../graphics.h"
 
 #include "../assets/crPaulFace.h"
 #include "../assets/crSpace.h"
@@ -28,6 +29,9 @@
 static const int whale_air_anime_count = 3;
 static const uint *whale_air_anime[] = {
 	whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+
+static const int star_pal_cycle_length = 4;
+static const u16 star_pal_cycle[] = {0x77bd, 0x77ff, 0x7bff, 0x7fff};
 
 static const int creditsCount = 8;
 static const cr_credit_t credits[] = {
@@ -141,7 +145,7 @@ static void show(void)
 	irq_add(II_VBLANK, mmVBlank);
 
 	/* Load palettes */
-	GRIT_CPY(pal_bg_mem + 120, crSpacePal);
+	GRIT_CPY(pal_bg_mem + CR_SKY_START_PAL, crSpacePal);
 	/* Load background tiles into CR_SHARED_CB Note the image background is loaded on the fly */
 	//Space
 	//Fuckyness since we don't have a combined pallete
@@ -305,6 +309,15 @@ static void update(void)
 		}
 		break;
 	}
+	}
+
+	//Cycle star colours
+	if (frame_count() % 35 == 0)
+	{
+		cycle_palate(
+			pal_bg_mem,
+			CR_SKY_START_PAL + 2, star_pal_cycle,
+			&data->star_pal_idx, star_pal_cycle_length);
 	}
 
 	//Player movement

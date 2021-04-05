@@ -16,6 +16,8 @@
 #define CR_PAUSE_TIME 120
 #define CR_OBJ_COUNT 128
 
+#define CR_SKY_START_PAL 120
+
 extern const scene_t credits_screen;
 
 typedef struct cr_credit_t
@@ -50,6 +52,7 @@ typedef struct cr_data_t
 	cr_states_t state;
 	int countdown;
 	FIXED eva, evb;
+	int star_pal_idx;
 } cr_data_t;
 
 #endif

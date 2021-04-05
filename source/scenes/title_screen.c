@@ -5,6 +5,7 @@
 #include "game_intro.h"
 #include "credits.h"
 #include "../debug.h"
+#include "../graphics.h"
 
 #include "../assets/titleScreenShared.h"
 #include "../assets/tsCity.h"
@@ -156,22 +157,18 @@ static void update(void)
 
 	if (frame_count() % 25 == 0)
 	{
-		for (int i = 0; i < TS_PAL_WATER_LENGTH; i++)
-		{
-			int pal_idx = wrap(_water_pal_idx + i, 0, TS_PAL_WATER_LENGTH - 1);
-			pal_bg_mem[TS_PAL_WATER_START + i] = water_cycle[pal_idx];
-		}
-		_water_pal_idx = wrap(_water_pal_idx + 1, 0, TS_PAL_WATER_LENGTH - 1);
+		cycle_palate(
+			pal_bg_mem,
+			TS_PAL_WATER_START, water_cycle,
+			&_water_pal_idx, TS_PAL_WATER_LENGTH);
 	}
 
 	if (frame_count() % 35 == 0)
 	{
-		for (int i = 0; i < TS_PAL_LAVA_LENGTH; i++)
-		{
-			int pal_idx = wrap(_lava_pal_idx + i, 0, TS_PAL_LAVA_LENGTH - 1);
-			pal_bg_mem[TS_PAL_LAVA_START + i] = lava_cycle[pal_idx];
-		}
-		_lava_pal_idx = wrap(_lava_pal_idx + 1, 0, TS_PAL_LAVA_LENGTH - 1);
+		cycle_palate(
+			pal_bg_mem,
+			TS_PAL_LAVA_START, lava_cycle,
+			&_lava_pal_idx, TS_PAL_LAVA_LENGTH);
 	}
 
 	obj_copy(oam_mem, _arrow_objs, 2);

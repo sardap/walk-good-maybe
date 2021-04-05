@@ -136,6 +136,8 @@ void update_enemy_biscut(ent_t *ent)
 	{
 		if (ent->ent_cols & (TYPE_BULLET))
 		{
+			add_score(ENEMY_BISCUT_SCORE);
+
 			//Play sound
 			mmEffectEx(&enemy_biscut_damage);
 
@@ -259,6 +261,8 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 
 	if (ent->x + int2fx(ent->w) < 0 || ent->ent_cols & (TYPE_BULLET))
 	{
+		add_score(ENEMY_UFO_BISCUT_SCORE);
+
 		//Play death sound
 		mmEffectEx(&enemy_ufo_damge);
 

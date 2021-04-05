@@ -19,11 +19,11 @@
 
 //Maybe do Probability math here
 //enemy_chance, lava_chance, token_chance
-static t_spawn_info _building_0 = {80, 30, 50};
-static t_spawn_info _building_1 = {80, 30, 50};
-static t_spawn_info _building_2 = {80, 30, 50};
-static t_spawn_info _building_3 = {80, 30, 50};
-static t_spawn_info _building_4 = {80, 30, 50};
+static t_spawn_info _building_0 = {80, 20, 70};
+static t_spawn_info _building_1 = {80, 20, 70};
+static t_spawn_info _building_2 = {80, 20, 70};
+static t_spawn_info _building_3 = {80, 20, 70};
+static t_spawn_info _building_4 = {80, 20, 70};
 static t_spawn_info _building_5 = {0, 0, 100};
 
 static int _lava_0_idx;

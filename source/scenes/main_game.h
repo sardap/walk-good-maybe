@@ -4,7 +4,7 @@
 #include "../common.h"
 
 #define MG_SHARED_CB 0
-#define MG_TEXT_SB 22
+#define MG_PAUSE_SBB 22
 #define MG_CITY_SB 30
 #define MG_CLOUD_SB 24
 #define MG_BUILDING_SB 26

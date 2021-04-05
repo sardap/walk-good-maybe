@@ -128,6 +128,7 @@ grit \
 	$ASSETS/background/building6TileSet.png \
 	$ASSETS/background/lava0TileSet.png \
 	$ASSETS/background/buildingtileset.png \
+	$ASSETS/background/mgPause.png \
 	$BG_OPTIONS
 
 

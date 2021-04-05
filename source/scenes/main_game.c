@@ -24,6 +24,7 @@
 #include "../assets/fog.h"
 #include "../assets/mainGameShared.h"
 #include "../assets/buildingtileset.h"
+#include "../assets/mgPause.h"
 
 static mg_data_t *_data = &_shared_data.mg;
 
@@ -159,6 +160,9 @@ static void show(void)
 	_data->fog_tiles_idx = backgroundCityTilesLen / 32;
 	GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx], fogTiles);
 
+	int pause_tile_offset = _data->fog_tiles_idx + fogTilesLen / 32;
+	GRIT_CPY(&tile_mem[MG_SHARED_CB][pause_tile_offset], mgPauseTiles);
+
 	load_foreground_tiles();
 
 	load_life_display();
@@ -166,6 +170,13 @@ static void show(void)
 
 	//City BG
 	dma3_cpy(se_mem[MG_CITY_SB], backgroundCityMap, backgroundCityMapLen);
+
+	//Pause screen
+	GRIT_CPY(&se_mem[MG_PAUSE_SBB], mgPauseMap);
+	for (int i = 0; i < mgPauseMapLen; i++)
+	{
+		se_mem[MG_PAUSE_SBB][i] += pause_tile_offset / 2;
+	}
 
 	//Fill Cloud
 	dma3_cpy(se_mem[MG_CLOUD_SB], fogMap, fogMapLen);
@@ -192,9 +203,9 @@ static void show(void)
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_CITY_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(MG_BUILDING_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
 	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
-	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_TEXT_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
+	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_PAUSE_SBB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
-	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
+	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
 	//Blend reg
 	REG_BLDCNT = BLD_BUILD(
@@ -258,6 +269,7 @@ static void update(void)
 	{
 		if (key_hit(KEY_START))
 		{
+			REG_DISPCNT ^= DCNT_BG3;
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
 			_data->state = _data->old_state;
 		}
@@ -276,6 +288,7 @@ static void update(void)
 		write_to_log(LOG_LEVEL_INFO, "PAUSING");
 		_data->old_state = _data->state;
 		_data->state = MG_S_PAUSED;
+		REG_DISPCNT |= DCNT_BG3;
 		return;
 	}
 
@@ -383,7 +396,7 @@ static void hide(void)
 	OAM_CLEAR();
 	M4_CLEAR();
 
-	SBB_CLEAR(MG_TEXT_SB);
+	SBB_CLEAR(MG_PAUSE_SBB);
 	SBB_CLEAR(MG_CITY_SB);
 	SBB_CLEAR(MG_CLOUD_SB);
 	SBB_CLEAR(MG_BUILDING_SB);

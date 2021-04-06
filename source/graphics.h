@@ -7,6 +7,9 @@
 #define OBJ_TILE_ALLC_SIZE 127
 #define BG_TILE_ALLC_SIZE 1024
 
+#define TILES_COUNT(x) (x / 64)
+#define TILE_COUNT(x) TILES_COUNT(x)
+
 void init_graphics();
 
 int allocate_obj_tile_idx(int size);
@@ -24,5 +27,8 @@ inline void cycle_palate(COLOR *target_pal, const int target_pal_start, const u1
 	}
 	*current_idx = WRAP(*current_idx + 1, 0, length - 1);
 }
+
+#define WATER_PAL_LENGTH 6
+extern const u16 _water_cycle[WATER_PAL_LENGTH];
 
 #endif

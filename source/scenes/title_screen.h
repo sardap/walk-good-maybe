@@ -10,24 +10,27 @@
 #define TS_TEXT_SSB 28
 #define TS_OPTION_SSB 30
 
-#define TS_PAL_WATER_START 4
-#define TS_PAL_WATER_LENGTH 6
-
 #define TS_PAL_LAVA_START 10
 #define TS_PAL_LAVA_LENGTH 3
 
 #define TS_ARROW_Y 115
 
+typedef enum ts_menu_enum
+{
+	TS_MENU_CITY,
+	TS_MENU_BEACH,
+	TS_MENU_CREDITS,
+	TS_MENU_SOUND_TEST
+} ts_menu_enum;
+
 typedef struct ts_menu_options_t
 {
-	const scene_t *scene;
+	ts_menu_enum type;
 	const unsigned short *map;
 	const uint mapLen;
 	const int lx, rx;
+	//Bad but cbf
 } ts_menu_options_t;
-
-#define TS_OPTIONS_LENGTH 3
-extern const ts_menu_options_t _options[TS_OPTIONS_LENGTH];
 
 extern const scene_t title_screen;
 

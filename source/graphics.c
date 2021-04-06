@@ -6,6 +6,8 @@
 #include "common.h"
 #include "debug.h"
 
+const u16 _water_cycle[] = {0x7FFF, 0x7FC6, 0x7B80, 0x7FD0, 0x7FB2, 0x7FD7};
+
 static byte _obj_tile_allc[OBJ_TILE_ALLC_SIZE];
 static byte _bg_tile_allc[BG_TILE_ALLC_SIZE];
 

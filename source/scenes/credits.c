@@ -206,7 +206,7 @@ static void show(void)
 		data->player,
 		ATTR0_SQUARE | ATTR0_8BPP,
 		ATTR1_SIZE_16,
-		ATTR2_ID(0) | ATTR2_PRIO(1));
+		ATTR2_ID(0) | ATTR2_PRIO(0));
 	data->player_x = (GBA_WIDTH / 2 - 8) * FIX_SCALE;
 	data->player_y = (GBA_HEIGHT / 2 - 8) * FIX_SCALE;
 	obj_set_pos(data->player, fx2int(data->player_x), fx2int(data->player_y));

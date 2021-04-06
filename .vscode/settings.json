@@ -76,7 +76,12 @@
 		"mm_types.h": "c",
 		"tonc_math.h": "c",
 		"tonc_input.h": "c",
-		"starrowred.h": "c"
+		"starrowred.h": "c",
+		"maingamebeachshared.h": "c",
+		"mgbeach.h": "c",
+		"tsbeachgametext.h": "c",
+		"tscitygametext.h": "c",
+		"titlescreenshared.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

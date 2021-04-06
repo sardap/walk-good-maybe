@@ -190,7 +190,28 @@ static void hide(void)
 	REG_DISPCNT = 0;
 }
 
-const scene_t game_intro = {
-	.show = show,
+static void show_city(void)
+{
+	mg_parm_t parm;
+	parm.mode = MG_MODE_CITY;
+	setMgParmters(parm);
+	show();
+}
+
+static void show_beach(void)
+{
+	mg_parm_t parm;
+	parm.mode = MG_MODE_BEACH;
+	setMgParmters(parm);
+	show();
+}
+
+const scene_t city_game_intro = {
+	.show = show_city,
+	.update = update,
+	.hide = hide};
+
+const scene_t beach_game_intro = {
+	.show = show_beach,
 	.update = update,
 	.hide = hide};

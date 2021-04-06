@@ -17,6 +17,8 @@
 #include "assets/building5TileSet.h"
 #include "assets/building6TileSet.h"
 
+#include "assets/mgBeachIsland00.h"
+
 //Maybe do Probability math here
 //enemy_chance, lava_chance, token_chance
 static t_spawn_info _building_0 = {80, 20, 70};
@@ -25,6 +27,8 @@ static t_spawn_info _building_2 = {80, 20, 70};
 static t_spawn_info _building_3 = {80, 20, 70};
 static t_spawn_info _building_4 = {80, 20, 70};
 static t_spawn_info _building_5 = {0, 0, 100};
+
+static t_spawn_info _island_00 = {80, 0, 70};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -35,6 +39,26 @@ static int _building_4_idx;
 static int _building_5_idx;
 static int _building_6_idx;
 
+static int _island_0_idx;
+
+static int _lowest_tile_idx;
+static int _highest_tile_idx;
+
+void init_gen()
+{
+	_lava_0_idx = 0;
+	_building_0_idx = 0;
+	_building_1_idx = 0;
+	_building_2_idx = 0;
+	_building_3_idx = 0;
+	_building_4_idx = 0;
+	_building_5_idx = 0;
+	_building_6_idx = 0;
+
+	_lowest_tile_idx = 21000000;
+	_highest_tile_idx = -21000000;
+}
+
 int get_lava_tile_offset()
 {
 	return _lava_0_idx / 2;
@@ -42,14 +66,13 @@ int get_lava_tile_offset()
 
 int get_buildings_tile_offset()
 {
-	//Issue this is fucked need to track which building is loaded first
-	return _building_0_idx / 2;
+	return _lowest_tile_idx;
 }
 
 int get_buildings_tile_offset_end()
 {
 	//Issue this is fucked need to track which building is loaded first
-	return (_building_5_idx / 2) + building5TileSetTilesLen / 64 - 1;
+	return _highest_tile_idx;
 }
 
 void load_lava_0(int cb)
@@ -182,10 +205,32 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	}
 }
 
+static void update_high_low_tile(int x, int count)
+{
+	x /= 2;
+
+	char str[50];
+	if (x < _lowest_tile_idx)
+	{
+		_lowest_tile_idx = x;
+		sprintf(str, "NL:%d", x);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+	}
+
+	if (x + count > _highest_tile_idx)
+	{
+		_highest_tile_idx = x + count;
+		sprintf(str, "NM:%d", x);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+	}
+}
+
 void load_building_0(int cb)
 {
 	_building_0_idx = allocate_bg_tile_idx(building0TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_0_idx], building0TileSetTiles + 32, building0TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_0_idx, TILES_COUNT(building0TileSetTilesLen) - 1);
 }
 
 void unload_building_0()
@@ -226,6 +271,8 @@ void load_building_1(int cb)
 {
 	_building_1_idx = allocate_bg_tile_idx(building1TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_1_idx], building1TileSetTiles + 32, building1TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_1_idx, TILES_COUNT(building1TileSetTilesLen) - 1);
 }
 
 void unload_building_1()
@@ -267,6 +314,8 @@ void load_building_2(int cb)
 {
 	_building_2_idx = allocate_bg_tile_idx(building2TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_2_idx], building2TileSetTiles + 32, building2TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_2_idx, TILES_COUNT(building3TileSetTilesLen) - 1);
 }
 
 void unload_building_2()
@@ -325,6 +374,8 @@ void load_building_3(int cb)
 {
 	_building_3_idx = allocate_bg_tile_idx(building3TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_3_idx], building3TileSetTiles + 32, building3TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_3_idx, TILES_COUNT(building3TileSetTilesLen) - 1);
 }
 
 void unload_building_3()
@@ -374,6 +425,8 @@ void load_building_4(int cb)
 {
 	_building_4_idx = allocate_bg_tile_idx(building4TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_4_idx], building4TileSetTiles + 32, building4TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_4_idx, TILES_COUNT(building4TileSetTilesLen) - 1);
 }
 
 void unload_building_4()
@@ -474,6 +527,8 @@ void load_building_5(int cb)
 {
 	_building_5_idx = allocate_bg_tile_idx(building5TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_5_idx], building5TileSetTiles + 32, building5TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_5_idx, TILES_COUNT(building5TileSetTilesLen) - 1);
 }
 
 void free_building_5()
@@ -526,6 +581,8 @@ void load_building_6(int cb)
 {
 	_building_6_idx = allocate_bg_tile_idx(building6TileSetTilesLen / 64 - 1);
 	dma3_cpy(&tile_mem[cb][_building_6_idx], building6TileSetTiles + 32, building6TileSetTilesLen - 64);
+
+	update_high_low_tile(_building_6_idx, TILES_COUNT(building6TileSetTilesLen) - 1);
 }
 
 void free_building_6()
@@ -545,7 +602,6 @@ int spawn_building_6(int start_x)
 	set_level_col(x_base, y + 1, BUILDING_6_BLANK + tile);
 
 	int width = 5;
-	int y_start = y;
 
 	//MIDDLE SECTION
 	for (int i = 1; i < width; ++i)
@@ -559,6 +615,42 @@ int spawn_building_6(int start_x)
 	x = level_wrap_x(x_base + width);
 	set_level_at(x, y, BUILDING_6_ANGLE_LEFT + tile);
 	set_level_col(x, y + 1, BUILDING_6_BLANK + tile);
+
+	return width;
+}
+
+void load_island_00(int cb)
+{
+	_island_0_idx = allocate_bg_tile_idx(TILE_COUNT(mgBeachIsland00TilesLen) - 1);
+	dma3_cpy(&tile_mem[cb][_island_0_idx], mgBeachIsland00Tiles + 32, mgBeachIsland00TilesLen - 64);
+
+	update_high_low_tile(_island_0_idx, TILE_COUNT(mgBeachIsland00TilesLen) - 1);
+}
+
+void free_island_00()
+{
+	free_bg_tile_idx(_island_0_idx, TILE_COUNT(mgBeachIsland00TilesLen) - 1);
+}
+
+int spawn_island_00(int start_x)
+{
+	int x_base = start_x;
+	int x;
+	int y = BEACH_ISLAND_Y_TILE_SPAWN;
+
+	int tile = _island_0_idx / 2;
+
+	int width = 10;
+
+	//MIDDLE SECTION
+	for (int i = 0; i < width; ++i)
+	{
+		x = level_wrap_x(x_base + i);
+		set_level_at(x, y, ISLAND_0_TOP + tile);
+		set_level_at(x, y + 1, ISLAND_0_MIDDLE + tile);
+	}
+
+	spawn_obstacles(start_x, width, y, &_island_00);
 
 	return width;
 }

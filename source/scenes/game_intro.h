@@ -32,6 +32,7 @@ typedef struct gi_data_t
 	int anime_cycle;
 } gi_data_t;
 
-extern const scene_t game_intro;
+extern const scene_t city_game_intro;
+extern const scene_t beach_game_intro;
 
 #endif

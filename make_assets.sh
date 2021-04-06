@@ -113,9 +113,9 @@ BG_OPTIONS="$BG_OPTIONS -m"						# Export map
 BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
-BG_OPTIONS="$BG_OPTIONS -O mainGameShared"		# Shared pallet name
+BG_OPTIONS="$BG_OPTIONS -O mainGameCityShared"	# Shared pallet name
 
-echo "Creating background tiles for main game / pal / map"
+echo "Creating background tiles for city main game / pal / map"
 grit \
 	$ASSETS/background/fog.png \
 	$ASSETS/background/backgroundCity.png \
@@ -128,7 +128,28 @@ grit \
 	$ASSETS/background/building6TileSet.png \
 	$ASSETS/background/lava0TileSet.png \
 	$ASSETS/background/buildingtileset.png \
-	$ASSETS/background/mgPause.png \
+	$ASSETS/background/mgPauseCity.png \
+	$BG_OPTIONS
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu16" 					# use short
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -O mainGameBeachShared"	# Shared pallet name
+
+echo "Creating background tiles for city main game / pal / map"
+grit \
+	$ASSETS/title_screen/tsEmpty.png \
+	$ASSETS/title_screen/tsWater.png \
+	$ASSETS/title_screen/tsLava.png \
+	$ASSETS/background/mgPauseBeach.png \
+	$ASSETS/background/mgBeach.png \
+	$ASSETS/background/mgBeachIsland00.png \
 	$BG_OPTIONS
 
 
@@ -151,7 +172,8 @@ grit \
 	$ASSETS/title_screen/tsLava.png \
 	$ASSETS/title_screen/tsCity.png \
 	$ASSETS/title_screen/tsBeach.png \
-	$ASSETS/title_screen/tsGameText.png \
+	$ASSETS/title_screen/tsBeachGameText.png \
+	$ASSETS/title_screen/tsCityGameText.png \
 	$ASSETS/title_screen/tsTitleText.png \
 	$ASSETS/title_screen/tsCredits.png \
 	$ASSETS/title_screen/tsSoundTestText.png \

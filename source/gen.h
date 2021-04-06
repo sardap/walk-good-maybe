@@ -2,9 +2,14 @@
 #define GEN_H
 
 #define BUILDING_Y_SPAWN 136
-#define CITY_BUILDING_Y_TILE_SPAWN BUILDING_Y_SPAWN / 8
+#define CITY_BUILDING_Y_TILE_SPAWN (BUILDING_Y_SPAWN / 8)
+
+#define BEACH_Y_SPAWN 144
+#define BEACH_ISLAND_Y_TILE_SPAWN (BEACH_Y_SPAWN / 8)
+
 #define MAX_JUMP_WIDTH_TILES 7
 #define MIN_JUMP_WIDTH_TILES 4
+
 // BUILDING 0
 #define BUILDING_0_BRICK 0
 #define BUILDING_0_WINDOW BUILDING_0_BRICK + 1
@@ -104,6 +109,19 @@
 #define LAVA_TILE_RIGHT LAVA_OFFSET + 2
 #define LAVA_TILE_END LAVA_TILE_RIGHT
 
+/**
+ *
+ * Islands
+ * 
+ */
+
+//Island 1
+#define ISLAND_0_OFFSET 0
+
+#define ISLAND_0_BOTTOM (ISLAND_0_OFFSET + 0)
+#define ISLAND_0_MIDDLE (ISLAND_0_OFFSET + 1)
+#define ISLAND_0_TOP (ISLAND_0_OFFSET + 2)
+
 typedef struct t_spawn_info
 {
 	int enemy_chance;
@@ -111,11 +129,14 @@ typedef struct t_spawn_info
 	int token_chance;
 } t_spawn_info;
 
+void init_gen();
+
 int get_lava_tile_offset();
 int get_buildings_tile_offset();
 int get_buildings_tile_offset_end();
 
 void load_lava_0(int cb);
+
 void unload_lava_0();
 
 void load_building_0(int cb);
@@ -145,5 +166,9 @@ int spawn_building_5(int start_x);
 void load_building_6(int cb);
 void free_building_6();
 int spawn_building_6(int start_x);
+
+void load_island_00(int cb);
+void free_island_00();
+int spawn_island_00(int start_x);
 
 #endif

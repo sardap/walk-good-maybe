@@ -34,20 +34,26 @@ func makeAssets() {
 		fmt.Printf("error running make assets %v\n", err)
 		panic(err)
 	}
-
-	fmt.Println(stdBuffer.String())
 }
 
 func runMake(arg string) {
 	fmt.Printf("running make\n")
 	cmd := exec.Command("make", arg)
-	out, err := cmd.CombinedOutput()
+
+	var stdBuffer bytes.Buffer
+	mw := io.MultiWriter(os.Stdout, &stdBuffer)
+
+	stdIn, _ := cmd.StdinPipe()
+	stdIn.Write([]byte("y"))
+	stdIn.Close()
+
+	cmd.Stdout = mw
+
+	err := cmd.Run()
 	if err != nil {
 		fmt.Printf("error running make %v\n", err)
-		fmt.Printf("out %s", out)
 		os.Exit(2)
 	}
-	fmt.Printf("%s", out)
 }
 
 func latestModify(path string) time.Time {

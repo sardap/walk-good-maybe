@@ -13,6 +13,7 @@ assets/obstacles/*.png
 assets/game_intro/*.png
 assets/title_screen/*.png
 assets/credits/*.png
+assets/sound_test/*.png
 
 assets/out.png
 __debug_bin

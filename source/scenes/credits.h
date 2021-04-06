@@ -14,6 +14,9 @@
 #define CR_TEXT_SCROLL_SPEED (0.5 * FIX_SCALE)
 #define CR_FADE_TIME 80
 #define CR_PAUSE_TIME 120
+#define CR_OBJ_COUNT 128
+
+#define CR_SKY_START_PAL 120
 
 extern const scene_t credits_screen;
 
@@ -41,11 +44,15 @@ typedef enum cr_states_t
 typedef struct cr_data_t
 {
 	OBJ_ATTR text_objs[128];
+	OBJ_ATTR *player;
+	int player_anime_cycle;
+	FIXED player_x, player_y;
 	int active_idx;
 	cr_active_credit_t active;
 	cr_states_t state;
 	int countdown;
 	FIXED eva, evb;
+	int star_pal_idx;
 } cr_data_t;
 
 #endif

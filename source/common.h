@@ -48,7 +48,8 @@ inline int gba_rand_range(int min, int max)
 void init_score();
 void clear_score();
 
-void add_score(FIXED x);
-FIXED get_score();
+//NOT FIXED int
+void add_score(int x);
+int get_score();
 
 #endif

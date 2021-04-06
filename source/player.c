@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <maxmod.h>
 
-#include "soundbank.h"
-#include "soundbank_bin.h"
 #include "common.h"
 #include "ent.h"
 #include "debug.h"
@@ -38,62 +36,6 @@ static const uint *walk_anime_cycle[] = {
 	whale_walk_3Tiles,
 	whale_walk_4Tiles,
 	whale_smallTiles,
-};
-
-static mm_sound_effect player_shoot_sound = {
-	{SFX_BY_LASER_4},
-	(int)(1.0f * (1 << 10)),
-	PLAYER_ACTION_SOUND_HANDLER,
-	120,
-	127,
-};
-
-static mm_sound_effect player_jump_sound = {
-	{SFX_BY_JUMP_2},
-	(int)(1.0f * (1 << 10)),
-	PLAYER_ACTION_SOUND_HANDLER,
-	120,
-	127,
-};
-
-static mm_sound_effect player_land_sound = {
-	{SFX_BY_BONK_1},
-	(int)(1.0f * (1 << 10)),
-	PLAYER_ACTION_SOUND_HANDLER,
-	120,
-	127,
-};
-
-static mm_sound_effect player_walk_sound = {
-	{SFX_H6_FEET_27},
-	(int)(1.0f * (1 << 10)),
-	PLAYER_WALK_SOUND_HANDLER,
-	70,
-	127,
-};
-
-static mm_sound_effect player_flap_sound = {
-	{SFX_FLAP_0},
-	(int)(1.0f * (1 << 10)),
-	PLAYER_WALK_SOUND_HANDLER,
-	70,
-	127,
-};
-
-static mm_sound_effect shrink_sound = {
-	{SFX_BY_R_COLLECT_7},
-	(int)(1.0f * (1 << 10)),
-	TOKEN_SOUND_HANDLER,
-	120,
-	127,
-};
-
-static mm_sound_effect grow_sound = {
-	{SFX_BY_COLLECT_7},
-	(int)(1.0f * (1 << 10)),
-	TOKEN_SOUND_HANDLER,
-	120,
-	127,
 };
 
 static int _player_anime_cycle;
@@ -162,14 +104,7 @@ static void apply_player_damage(int ammount)
 	_player_life -= ammount;
 
 	//Play sound
-	mm_sound_effect damage = {
-		{SFX_WHALE_DAMGE},
-		(int)(1.0f * (1 << 10)),
-		0,
-		120,
-		127,
-	};
-	mmEffectEx(&damage);
+	mmEffectEx(&_player_damage);
 
 	//Setup moasic effect
 	_player_mos.x = 32;
@@ -182,7 +117,7 @@ static void apply_player_damage(int ammount)
 static void player_shoot()
 {
 	//Play sound
-	mmEffectEx(&player_shoot_sound);
+	mmEffectEx(&_player_shoot_sound);
 
 	FIXED vx, x;
 	if (_facing == FACING_RIGHT)
@@ -300,12 +235,12 @@ void update_player()
 			char str[50];
 			sprintf(str, "%.2f", fx2float(_player.vy));
 			write_to_log(LOG_LEVEL_DEBUG, str);
-			mmEffectEx(&player_flap_sound);
+			mmEffectEx(&_player_flap_sound);
 		}
 		//Walking sound
 		else if (_player.vx > 0 || _player.vx < -_scroll_x)
 		{
-			mmEffectEx(&player_walk_sound);
+			mmEffectEx(&_player_walk_sound);
 		}
 	}
 
@@ -370,7 +305,7 @@ void update_player()
 	if (_player.ent_cols & (TYPE_SHRINK_TOKEN))
 	{
 		if (!_shrinking)
-			mmEffectEx(&shrink_sound);
+			mmEffectEx(&_player_shrink_sound);
 
 		_shrinking = PLAYER_SHRINKING_TIME;
 	}
@@ -383,7 +318,7 @@ void update_player()
 		--_shrinking;
 		if (_shrinking <= 0)
 		{
-			mmEffectEx(&grow_sound);
+			mmEffectEx(&_player_grow_sound);
 			_shrinking = 0;
 		}
 	}
@@ -412,7 +347,7 @@ void update_player()
 		{
 			_player_anime_cycle = PLAYER_JUMP_TIME;
 			mmEffectCancel(PLAYER_WALK_SOUND_HANDLER);
-			mmEffectEx(&player_jump_sound);
+			mmEffectEx(&_player_jump_sound);
 			_move_state = MOVEMENT_JUMPING;
 		}
 		break;
@@ -439,7 +374,7 @@ void update_player()
 	case MOVEMENT_AIR:
 		if (hit_y)
 		{
-			mmEffectEx(&player_land_sound);
+			mmEffectEx(&_player_land_sound);
 			_move_state = MOVEMENT_LANDED;
 			_player_anime_cycle = PLAYER_LAND_TIME;
 		}

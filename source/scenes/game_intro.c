@@ -11,6 +11,7 @@
 #include "../graphics.h"
 #include "../debug.h"
 #include "../anime.h"
+#include "../sound.h"
 
 #include "../assets/ready.h"
 #include "../assets/set.h"
@@ -123,14 +124,7 @@ static void show(void)
 	//Start sound
 	_data->state = GI_S_READY;
 
-	mm_sound_effect ready_sound = {
-		{SFX_READY_0},
-		(int)(1.0f * (1 << 10)),
-		GI_INTRO_HANDLER,
-		120,
-		127,
-	};
-	mmEffectEx(&ready_sound);
+	mmEffectEx(&_ready_sound);
 
 	_data->countdown = GI_STARTING_COUNTDOWN;
 	_data->whale_scale = GI_WHALE_START_SCALE;
@@ -167,14 +161,7 @@ static void update(void)
 		if (mmEffectActive(GI_INTRO_HANDLER))
 			return;
 
-		mm_sound_effect set_sound = {
-			{SFX_SET_0},
-			(int)(1.0f * (1 << 10)),
-			GI_INTRO_HANDLER,
-			120,
-			127,
-		};
-		mmEffectEx(&set_sound);
+		mmEffectEx(&_set_sound);
 		_data->state = GI_S_SET;
 		GRIT_CPY(&se_mem[GI_TEXT_SSB], setMap);
 		break;
@@ -185,14 +172,7 @@ static void update(void)
 			return;
 
 		GRIT_CPY(&se_mem[GI_TEXT_SSB], goMap);
-		mm_sound_effect go_sound = {
-			{SFX_GO_0},
-			(int)(1.0f * (1 << 10)),
-			GI_INTRO_HANDLER,
-			120,
-			127,
-		};
-		mmEffectEx(&go_sound);
+		mmEffectEx(&_go_sound);
 		mmSetModuleVolume(300);
 		mmStart(MOD_INTRO, MM_PLAY_ONCE);
 		_data->state = GI_S_GO;
@@ -210,7 +190,28 @@ static void hide(void)
 	REG_DISPCNT = 0;
 }
 
-const scene_t game_intro = {
-	.show = show,
+static void show_city(void)
+{
+	mg_parm_t parm;
+	parm.mode = MG_MODE_CITY;
+	setMgParmters(parm);
+	show();
+}
+
+static void show_beach(void)
+{
+	mg_parm_t parm;
+	parm.mode = MG_MODE_BEACH;
+	setMgParmters(parm);
+	show();
+}
+
+const scene_t city_game_intro = {
+	.show = show_city,
+	.update = update,
+	.hide = hide};
+
+const scene_t beach_game_intro = {
+	.show = show_beach,
 	.update = update,
 	.hide = hide};

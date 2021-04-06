@@ -4,25 +4,31 @@
 
 #include "game_intro.h"
 #include "credits.h"
+#include "sound_test.h"
+#include "main_game.h"
 #include "../debug.h"
+#include "../graphics.h"
 
 #include "../assets/titleScreenShared.h"
 #include "../assets/tsCity.h"
 #include "../assets/tsBeach.h"
 #include "../assets/tsTitleText.h"
 #include "../assets/tsLava.h"
-#include "../assets/tsGameText.h"
 #include "../assets/tsCredits.h"
 #include "../assets/tsArrow.h"
 #include "../assets/tsArrowRed.h"
 #include "../assets/tsSpirteShared.h"
+#include "../assets/tsSoundTestText.h"
+#include "../assets/tsBeachGameText.h"
+#include "../assets/tsCityGameText.h"
 
-const ts_menu_options_t _options[] = {
-	{&game_intro, tsGameTextMap, tsGameTextMapLen, 51, 160},
-	{&credits_screen, tsCreditsMap, tsCreditsMapLen, 23, 190},
-};
+static const int _options_length = 4;
+static const ts_menu_options_t _options[] = {
+	{TS_MENU_CITY, tsCityGameTextMap, tsCityGameTextMapLen, 51, 160},
+	{TS_MENU_BEACH, tsBeachGameTextMap, tsBeachGameTextMapLen, 43, 167},
+	{TS_MENU_CREDITS, tsCreditsMap, tsCreditsMapLen, 23, 185},
+	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175}};
 
-static const u16 water_cycle[] = {0x7FFF, 0x7FC6, 0x7B80, 0x7FD0, 0x7FB2, 0x7FD7};
 static const u16 lava_cycle[] = {0x11D9, 0x1E3C, 0x20FF};
 
 static FIXED _bkg_x;
@@ -117,7 +123,7 @@ static void update(void)
 
 	if (key_hit(KEY_LEFT) || key_hit(KEY_RIGHT))
 	{
-		_active_opt_idx = wrap(_active_opt_idx + key_tri_horz(), 0, TS_OPTIONS_LENGTH);
+		_active_opt_idx = wrap(_active_opt_idx + key_tri_horz(), 0, _options_length);
 		//Copy active menu item into OPTION SBB
 		memcpy16(
 			&se_mem[TS_OPTION_SSB],
@@ -147,31 +153,39 @@ static void update(void)
 	if (key_hit(KEY_A))
 	{
 		for (int i = 0; i < frame_count(); i++)
-		{
 			qran();
-		}
 
-		scene_set(*_options[_active_opt_idx].scene);
+		switch (_options[_active_opt_idx].type)
+		{
+		case TS_MENU_CITY:
+			scene_set(city_game_intro);
+			break;
+		case TS_MENU_BEACH:
+			scene_set(beach_game_intro);
+			break;
+		case TS_MENU_CREDITS:
+			scene_set(credits_screen);
+			break;
+		case TS_MENU_SOUND_TEST:
+			scene_set(sound_test_scene);
+			break;
+		}
 	}
 
 	if (frame_count() % 25 == 0)
 	{
-		for (int i = 0; i < TS_PAL_WATER_LENGTH; i++)
-		{
-			int pal_idx = wrap(_water_pal_idx + i, 0, TS_PAL_WATER_LENGTH - 1);
-			pal_bg_mem[TS_PAL_WATER_START + i] = water_cycle[pal_idx];
-		}
-		_water_pal_idx = wrap(_water_pal_idx + 1, 0, TS_PAL_WATER_LENGTH - 1);
+		cycle_palate(
+			pal_bg_mem,
+			4, _water_cycle,
+			&_water_pal_idx, WATER_PAL_LENGTH);
 	}
 
 	if (frame_count() % 35 == 0)
 	{
-		for (int i = 0; i < TS_PAL_LAVA_LENGTH; i++)
-		{
-			int pal_idx = wrap(_lava_pal_idx + i, 0, TS_PAL_LAVA_LENGTH - 1);
-			pal_bg_mem[TS_PAL_LAVA_START + i] = lava_cycle[pal_idx];
-		}
-		_lava_pal_idx = wrap(_lava_pal_idx + 1, 0, TS_PAL_LAVA_LENGTH - 1);
+		cycle_palate(
+			pal_bg_mem,
+			TS_PAL_LAVA_START, lava_cycle,
+			&_lava_pal_idx, TS_PAL_LAVA_LENGTH);
 	}
 
 	obj_copy(oam_mem, _arrow_objs, 2);

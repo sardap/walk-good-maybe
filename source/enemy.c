@@ -2,8 +2,6 @@
 
 #include <tonc.h>
 #include <maxmod.h>
-#include "soundbank.h"
-#include "soundbank_bin.h"
 
 #include "common.h"
 #include "anime.h"
@@ -68,30 +66,6 @@ const uint *enemy_biscut_ufo_death_cycle[] = {
 	enemyBiscutUFODeath05Tiles,
 };
 
-static mm_sound_effect enemy_biscut_damage = {
-	{SFX_PD_ENEMY_0_DEATH_0},
-	(int)(1.0f * (1 << 10)),
-	ENEMY_SOUND_HANDLER,
-	120,
-	127,
-};
-
-static mm_sound_effect enemy_ufo_damge = {
-	{SFX_ENEMY_BISCUT_UFO_DEATH_0},
-	(int)(1.0f * (1 << 10)),
-	ENEMY_SOUND_HANDLER,
-	120,
-	127,
-};
-
-static mm_sound_effect enemy_shoot = {
-	{SFX_BY_GUN_4},
-	(int)(1.0f * (1 << 10)),
-	ENEMY_SOUND_HANDLER,
-	50,
-	127,
-};
-
 static int _enemy_bullet_0_tile_idx;
 
 void load_enemy_bullets_tiles()
@@ -136,8 +110,10 @@ void update_enemy_biscut(ent_t *ent)
 	{
 		if (ent->ent_cols & (TYPE_BULLET))
 		{
+			add_score(ENEMY_BISCUT_SCORE);
+
 			//Play sound
-			mmEffectEx(&enemy_biscut_damage);
+			mmEffectEx(&_enemy_biscut_damage);
 
 			visual_ent_t *visual_ent = allocate_visual_ent();
 			create_enemy_biscut_death(
@@ -259,8 +235,10 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 
 	if (ent->x + int2fx(ent->w) < 0 || ent->ent_cols & (TYPE_BULLET))
 	{
+		add_score(ENEMY_UFO_BISCUT_SCORE);
+
 		//Play death sound
-		mmEffectEx(&enemy_ufo_damge);
+		mmEffectEx(&_enemy_ufo_damge);
 
 		free_obj_tile_idx(ent->ebu_tile_id, 4);
 		free_ent(ent);
@@ -281,7 +259,7 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 			bul_ent, ent->x + 6 * FIX_SCALE,
 			ent->y + 16 * FIX_SCALE, 0, 0.5 * FIX_SCALE);
 
-		mmEffectEx(&enemy_shoot);
+		mmEffectEx(&_enemy_shoot);
 	}
 
 	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));

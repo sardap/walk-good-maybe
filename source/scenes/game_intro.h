@@ -7,7 +7,6 @@
 #define GI_COOL_BACKGROUND_SSB 8
 #define GI_TEXT_SSB 24
 #define GI_SKY_SSB 26
-#define GI_INTRO_HANDLER (mm_sfxhand)1
 #define GI_M7_D 128
 #define GI_STARTING_COUNTDOWN 1.65 * 60
 //1.65 seconds 60 frames per second
@@ -33,6 +32,7 @@ typedef struct gi_data_t
 	int anime_cycle;
 } gi_data_t;
 
-extern const scene_t game_intro;
+extern const scene_t city_game_intro;
+extern const scene_t beach_game_intro;
 
 #endif

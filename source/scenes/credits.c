@@ -8,6 +8,8 @@
 #include "scene_shared.h"
 
 #include "../debug.h"
+#include "../anime.h"
+#include "../graphics.h"
 
 #include "../assets/crPaulFace.h"
 #include "../assets/crSpace.h"
@@ -19,6 +21,17 @@
 #include "../assets/crRealBuildings.h"
 #include "../assets/crTunaPasta.h"
 #include "../assets/crEmpty.h"
+#include "../assets/whale_air_0.h"
+#include "../assets/whale_air_1.h"
+#include "../assets/whale_air_2.h"
+#include "../assets/spriteShared.h"
+
+static const int whale_air_anime_count = 3;
+static const uint *whale_air_anime[] = {
+	whale_air_0Tiles, whale_air_1Tiles, whale_air_2Tiles};
+
+static const int star_pal_cycle_length = 4;
+static const u16 star_pal_cycle[] = {0x77bd, 0x77ff, 0x7bff, 0x7fff};
 
 static const int creditsCount = 8;
 static const cr_credit_t credits[] = {
@@ -132,7 +145,7 @@ static void show(void)
 	irq_add(II_VBLANK, mmVBlank);
 
 	/* Load palettes */
-	GRIT_CPY(pal_bg_mem + 120, crSpacePal);
+	GRIT_CPY(pal_bg_mem + CR_SKY_START_PAL, crSpacePal);
 	/* Load background tiles into CR_SHARED_CB Note the image background is loaded on the fly */
 	//Space
 	//Fuckyness since we don't have a combined pallete
@@ -160,7 +173,7 @@ static void show(void)
 	REG_BG2CNT = BG_PRIO(2) | BG_SBB(CR_TEXT_SBB) | BG_CBB(CR_SHARED_CB) | BG_REG_32x32;
 
 	//Display Reg
-	REG_DISPCNT = DCNT_OBJ | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
+	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
 	REG_BLDCNT = BLD_BUILD(
 		BLD_BG1, // Top layers
@@ -182,11 +195,23 @@ static void show(void)
 
 	load_next_credit();
 
-	for (int i = 0; i < 128; i++)
-	{
-		data->text_objs[i].attr0 = ATTR0_HIDE;
-	}
+	//init objects
+	obj_hide_multi(data->text_objs, CR_OBJ_COUNT);
 
+	data->player = &data->text_objs[CR_OBJ_COUNT - 1];
+
+	GRIT_CPY(pal_obj_mem, spriteSharedPal);
+	GRIT_CPY(tile_mem[4], whale_air_0Tiles);
+	obj_set_attr(
+		data->player,
+		ATTR0_SQUARE | ATTR0_8BPP,
+		ATTR1_SIZE_16,
+		ATTR2_ID(0) | ATTR2_PRIO(0));
+	data->player_x = (GBA_WIDTH / 2 - 8) * FIX_SCALE;
+	data->player_y = (GBA_HEIGHT / 2 - 8) * FIX_SCALE;
+	obj_set_pos(data->player, fx2int(data->player_x), fx2int(data->player_y));
+
+	//Setup blending
 	data->eva = 3 * FIX_SCALE;
 	data->evb = 124 * FIX_SCALE;
 
@@ -223,14 +248,17 @@ static void update(void)
 	REG_BLDALPHA = BLDA_BUILD(fx2int(data->eva) / 8, fx2int(data->evb) / 8);
 	REG_BLDY = BLDY_BUILD(0);
 
+	if (key_hit(KEY_START) || key_hit(KEY_B))
+		scene_set(title_screen);
+
 	FIXED step;
 	switch (data->state)
 	{
 	case CR_STATE_SCROLLING_UP:
 		data->active.y -= CR_TEXT_SCROLL_SPEED;
 
-		step = fxdiv(124, CR_FADE_TIME);
-		data->evb = clamp(data->evb - step, 3 * FIX_SCALE, 124 * FIX_SCALE);
+		step = fxdiv(130, CR_FADE_TIME);
+		data->evb = clamp(data->evb - step, 0, 124 * FIX_SCALE);
 
 		if (fx2int(data->active.y) < GBA_HEIGHT / 4)
 		{
@@ -240,8 +268,8 @@ static void update(void)
 		break;
 	case CR_STATE_PAUSE:
 		--data->countdown;
-		step = fxdiv(124, CR_PAUSE_TIME);
-		data->eva = clamp(data->eva + step, 3 * FIX_SCALE, 124 * FIX_SCALE);
+		step = fxdiv(130, CR_PAUSE_TIME);
+		data->eva = clamp(data->eva + step, 0, 124 * FIX_SCALE);
 
 		if (data->countdown <= 0)
 		{
@@ -266,10 +294,10 @@ static void update(void)
 
 		if (data->countdown < 0)
 		{
-			step = fxdiv(124, CR_FADE_TIME);
-			data->evb = clamp(data->evb + step, 3 * FIX_SCALE, 124 * FIX_SCALE);
-			step = fxdiv(124, CR_FADE_TIME);
-			data->eva = clamp(data->eva - step, 3 * FIX_SCALE, 124 * FIX_SCALE);
+			step = fxdiv(130, CR_FADE_TIME);
+			data->evb = clamp(data->evb + step, 0, 124 * FIX_SCALE);
+			step = fxdiv(130, CR_FADE_TIME);
+			data->eva = clamp(data->eva - step, 0, 124 * FIX_SCALE);
 		}
 
 		if (compelte)
@@ -283,18 +311,49 @@ static void update(void)
 	}
 	}
 
+	//Cycle star colours
+	if (frame_count() % 35 == 0)
+	{
+		cycle_palate(
+			pal_bg_mem,
+			CR_SKY_START_PAL + 2, star_pal_cycle,
+			&data->star_pal_idx, star_pal_cycle_length);
+	}
+
+	//Player movement
+	if (frame_count() % 4 == 0)
+	{
+		step_anime(
+			&data->player_anime_cycle, whale_air_anime,
+			whale_air_anime_count,
+			0, whale_air_0TilesLen);
+	}
+
+	if (key_hit(KEY_LEFT))
+		data->player->attr1 = ATTR1_SIZE_16 | ATTR1_HFLIP;
+	else if (key_hit(KEY_RIGHT))
+		data->player->attr1 = ATTR1_SIZE_16;
+
+	data->player_x = wrap(data->player_x + int2fx(key_tri_horz()), -16 * FIX_SCALE, GBA_WIDTH * FIX_SCALE);
+	data->player_y = wrap(data->player_y + int2fx(key_tri_vert()), -16 * FIX_SCALE, GBA_HEIGHT * FIX_SCALE);
+	obj_set_pos(data->player, fx2int(data->player_x), fx2int(data->player_y));
+
 	//Draws text
 	obj_puts2(
 		fx2int(data->active.x), fx2int(data->active.y),
 		data->active.crd->str, 0xF200, data->text_objs);
-	oam_copy(oam_mem, data->text_objs, 128);
+	oam_copy(oam_mem, data->text_objs, CR_OBJ_COUNT);
 }
 
 static void hide(void)
 {
+	REG_BLDCNT = 0;
+
 	mmStop();
 
-	OAM_CLEAR();
+	//init objects
+	obj_hide_multi(data->text_objs, CR_OBJ_COUNT);
+	oam_copy(oam_mem, data->text_objs, CR_OBJ_COUNT);
 }
 
 const scene_t credits_screen = {

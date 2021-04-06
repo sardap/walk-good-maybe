@@ -6,6 +6,8 @@
 #include "common.h"
 #include "debug.h"
 
+const u16 _water_cycle[] = {0x7FFF, 0x7FC6, 0x7B80, 0x7FD0, 0x7FB2, 0x7FD7};
+
 static byte _obj_tile_allc[OBJ_TILE_ALLC_SIZE];
 static byte _bg_tile_allc[BG_TILE_ALLC_SIZE];
 
@@ -92,46 +94,4 @@ int allocate_bg_tile_idx(int size)
 void free_bg_tile_idx(int idx, int size)
 {
 	free_tile_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, idx, size);
-}
-
-static inline int calc_address(int width, int x, int y)
-{
-	return width * y + x;
-}
-
-bool valid_cloud_address(int tile_offset, int sb, int width, int x, int y)
-{
-	int address = calc_address(width, x, y);
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (se_mem[sb][address + i] != tile_offset)
-		{
-			return false;
-		}
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		if (se_mem[sb][address + 32 + i] != tile_offset)
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void create_cloud(int tile_offset, int sb, int width, int x, int y)
-{
-	int address = calc_address(width, x, y);
-
-	se_mem[sb][address + 0] = tile_offset + 0x1;
-	se_mem[sb][address + 1] = tile_offset + 0x2;
-	se_mem[sb][address + 2] = tile_offset + 0x3;
-	se_mem[sb][address + 3] = tile_offset + 0x4;
-	se_mem[sb][address + 32] = tile_offset + 0x5;
-	se_mem[sb][address + 33] = tile_offset + 0x6;
-	se_mem[sb][address + 34] = tile_offset + 0x7;
-	se_mem[sb][address + 35] = tile_offset + 0x8;
 }

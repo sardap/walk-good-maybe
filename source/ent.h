@@ -4,6 +4,7 @@
 #include "level.h"
 
 #include <tonc_types.h>
+#include <tonc_math.h>
 
 #ifdef ISMAIN
 #define def
@@ -49,6 +50,7 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
 	TYPE_VISUAL_SPEED_LEVEL = 6,
 	TYPE_VISUAL_JUMP_LEVEL = 7,
+	TYPE_VISUAL_SPLASH = 8,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -127,6 +129,12 @@ typedef struct visual_ent_t
 		{
 			int eb_tile_idx;
 			int eb_anime_cycle;
+		};
+		//Splash
+		struct
+		{
+			int sp_tile_idx;
+			int sp_anime_cycle;
 		};
 	};
 } visual_ent_t;

@@ -56,6 +56,9 @@ add_objects "./assets/enemy"
 gen_png "./assets/obstacles"
 add_objects "./assets/obstacles"
 
+gen_png "./assets/effects"
+add_objects "./assets/effects"
+
 gen_png "./assets/game_intro"
 
 gen_png "./assets/title_screen"
@@ -142,13 +145,14 @@ BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
 BG_OPTIONS="$BG_OPTIONS -O mainGameBeachShared"	# Shared pallet name
 
-echo "Creating background tiles for city main game / pal / map"
+echo "Creating background tiles for beach main game / pal / map"
 grit \
 	$ASSETS/title_screen/tsEmpty.png \
 	$ASSETS/title_screen/tsWater.png \
 	$ASSETS/title_screen/tsLava.png \
 	$ASSETS/background/mgPauseBeach.png \
 	$ASSETS/background/mgBeach.png \
+	$ASSETS/background/mgBeachWaterFog.png \
 	$ASSETS/background/mgBeachIsland00.png \
 	$BG_OPTIONS
 

@@ -37,12 +37,14 @@ typedef struct mg_data_t
 	int bg_2_scroll;
 
 	int water_pal_idx;
-	
+
 	int far_tiles_idx;
 
 	mg_states_t state;
 	mg_states_t old_state;
 	mg_mode_t mode;
+
+	int splash_active;
 } mg_data_t;
 
 typedef struct mg_parm_t

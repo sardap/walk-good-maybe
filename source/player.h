@@ -23,6 +23,8 @@
 
 #define PLAYER_SHRINK_STEP ((PLAYER_SHRINK_SIZE)*FIX_SCALE) / (48 * FIX_SCALE)
 
+#define PLAYER_PRIO (2)
+
 extern ent_t _player;
 
 void init_player();

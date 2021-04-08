@@ -48,6 +48,7 @@ func runMake(arg string) {
 	stdIn.Close()
 
 	cmd.Stdout = mw
+	cmd.Stderr = mw
 
 	err := cmd.Run()
 	if err != nil {

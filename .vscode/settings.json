@@ -81,7 +81,13 @@
 		"mgbeach.h": "c",
 		"tsbeachgametext.h": "c",
 		"tscitygametext.h": "c",
-		"titlescreenshared.h": "c"
+		"titlescreenshared.h": "c",
+		"ui_display.h": "c",
+		"mgpausecity.h": "c",
+		"mgbeachwaterfog.h": "c",
+		"effect.h": "c",
+		"exsplash.h": "c",
+		"exsplash01.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

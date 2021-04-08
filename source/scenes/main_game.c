@@ -19,6 +19,7 @@
 #include "../ui_display.h"
 #include "../gen.h"
 #include "../obstacles.h"
+#include "../effect.h"
 
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
@@ -28,6 +29,7 @@
 #include "../assets/mgBeach.h"
 #include "../assets/mgPauseBeach.h"
 #include "../assets/mgPauseCity.h"
+#include "../assets/mgBeachWaterFog.h"
 
 static mg_parm_t _parm;
 static mg_data_t *_data = &_shared_data.mg;
@@ -202,6 +204,9 @@ static void show(void)
 		_data->far_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->far_tiles_idx], mgBeachTiles);
 
+		fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachWaterFogTilesLen));
+		GRIT_CPY(&tile_mem[MG_SHARED_CB][fog_tiles_idx], mgBeachWaterFogTiles);
+
 		pause_tile_offset = allocate_bg_tile_idx(TILES_COUNT(mgPauseBeachTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][pause_tile_offset], mgPauseBeachTiles);
 		break;
@@ -235,7 +240,12 @@ static void show(void)
 	case MG_MODE_BEACH:
 		GRIT_CPY(se_mem[MG_FAR_SB], mgBeachMap);
 
-		se_fill(se_mem[MG_CLOUD_SB], 0);
+		//Fog
+		GRIT_CPY(se_mem[MG_CLOUD_SB], mgBeachWaterFogMap);
+		//TODO: stop this double iteration bullshit
+		for (int i = 0; i < mgBeachWaterFogMapLen; i++)
+			se_mem[MG_CLOUD_SB][i] += fog_tiles_idx / 2;
+
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
 	}
@@ -253,10 +263,24 @@ static void show(void)
 	REG_BG3HOFS = 0;
 	REG_BG3VOFS = 0;
 
+	int bg1Prio = 0;
+	int bg2Prio = 0;
+	switch (_data->mode)
+	{
+	case MG_MODE_BEACH:
+		bg1Prio = 2;
+		bg2Prio = 1;
+		break;
+	case MG_MODE_CITY:
+		bg1Prio = 1;
+		bg2Prio = 2;
+		break;
+	}
+
 	// Set bkg reg
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_FAR_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
-	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(MG_PLATFROM_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
-	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
+	REG_BG1CNT = BG_PRIO(bg1Prio) | BG_8BPP | BG_SBB(MG_PLATFROM_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
+	REG_BG2CNT = BG_PRIO(bg2Prio) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_PAUSE_SBB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
@@ -287,6 +311,7 @@ static void show(void)
 	_data->building_spawn_x = 0;
 	_data->state = MG_S_STARTING;
 	_data->water_pal_idx = 0;
+	_data->splash_active = 0;
 
 	init_level();
 
@@ -429,6 +454,19 @@ static void update(void)
 	update_ents();
 	update_visual_ents();
 	copy_ents_to_oam();
+
+	//Player visual effect
+	if (_data->splash_active > 0)
+		_data->splash_active--;
+
+	if (
+		_data->mode == MG_MODE_BEACH &&
+		_data->splash_active <= 0 &&
+		_player.y + int2fx(_player.h) > (BEACH_Y_SPAWN + 3) * FIX_SCALE)
+	{
+		create_splash_effect(allocate_visual_ent(), _player.x - 16, _player.y);
+		_data->splash_active = 60;
+	}
 
 	switch (_data->state)
 	{

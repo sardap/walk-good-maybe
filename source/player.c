@@ -80,7 +80,7 @@ void init_player()
 
 	_player.att.attr0 = ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF;
 	_player.att.attr1 = ATTR1_SIZE_16;
-	_player.att.attr2 = ATTR2_PALBANK(0) | ATTR2_ID(_tile_start_idx);
+	_player.att.attr2 = ATTR2_PRIO(PLAYER_PRIO) | ATTR2_ID(_tile_start_idx);
 	obj_aff_identity(&_player.aff);
 
 	_facing = FACING_RIGHT;

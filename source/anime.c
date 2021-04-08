@@ -22,14 +22,14 @@ void step_anime_bad(
 	}
 }
 
-bool step_anime(
-	int *cycle,
+bool step_cb_anime(
+	int cb, int *cycle,
 	const unsigned int *anime[], int count,
 	int tile_idx, int tile_len)
 {
 	//Copy current frame into tile mem
 	dma3_cpy(
-		&tile_mem[4][tile_idx],
+		&tile_mem[cb][tile_idx],
 		anime[(*cycle)],
 		tile_len);
 

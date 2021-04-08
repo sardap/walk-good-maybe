@@ -39,6 +39,9 @@ typedef struct mg_data_t
 	int water_pal_idx;
 
 	int far_tiles_idx;
+	int fog_tiles_idx;
+
+	int fog_tiles_cycle_idx;
 
 	mg_states_t state;
 	mg_states_t old_state;

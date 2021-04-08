@@ -87,7 +87,10 @@
 		"mgbeachwaterfog.h": "c",
 		"effect.h": "c",
 		"exsplash.h": "c",
-		"exsplash01.h": "c"
+		"exsplash01.h": "c",
+		"mgbeachwaterfog00.h": "c",
+		"mgbeachwaterfog01.h": "c",
+		"mgbeachisland00.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -635,20 +635,20 @@ void free_island_00()
 int spawn_island_00(int start_x)
 {
 	int x_base = start_x;
-	int x;
 	int y = BEACH_ISLAND_Y_TILE_SPAWN;
 
 	int tile = _island_0_idx / 2;
 
-	int width = 10;
+	int width = gba_rand_range(6, 10);
+	set_level_at(level_wrap_x(x_base), y, ISLAND_00_LEFT + tile);
 
 	//MIDDLE SECTION
-	for (int i = 0; i < width; ++i)
+	for (int i = 1; i < width - 1; ++i)
 	{
-		x = level_wrap_x(x_base + i);
-		set_level_at(x, y, ISLAND_0_TOP + tile);
-		set_level_at(x, y + 1, ISLAND_0_MIDDLE + tile);
+		set_level_at(level_wrap_x(x_base + i), y, ISLAND_00_TOP + tile);
 	}
+
+	set_level_at(level_wrap_x(x_base + width - 1), y, ISLAND_00_RIGHT + tile);
 
 	spawn_obstacles(start_x, width, y, &_island_00);
 

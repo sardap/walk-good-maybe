@@ -20,6 +20,7 @@
 #include "../gen.h"
 #include "../obstacles.h"
 #include "../effect.h"
+#include "../anime.h"
 
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
@@ -29,7 +30,15 @@
 #include "../assets/mgBeach.h"
 #include "../assets/mgPauseBeach.h"
 #include "../assets/mgPauseCity.h"
-#include "../assets/mgBeachWaterFog.h"
+#include "../assets/mgBeachWaterFog00.h"
+#include "../assets/mgBeachWaterFog01.h"
+
+static const int fog_water_cycle_length = 2;
+static const tile_map_set_t fog_water_cycle[] = {
+	{mgBeachWaterFog00Tiles, mgBeachWaterFog00TilesLen,
+	 mgBeachWaterFog00Map, mgBeachWaterFog00MapLen},
+	{mgBeachWaterFog01Tiles, mgBeachWaterFog01TilesLen,
+	 mgBeachWaterFog01Map, mgBeachWaterFog01MapLen}};
 
 static mg_parm_t _parm;
 static mg_data_t *_data = &_shared_data.mg;
@@ -187,15 +196,14 @@ static void show(void)
 	_data->bg_2_scroll = int2fx(gba_rand());
 
 	int pause_tile_offset = 0;
-	int fog_tiles_idx = 0;
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
 		_data->far_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(backgroundCityTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->far_tiles_idx], backgroundCityTiles);
 
-		fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(fogTilesLen));
-		GRIT_CPY(&tile_mem[MG_SHARED_CB][fog_tiles_idx], fogTiles);
+		_data->fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(fogTilesLen));
+		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx], fogTiles);
 
 		pause_tile_offset = allocate_bg_tile_idx(TILES_COUNT(mgPauseCityTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][pause_tile_offset], mgPauseCityTiles);
@@ -204,8 +212,8 @@ static void show(void)
 		_data->far_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->far_tiles_idx], mgBeachTiles);
 
-		fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachWaterFogTilesLen));
-		GRIT_CPY(&tile_mem[MG_SHARED_CB][fog_tiles_idx], mgBeachWaterFogTiles);
+		_data->fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachWaterFog00TilesLen));
+		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx], mgBeachWaterFog00Tiles);
 
 		pause_tile_offset = allocate_bg_tile_idx(TILES_COUNT(mgPauseBeachTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][pause_tile_offset], mgPauseBeachTiles);
@@ -232,23 +240,18 @@ static void show(void)
 
 		//Fog
 		GRIT_CPY(se_mem[MG_CLOUD_SB], fogMap);
-		//TODO: stop this double iteration bullshit
-		for (int i = 0; i < fogMapLen; i++)
-			se_mem[MG_CLOUD_SB][i] += fog_tiles_idx / 2;
-
 		break;
 	case MG_MODE_BEACH:
 		GRIT_CPY(se_mem[MG_FAR_SB], mgBeachMap);
 
 		//Fog
-		GRIT_CPY(se_mem[MG_CLOUD_SB], mgBeachWaterFogMap);
-		//TODO: stop this double iteration bullshit
-		for (int i = 0; i < mgBeachWaterFogMapLen; i++)
-			se_mem[MG_CLOUD_SB][i] += fog_tiles_idx / 2;
-
+		GRIT_CPY(se_mem[MG_CLOUD_SB], mgBeachWaterFog00Map);
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
 	}
+	//TODO: stop this double iteration bullshit
+	for (int i = 0; i < mgBeachWaterFog00MapLen; i++)
+		se_mem[MG_CLOUD_SB][i] += _data->fog_tiles_idx / 2;
 
 	//Set bg postions
 	REG_BG0HOFS = fx2int(_data->bg_0_scroll / 6);
@@ -312,6 +315,7 @@ static void show(void)
 	_data->state = MG_S_STARTING;
 	_data->water_pal_idx = 0;
 	_data->splash_active = 0;
+	_data->fog_tiles_cycle_idx = 0;
 
 	init_level();
 
@@ -376,6 +380,21 @@ static void update(void)
 				4, _water_cycle,
 				&_data->water_pal_idx, WATER_PAL_LENGTH);
 		}
+		if (frame_count() % 30 == 0)
+		{
+			//Copy current frame into tile mem
+			dma3_cpy(
+				&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx],
+				fog_water_cycle[_data->fog_tiles_cycle_idx].tiles,
+				fog_water_cycle[_data->fog_tiles_cycle_idx].tiles_length);
+
+			//Next frame
+			++_data->fog_tiles_cycle_idx;
+
+			//Check if need to wrap cycle
+			if (_data->fog_tiles_cycle_idx >= fog_water_cycle_length)
+				_data->fog_tiles_cycle_idx = 0;
+		}
 		break;
 	}
 
@@ -422,7 +441,15 @@ static void update(void)
 
 	REG_BG0HOFS = fx2int(_data->bg_0_scroll / 6);
 	REG_BG1HOFS = fx2int(_bg_pos_x);
-	REG_BG2HOFS = fx2int(_data->bg_2_scroll / 4);
+	switch (_data->mode)
+	{
+	case MG_MODE_BEACH:
+		REG_BG2HOFS = fx2int(_bg_pos_x);
+		break;
+	case MG_MODE_CITY:
+		REG_BG2HOFS = fx2int(_data->bg_2_scroll / 4);
+		break;
+	}
 
 	_data->next_building_spawn -= _scroll_x;
 
@@ -462,7 +489,7 @@ static void update(void)
 	if (
 		_data->mode == MG_MODE_BEACH &&
 		_data->splash_active <= 0 &&
-		_player.y + int2fx(_player.h) > (BEACH_Y_SPAWN + 3) * FIX_SCALE)
+		_player.y + int2fx(_player.h) > (BEACH_Y_SPAWN + 5) * FIX_SCALE)
 	{
 		create_splash_effect(allocate_visual_ent(), _player.x - 16, _player.y);
 		_data->splash_active = 60;

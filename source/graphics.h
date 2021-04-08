@@ -10,6 +10,14 @@
 #define TILES_COUNT(x) (x / 64)
 #define TILE_COUNT(x) TILES_COUNT(x)
 
+typedef struct tile_map_set_t
+{
+	const u16 *tiles;
+	const int tiles_length;
+	const u16 *map;
+	const int map_length;
+} tile_map_set_t;
+
 void init_graphics();
 
 int allocate_obj_tile_idx(int size);

@@ -118,9 +118,9 @@
 //Island 1
 #define ISLAND_0_OFFSET 0
 
-#define ISLAND_0_BOTTOM (ISLAND_0_OFFSET + 0)
-#define ISLAND_0_MIDDLE (ISLAND_0_OFFSET + 1)
-#define ISLAND_0_TOP (ISLAND_0_OFFSET + 2)
+#define ISLAND_00_TOP (ISLAND_0_OFFSET + 0)
+#define ISLAND_00_LEFT (ISLAND_0_OFFSET + 1)
+#define ISLAND_00_RIGHT (ISLAND_0_OFFSET + 2)
 
 typedef struct t_spawn_info
 {

@@ -152,7 +152,8 @@ grit \
 	$ASSETS/title_screen/tsLava.png \
 	$ASSETS/background/mgPauseBeach.png \
 	$ASSETS/background/mgBeach.png \
-	$ASSETS/background/mgBeachWaterFog.png \
+	$ASSETS/background/mgBeachWaterFog00.png \
+	$ASSETS/background/mgBeachWaterFog01.png \
 	$ASSETS/background/mgBeachIsland00.png \
 	$BG_OPTIONS
 

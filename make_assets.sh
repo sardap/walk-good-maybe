@@ -155,6 +155,7 @@ grit \
 	$ASSETS/background/mgBeachWaterFog00.png \
 	$ASSETS/background/mgBeachWaterFog01.png \
 	$ASSETS/background/mgBeachIsland00.png \
+	$ASSETS/background/mgBeachIsland01.png \
 	$BG_OPTIONS
 
 

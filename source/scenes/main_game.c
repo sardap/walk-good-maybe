@@ -108,10 +108,14 @@ static void spawn_buildings()
 		}
 		break;
 	case MG_MODE_BEACH:
-		switch (gba_rand_range(1, 1))
+		switch (gba_rand_range(1, 10000))
 		{
 		case 1:
 			width = spawn_island_00(start_x);
+			break;
+		case 2:
+		default:
+			width = spawn_island_01(start_x);
 			break;
 		}
 		break;
@@ -147,6 +151,7 @@ static void load_foreground_tiles()
 	case MG_MODE_BEACH:
 		load_lava_0(MG_SHARED_CB);
 		load_island_00(MG_SHARED_CB);
+		load_island_01(MG_SHARED_CB);
 		break;
 	}
 }
@@ -166,7 +171,9 @@ static void free_foreground_tiles()
 		free_building_6();
 		break;
 	case MG_MODE_BEACH:
+		unload_lava_0();
 		free_island_00();
+		free_island_01();
 		break;
 	}
 }

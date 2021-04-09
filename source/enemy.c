@@ -131,19 +131,16 @@ void update_enemy_biscut(ent_t *ent)
 	if (!hit_y)
 	{
 		if (ent->vy < TERMINAL_VY)
-		{
 			ent->vy += GRAVITY;
-		}
+
 		ent->vx = 0;
 	}
 	else
 	{
 		if (ent->vx == 0)
-		{
-			ent->vx = float2fx(0.75);
-		}
-		int hit_x = ent_level_collision_at(ent, ent->vx, ent->vy);
-		if (!hit_x)
+			ent->vx = 0.75 * FIX_SCALEF;
+
+		if (!ent_level_collision_at(ent, ent->vx, ent->vy))
 		{
 			ent->vx = -ent->vx;
 		}

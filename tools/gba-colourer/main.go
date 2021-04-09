@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+var (
+	transparentColour = color.RGBA{255, 0, 246, 255}
+)
+
 type GBAColour struct {
 	R, G, B, A uint8
 }
@@ -57,7 +61,13 @@ func main() {
 
 	for y := 0; y < img.Bounds().Max.Y; y++ {
 		for x := 0; x < img.Bounds().Max.X; x++ {
-			newImg.Set(x, y, toGBAColour(img.At(x, y)))
+			clr := img.At(x, y)
+			if _, _, _, a := clr.RGBA(); a == 255 {
+				newImg.Set(x, y, toGBAColour(transparentColour))
+			} else {
+				//Replace with GBA colour
+				newImg.Set(x, y, toGBAColour(clr))
+			}
 		}
 	}
 

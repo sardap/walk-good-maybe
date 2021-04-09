@@ -115,12 +115,24 @@
  * 
  */
 
-//Island 1
-#define ISLAND_0_OFFSET 0
+//Island 00
+#define ISLAND_00_OFFSET 0
 
-#define ISLAND_00_TOP (ISLAND_0_OFFSET + 0)
-#define ISLAND_00_LEFT (ISLAND_0_OFFSET + 1)
-#define ISLAND_00_RIGHT (ISLAND_0_OFFSET + 2)
+#define ISLAND_00_TOP (ISLAND_00_OFFSET + 0)
+#define ISLAND_00_LEFT (ISLAND_00_OFFSET + 1)
+#define ISLAND_00_RIGHT (ISLAND_00_OFFSET + 2)
+
+//Island 01
+#define ISLAND_01_OFFSET 0
+
+#define ISLAND_01_LEFT (ISLAND_01_OFFSET + 0)
+#define ISLAND_01_MIDDLE_EDGE (ISLAND_01_OFFSET + 1)
+#define ISLAND_01_MIDDLE (ISLAND_01_OFFSET + 2)
+#define ISLAND_01_ROCK_LEFT (ISLAND_01_OFFSET + 3)
+#define ISLAND_01_ROCK_MIDDLE (ISLAND_01_OFFSET + 4)
+#define ISLAND_01_ROCK_TOP (ISLAND_01_OFFSET + 5)
+#define ISLAND_01_ROCK_RIGHT (ISLAND_01_OFFSET + 6)
+#define ISLAND_01_RIGHT (ISLAND_01_OFFSET + 7)
 
 typedef struct t_spawn_info
 {
@@ -170,5 +182,9 @@ int spawn_building_6(int start_x);
 void load_island_00(int cb);
 void free_island_00();
 int spawn_island_00(int start_x);
+
+void load_island_01(int cb);
+void free_island_01();
+int spawn_island_01(int start_x);
 
 #endif

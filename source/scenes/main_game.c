@@ -108,7 +108,7 @@ static void spawn_buildings()
 		}
 		break;
 	case MG_MODE_BEACH:
-		switch (gba_rand_range(1, 10000))
+		switch (gba_rand_range(1, 2))
 		{
 		case 1:
 			width = spawn_island_00(start_x);

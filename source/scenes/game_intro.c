@@ -20,7 +20,9 @@
 #include "../assets/giSpriteShared.h"
 #include "../assets/giCityTop.h"
 #include "../assets/giSky.h"
-#include "../assets/giBackgroundAffShared.h"
+#include "../assets/giBeachAffShared.h"
+#include "../assets/giCityAffShared.h"
+#include "../assets/giBeachTop.h"
 #include "../assets/giWhale_air_0.h"
 #include "../assets/giWhale_air_1.h"
 #include "../assets/giWhale_air_2.h"
@@ -65,7 +67,7 @@ static void m7_hbl()
 	REG_BG2Y = _data->cam_pos.z - lxr - lyr;
 }
 
-static void show(void)
+static void show(mg_mode_t mode)
 {
 	_data->obj_aff_buffer = (OBJ_AFFINE *)_obj_buffer;
 
@@ -74,18 +76,30 @@ static void show(void)
 	REG_BG1VOFS = 0;
 
 	/* Load palettes */
-	GRIT_CPY(pal_bg_mem, giBackgroundAffSharedPal);
 	GRIT_CPY(pal_obj_mem, giSpriteSharedPal);
 	/* Load background tiles into GI_SHARED_CB */
-	//afine background
-	LZ77UnCompVram(giBackgroundAffSharedTiles, &tile_mem[GI_SHARED_CB]);
 	//reg background
 	GRIT_CPY(&tile_mem[GI_SHARED_CB][450 * 2], giBackgroundSharedTiles);
 	//Load object tiles
 	GRIT_CPY(&tile_mem[4][0], giWhale_air_0Tiles);
 
-	// Background maps
-	GRIT_CPY(&se_mem[GI_COOL_BACKGROUND_SSB], giCityTopMap);
+	//afine background
+	switch (mode)
+	{
+	case MG_MODE_BEACH:
+		GRIT_CPY(pal_bg_mem, giBeachAffSharedPal);
+		//The fucking grit is being a stupid fucking bitch fucking asshole
+		pal_bg_mem[7] = 0x76eb;
+		LZ77UnCompVram(giBeachAffSharedTiles, &tile_mem[GI_SHARED_CB]);
+		GRIT_CPY(&se_mem[GI_COOL_BACKGROUND_SSB], giBeachTopMap);
+		break;
+
+	case MG_MODE_CITY:
+		GRIT_CPY(pal_bg_mem, giCityAffSharedPal);
+		LZ77UnCompVram(giCityAffSharedTiles, &tile_mem[GI_SHARED_CB]);
+		GRIT_CPY(&se_mem[GI_COOL_BACKGROUND_SSB], giCityTopMap);
+		break;
+	}
 	GRIT_CPY(&se_mem[GI_TEXT_SSB], readyMap);
 	GRIT_CPY(&se_mem[GI_SKY_SSB], giSkyMap);
 
@@ -195,7 +209,7 @@ static void show_city(void)
 	mg_parm_t parm;
 	parm.mode = MG_MODE_CITY;
 	setMgParmters(parm);
-	show();
+	show(MG_MODE_CITY);
 }
 
 static void show_beach(void)
@@ -203,7 +217,7 @@ static void show_beach(void)
 	mg_parm_t parm;
 	parm.mode = MG_MODE_BEACH;
 	setMgParmters(parm);
-	show();
+	show(MG_MODE_BEACH);
 }
 
 const scene_t city_game_intro = {

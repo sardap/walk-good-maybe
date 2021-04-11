@@ -642,7 +642,7 @@ int spawn_island_00(int start_x)
 
 	int tile = _island_00_idx / 2;
 
-	int width = gba_rand_range(6, 10);
+	int width = gba_rand_range(3, 6);
 	set_level_at(level_wrap_x(x_base), y, ISLAND_00_LEFT + tile);
 
 	//MIDDLE SECTION

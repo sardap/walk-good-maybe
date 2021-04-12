@@ -67,6 +67,8 @@ gen_png "./assets/credits"
 
 gen_png "./assets/sound_test"
 
+gen_png "./assets/speical_zone"
+
 
 OBJECTS="$OBJECTS $PWD/assets/text/lifeTitle.png "
 
@@ -337,6 +339,24 @@ BG_OPTIONS="$BG_OPTIONS -Zl" 					# compress all with lz77
 echo "Creating background tiles for sound test / pal / map"
 grit \
 	$ASSETS/sound_test/stBackground.png \
+	$BG_OPTIONS
+
+
+BG_OPTIONS=""
+BG_OPTIONS="$BG_OPTIONS -ftc"					# Create C file
+BG_OPTIONS="$BG_OPTIONS -gT ff00f7" 			# RGB 24 BIT
+BG_OPTIONS="$BG_OPTIONS -gB8"					# Bit depth 8
+BG_OPTIONS="$BG_OPTIONS -gu8"					# export as bytes
+BG_OPTIONS="$BG_OPTIONS -m"						# Export map
+BG_OPTIONS="$BG_OPTIONS -mR8"					# Create MapszBanditFace00
+BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
+BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
+BG_OPTIONS="$BG_OPTIONS -gS"					# Share tiles
+BG_OPTIONS="$BG_OPTIONS -O szSharedBackground"	# Shared pallet name
+
+echo "Creating background tiles for speical zone / pal / map"
+grit \
+	$ASSETS/speical_zone/szBanditFace00.png \
 	$BG_OPTIONS
 
 SP_OPTIONS=""

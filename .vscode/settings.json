@@ -90,7 +90,10 @@
 		"exsplash01.h": "c",
 		"mgbeachwaterfog00.h": "c",
 		"mgbeachwaterfog01.h": "c",
-		"mgbeachisland00.h": "c"
+		"mgbeachisland00.h": "c",
+		"gispriteshared.h": "c",
+		"gibeachaffshared.h": "c",
+		"szsharedbackground.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

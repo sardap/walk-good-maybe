@@ -1,0 +1,295 @@
+[[Targets]]
+name="game objects"
+options=[
+	"-ftc",				# Create C file
+	"-gt",        		# output tiled graphics
+	"-gT ff00f7", 		# RGB 24 BIT
+	"-gB8",       		# output 8bpp graphics
+	"-gu32",       		# output data as byte array
+	"-pS", 				# Share pallet
+	"-O spriteShared",	# Shared pallet name
+]
+dirs=[
+	"effects",
+	"obstacles",
+	"enemy",
+	"weapons",
+	"misc",
+	"text",
+	"whale",
+]
+
+[[Targets]]
+name="main game city background"
+options=[
+	"-ftc",						# Create C file
+	"-gT ff00f7", 				# RGB 24 BIT
+	"-gB8",						# Bit depth 8
+	"-gu16", 					# use short
+	"-m",						# Export map
+	"-mR8",						# Create Map
+	"-mLs",						# Map 16 Bit
+	"-pS", 						# Share pallet
+	"-O mainGameCityShared",	# Shared pallet name
+]
+files=[
+	"background/fog",
+	"background/backgroundCity",
+	"background/building0TileSet",
+	"background/building1TileSet",
+	"background/building2TileSet",
+	"background/building3TileSet",
+	"background/building4TileSet",
+	"background/building5TileSet",
+	"background/building6TileSet",
+	"background/lava0TileSet",
+	"background/buildingtileset",
+	"background/mgPauseCity",
+]
+
+
+[[Targets]]
+name="main game beach background"
+options=[
+	"-ftc",						# Create C file
+	"-gT ff00f7", 				# RGB 24 BIT
+	"-gB8",						# Bit depth 8
+	"-gu16", 					# use short
+	"-m",						# Export map
+	"-mR8",						# Create Map
+	"-mLs",						# Map 16 Bit
+	"-pS", 						# Share pallet
+	"-O mainGameBeachShared",	# Shared pallet name
+]
+files=[
+	"title_screen/tsEmpty",
+	"title_screen/tsWater",
+	"title_screen/tsLava",
+	"background/mgPauseBeach",
+	"background/mgBeach",
+	"background/mgBeachWaterFog00",
+	"background/mgBeachWaterFog01",
+	"background/mgBeachIsland00",
+	"background/mgBeachIsland01",
+]
+
+[[Targets]]
+name="title screen background"
+options=[
+	"-ftc",					# Create C file
+	"-gT ff00f7", 			# RGB 24 BIT
+	"-gB8",					# Bit depth 8
+	"-gzl", 				# LZ77 compressed
+	"-m",					# Export map
+	"-mR8",					# Create Map
+	"-mLs",					# Map 16 Bit
+	"-pS", 					# Share pallet
+	"-gS",					# Share tiles
+	"-O titleScreenShared",	# Shared pallet name
+]
+files=[
+	"title_screen/tsEmpty",
+	"title_screen/tsWater",
+	"title_screen/tsLava",
+	"title_screen/tsCity",
+	"title_screen/tsBeach",
+	"title_screen/tsBeachGameText",
+	"title_screen/tsCityGameText",
+	"title_screen/tsTitleText",
+	"title_screen/tsCredits",
+	"title_screen/tsSoundTestText",
+]
+
+[[Targets]]
+name="title screen objects"
+options=[
+	"-ftc",				# Create C file
+	"-gt", 				# output tiled graphics
+	"-gT ff00f7", 		# RGB 24 BIT
+	"-gB8",				# output 8bpp graphics
+	"-pS",				# Share pallet
+	"-O tsSpirteShared"	# Shared pallet name
+]
+files=[
+	"title_screen/tsArrow",
+	"title_screen/tsArrowRed"
+]
+
+[[Targets]]
+name="game intro city regualr background"
+options=[
+	"-ftc",						# Create C file
+	"-gT ff00f7", 				# RGB 24 BIT
+	"-gB8",						# Bit depth 8
+	"-gu16", 					# use short
+	"-ga 240", 					# start pallet at 240
+	"-m",						# Export map
+	"-ma 450",					# Tiles start at 450
+	"-mLs",						# Map 16 Bit
+	"-pS", 						# Share pallet
+	"-ps 240", 					# start pallet at 240
+	"-ps 249", 					# start pallet at 240
+	"-pn 15", 					# start pallet at 240
+	"-gS",						# Share tiles
+	"-O giBackgroundShared",	# Shared pallet name
+]
+files=[
+	"game_intro/giEmpty",
+	"game_intro/ready",
+	"game_intro/set",
+	"game_intro/go",
+	"game_intro/giSky"
+]
+
+[[Targets]]
+name="game intro city affine background"
+options=[
+	"-ftc",					# Create C file
+	"-gT ff00f7", 			# RGB 24 BIT
+	"-gB8",					# Bit depth 8
+	"-gzl", 				# LZ77 compressed
+	"-m",					# Export map
+	"-mLa",					# Map Affine
+	"-mRa",					# Tile reudciton needs this to stop from that stupid flip tile reduciotn
+	"-pS", 					# Share pallet
+	"-gS",					# Share tiles
+	"-O giCityAffShared",	# Shared pallet name
+]
+files=[
+	"game_intro/giEmpty",
+	"game_intro/giCityTop"
+]
+
+[[Targets]]
+name="game intro beach affine background"
+options=[
+	"-ftc",					# Create C file
+	"-gT ff00f7", 			# RGB 24 BIT
+	"-gB8",					# Bit depth 8
+	"-gzl", 				# LZ77 compressed
+	"-m",					# Export map
+	"-mLa",					# Map Affine
+	"-mRa",					# Tile reudciton needs this to stop from that stupid flip tile reduciotn
+	"-pS", 					# Share pallet
+	"-gS",					# Share tiles
+	"-O giBeachAffShared",	# Shared pallet name
+]
+files=[
+	"game_intro/giEmpty",
+	"game_intro/giBeachTop",
+	"game_intro/giBeachEmpty"
+]
+
+[[Targets]]
+name="game intro objects"
+options=[
+	"-ftc",
+	"-gt",        			# output tiled graphics
+	"-gT ff00f7", 			# RGB 24 BIT
+	"-gB8",       			# output 8bpp graphics
+	"-gu32",       			# output data as byte array
+	"-pS", 					# Share pallet
+	"-O giSpriteShared",	# Shared pallet name
+]
+files=[
+	"game_intro/giWhale_air_0",
+	"game_intro/giWhale_air_1",
+	"game_intro/giWhale_air_2",
+	"game_intro/giWhale_air_3"
+]
+
+[[Targets]]
+name="credits Space background"
+options=[
+	"-ftc",			# Create C file
+	"-gT ff00f7", 	# RGB 24 BIT
+	"-gB8",			# Bit depth 8
+	"-gu8",			# export as bytes
+	"-m",			# Export map
+	"-ma 600",		# Tiles start at 600
+	"-mR8",			# Create Map
+	"-mLs",			# Map 16 Bit
+	"-p", 			# exculde pallet output
+	"-pe 10", 		# export up until 10
+]
+files=[
+	"credits/crSpace"
+]
+
+[[Targets]]
+name="credits face background"
+options=[
+	"-ftc",			# Create C file
+	"-gT ff00f7",	# RGB 24 BIT
+	"-gB8",			# Bit depth 8
+	"-m",			# Export map
+	"-ma 0",		# Tiles start at 0
+	"-mR8",			# Create Map
+	"-mLs",			# Map 16 Bit
+	"-p",			# exculde pallet output
+	"-pe 120", 		# export up until 100
+	"-Zl",			# compress all with lz77
+]
+files=[
+	"credits/crPaulFace",
+	"credits/crWhaleLargeStanding",
+	"credits/crBiscut",
+	"credits/crPaulMic",
+	"credits/crBuildings",
+	"credits/crRealBuildings",
+	"credits/crTunaPasta",
+	"credits/crEmpty",
+	"credits/crPatrickFace"
+]
+
+[[Targets]]
+name="speical zone background"
+options=[
+	"-ftc",						# Create C file
+	"-gT ff00f7", 				# RGB 24 BIT
+	"-gB8",						# Bit depth 8
+	"-gu8",						# export as bytes
+	"-m",						# Export map
+	"-mR8",						# Create MapszBanditFace00
+	"-mLs",						# Map 16 Bit
+	"-pS", 						# Share pallet
+	"-gS",						# Share tiles
+	"-O szSharedBackground",	# Shared pallet name
+]
+files=[
+	"speical_zone/szBanditFace00"
+]
+
+[[Targets]]
+name="sound_test background"
+options=[
+	"-ftc",						# Create C file
+	"-gT ff00f7", 				# RGB 24 BIT
+	"-gB8",						# Bit depth 8
+	"-gu8",						# export as bytes
+	"-m",						# Export map
+	"-mR8",						# Create Map
+	"-mLs",						# Map 16 Bit
+	"-pS", 						# Share pallet
+	"-gS",						# Share tiles
+	"-O stSharedBackground",	# Shared pallet name
+	"-Zl", 						# compress all with lz77
+]
+files=[
+	"sound_test/stBackground"
+]
+
+[[Targets]]
+name="sound_test Objects"
+options=[
+	"-ftc", 				# Output C file
+	"-gt",  				# output tiled graphics
+	"-gT ff00f7",  			# RGB 24 BIT
+	"-gB8",              	# output 8bpp graphics
+	"-pS",               	# Share pallet
+	"-O stSpirteShared", 	# Shared pallet name
+]
+files=[
+	"sound_test/stArrow",
+	"sound_test/stArrowRed"
+]

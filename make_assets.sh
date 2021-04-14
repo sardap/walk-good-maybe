@@ -119,7 +119,6 @@ BG_OPTIONS="$BG_OPTIONS -mR8"					# Create Map
 BG_OPTIONS="$BG_OPTIONS -mLs"					# Map 16 Bit
 BG_OPTIONS="$BG_OPTIONS -pS" 					# Share pallet
 BG_OPTIONS="$BG_OPTIONS -O mainGameCityShared"	# Shared pallet name
-
 echo "Creating background tiles for city main game / pal / map"
 grit \
 	$ASSETS/background/fog.png \

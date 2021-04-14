@@ -20,7 +20,7 @@
 		{
 			"label": "clean-rom",
 			"type": "shell",
-			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest clean",
+			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest /app/build.toml /app/assets /app/source/assets clean",
 			"group": {
 				"kind": "build",
 				"isDefault": true
@@ -33,7 +33,7 @@
 		{
 			"label": "build-assets",
 			"type": "shell",
-			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest assets",
+			"command": "docker run --rm -v ${PWD}:/app wgm-builder:latest /app/build.toml /app/assets /app/source/assets assets",
 			"group": {
 				"kind": "build",
 				"isDefault": true

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "ROOT",
+			"path": "../"
+		},
+		{
+			"name": "builder",
+			"path": "../tools/builder"
+		},
+	],
+	"settings": {}
+}

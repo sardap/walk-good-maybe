@@ -17,6 +17,7 @@ COPY ./tools/builder/go.mod .
 RUN go mod download
 
 COPY ./tools/builder/*.go ./
+COPY ./tools/builder/assets/*.go ./assets/
 
 RUN go build -o main .
 
@@ -74,4 +75,4 @@ RUN mkdir /app
 WORKDIR /app
 
 ENTRYPOINT [ "builder" ]
-CMD [ "build" ]
+CMD [ "/app/build.toml", "/app/assets", "/app/source/assets", "build" ]

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"builder/assets"
 	"bytes"
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,30 +11,6 @@ import (
 	"path/filepath"
 	"time"
 )
-
-const makeAssetsScriptPath = "make_assets.sh"
-
-func makeAssets() {
-	fmt.Printf("making assets\n")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(60)*time.Second)
-	defer cancel()
-	cmd := exec.CommandContext(ctx, "bash", makeAssetsScriptPath)
-
-	stdIn, _ := cmd.StdinPipe()
-	stdIn.Write([]byte("y"))
-	stdIn.Close()
-
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-
-	cmd.Stdout = mw
-
-	err := cmd.Run()
-	if err != nil {
-		fmt.Printf("error running make assets %v\n", err)
-		panic(err)
-	}
-}
 
 func runMake(arg string) {
 	fmt.Printf("running make\n")
@@ -77,16 +53,31 @@ func latestModify(path string) time.Time {
 }
 
 func main() {
-	if os.Args[1] == "assets" {
-		makeAssets()
+	buildFilePath := os.Args[1]
+	assetsPath := os.Args[2]
+	targetPath := os.Args[3]
+	cmd := os.Args[4]
+
+	fmt.Printf("Assets: %s Target: %s\n", assetsPath, targetPath)
+
+	if _, err := os.Stat(assetsPath); err != nil {
+		panic(err)
+	}
+
+	if _, err := os.Stat(targetPath); err != nil {
+		os.Mkdir(targetPath, os.ModeDir)
+	}
+
+	if cmd == "assets" {
+		assets.Make(buildFilePath, assetsPath, targetPath)
 		return
 	}
 
 	//Hacked makefile lamo
-	if files, _ := ioutil.ReadDir("source/assets"); os.Args[1] != "clean" &&
+	if files, _ := ioutil.ReadDir("source/assets"); cmd != "clean" &&
 		(len(files) == 0 || latestModify("assets").After(latestModify("source/assets"))) {
-		makeAssets()
+		assets.Make(buildFilePath, assetsPath, targetPath)
 	}
 
-	runMake(os.Args[1])
+	runMake(cmd)
 }

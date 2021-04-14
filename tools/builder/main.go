@@ -69,7 +69,9 @@ func main() {
 	}
 
 	if cmd == "assets" {
+		t := time.Now()
 		assets.Make(buildFilePath, assetsPath, targetPath)
+		fmt.Printf("Creating assets took %v\n", time.Now().Sub(t).Seconds())
 		return
 	}
 

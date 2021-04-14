@@ -1,6 +1,10 @@
 package assets
 
 import (
+	"builder/gbacolour"
+	"image"
+	"image/png"
+
 	"bytes"
 	"context"
 	"fmt"
@@ -12,6 +16,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	_ "github.com/oov/psd"
 
 	"github.com/pelletier/go-toml"
 )
@@ -162,19 +168,6 @@ func convertCall(ctx context.Context, file string) error {
 	return cmd.Run()
 }
 
-func gbaColourCall(ctx context.Context, filename string) error {
-	cmd := exec.CommandContext(ctx, "gba-colourer",
-		toPngFileName(filename),
-	)
-
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	cmd.Stdout = mw
-	cmd.Stderr = mw
-
-	return cmd.Run()
-}
-
 func gritCall(ctx context.Context, assetsPath, targetPath string, target *GraphicsOutput) error {
 	gritMutex.Lock()
 	defer gritMutex.Unlock()
@@ -202,13 +195,37 @@ func gritCall(ctx context.Context, assetsPath, targetPath string, target *Graphi
 	return cmd.Run()
 }
 
-func toPng(ctx context.Context, name string) {
-	if err := convertCall(ctx, name); err != nil {
-		panic(err)
-	}
+func toPng(ctx context.Context, filename string) {
+	ch := make(chan struct{})
 
-	if err := gbaColourCall(ctx, name); err != nil {
-		panic(err)
+	go func() {
+		file, err := os.Open(filename)
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+
+		img, _, err := image.Decode(file)
+		if err != nil {
+			panic(err)
+		}
+
+		img = gbacolour.ConvertImg(img)
+
+		os.Remove(toPngFileName(filename))
+		pngFile, _ := os.Create(toPngFileName(filename))
+		defer pngFile.Close()
+		png.Encode(pngFile, img)
+
+		close(ch)
+	}()
+
+	select {
+	case <-ctx.Done():
+		if ctx.Err() != nil {
+			panic(ctx.Err())
+		}
+	case <-ch:
 	}
 }
 
@@ -237,8 +254,9 @@ func genPngs(ctx context.Context, generatedAssetsPath, targetDir string) map[str
 
 			baseFile := strings.TrimSuffix(filepath.Base(item.Name()), ".psd")
 
-			assetStat, err := os.Stat(getGenratedAsset(generatedAssetsPath, item.Name()))
-			if err != nil || psdStat.ModTime().After(assetStat.ModTime()) {
+			assetStat, genErr := os.Stat(getGenratedAsset(generatedAssetsPath, item.Name()))
+			_, pngErr := os.Stat(toPngFileName(item.Name()))
+			if genErr != nil || pngErr != nil || psdStat.ModTime().After(assetStat.ModTime()) {
 				toPng(ctx, psdFile)
 				result[filepath.Base(baseFile)] = true
 			}

@@ -253,11 +253,11 @@ options=[
     "-mR8",					# Create MapszBanditFace00
     "-mLs",					# Map 16 Bit
     "-pS",					# Share pallet
-    "-gS",					# Share tiles
     "-O szSharedBackground",# Shared pallet name
 ]
 files=[
-    "speical_zone/szBanditFace00"
+    "speical_zone/szGrid00",
+    "speical_zone/szGrid01"
 ]
 
 [[Targets]]

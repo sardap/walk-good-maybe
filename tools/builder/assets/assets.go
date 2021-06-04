@@ -55,6 +55,27 @@ func (g *GraphicsOutput) addFilesFromDirs(assetsPath string) {
 	}
 }
 
+func (g *GraphicsOutput) clearTargetFiles(targetPath string) {
+	//Clear shared files
+	for _, o := range g.Options {
+		if strings.Contains(o, "-O ") {
+			sharedFilename := strings.Split(o, " ")[1]
+			os.Remove(filepath.Join(
+				targetPath, fmt.Sprintf("%s.h", sharedFilename)),
+			)
+			os.Remove(filepath.Join(
+				targetPath, fmt.Sprintf("%s.c", sharedFilename)),
+			)
+		}
+	}
+
+	for _, filename := range g.Files {
+		filename := filepath.Base(filename)
+		os.Remove(filepath.Join(targetPath, fmt.Sprintf("%s.h", filename)))
+		os.Remove(filepath.Join(targetPath, fmt.Sprintf("%s.c", filename)))
+	}
+}
+
 func (g *GraphicsOutput) changedFiles(
 	updatedFiles map[string]bool,
 ) []string {
@@ -125,6 +146,11 @@ func Make(buildFilePath, assetsPath, targetPath string) {
 
 	fmt.Printf("\nRunning targets\n")
 
+	//Change into dir for grit
+	workingDir, _ := os.Getwd()
+	os.Chdir(targetPath)
+	defer os.Chdir(workingDir)
+
 	for _, target := range config.Targets {
 		target.addFilesFromDirs(assetsPath)
 		targetChangedFiles := target.changedFiles(updatedFiles)
@@ -132,8 +158,10 @@ func Make(buildFilePath, assetsPath, targetPath string) {
 			continue
 		}
 
-		fmt.Printf("Building %s\n", target.Name)
+		fmt.Printf("\nBuilding %s\n", target.Name)
 		fmt.Printf("Files changed %v\n", targetChangedFiles)
+
+		target.clearTargetFiles(targetPath)
 
 		err := gritCall(ctx, assetsPath, targetPath, &target)
 		if err != nil && !strings.Contains(err.Error(), "signal: segmentation fault") {
@@ -154,20 +182,6 @@ func toPngFileName(filename string) string {
 	return fmt.Sprintf("%s.png", strings.TrimSuffix(filename, ".psd"))
 }
 
-func convertCall(ctx context.Context, file string) error {
-	cmd := exec.CommandContext(ctx,
-		"convert", "-quiet", file,
-		"-flatten", toPngFileName(file),
-	)
-
-	var stdBuffer bytes.Buffer
-	mw := io.MultiWriter(os.Stdout, &stdBuffer)
-	cmd.Stdout = mw
-	cmd.Stderr = mw
-
-	return cmd.Run()
-}
-
 func gritCall(ctx context.Context, assetsPath, targetPath string, target *GraphicsOutput) error {
 	gritMutex.Lock()
 	defer gritMutex.Unlock()
@@ -179,11 +193,6 @@ func gritCall(ctx context.Context, assetsPath, targetPath string, target *Graphi
 	for _, option := range target.Options {
 		arguments = append(arguments, strings.Split(option, " ")...)
 	}
-
-	workingDir, _ := os.Getwd()
-
-	os.Chdir(targetPath)
-	defer os.Chdir(workingDir)
 
 	cmd := exec.CommandContext(ctx, "grit", arguments...)
 
@@ -255,8 +264,7 @@ func genPngs(ctx context.Context, generatedAssetsPath, targetDir string) map[str
 			baseFile := strings.TrimSuffix(filepath.Base(item.Name()), ".psd")
 
 			assetStat, genErr := os.Stat(getGenratedAsset(generatedAssetsPath, item.Name()))
-			_, pngErr := os.Stat(toPngFileName(item.Name()))
-			if genErr != nil || pngErr != nil || psdStat.ModTime().After(assetStat.ModTime()) {
+			if genErr != nil || psdStat.ModTime().After(assetStat.ModTime()) {
 				toPng(ctx, psdFile)
 				result[filepath.Base(baseFile)] = true
 			}

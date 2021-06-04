@@ -21,6 +21,8 @@
 //Stolen https://stackoverflow.com/questions/2422712/rounding-integer-division-instead-of-truncating
 #define INT_DIV_CEIL(x, y) (x + y - 1) / y
 
+#define RAND_FLOAT(max) ((float)gba_rand_range(0, 8000) / (float)(8000) * max)
+
 typedef struct scene_t
 {
 	void (*show)(void);

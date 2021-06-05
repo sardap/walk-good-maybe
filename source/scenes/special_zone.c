@@ -68,8 +68,48 @@ static void make_eye(int x_ofs, int y_ofs)
 	}
 }
 
-static void update_text_fade()
+static void update_text_fade(FIXED max)
 {
+	int base;
+	switch (_data->text_state)
+	{
+	case FADED:
+		base = 120;
+		break;
+	case UNFDAING:
+	case FADING:
+		base = 5;
+	default:
+		break;
+	}
+
+	_data->text_fade_count++;
+
+	if (_data->text_fade_count < base + fx2int(fxmul(base * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
+		return;
+
+	_data->text_fade_count = 0;
+
+	switch (_data->text_state)
+	{
+	case FADED:
+		_data->text_state = UNFDAING;
+		break;
+	case UNFDAING:
+		_data->text_eva++;
+		if (_data->text_eva >= 15)
+			_data->text_state = FADING;
+		break;
+	case FADING:
+		_data->text_eva--;
+		if (_data->text_eva < 0)
+		{
+			_data->text_eva = 0;
+			_data->text_state = FADED;
+		}
+		break;
+	}
+
 	// Transparent
 	REG_BLDCNT = BLD_BUILD(
 		BLD_BG2,					 // Top layers
@@ -84,19 +124,6 @@ static void update_text_fade()
 	*/
 	REG_BLDALPHA = BLDA_BUILD(_data->text_eva, 15 - _data->text_eva);
 	REG_BLDY = BLDY_BUILD(0);
-
-	if (_data->text_increment)
-	{
-		_data->text_eva++;
-		if (_data->text_eva >= 15)
-			_data->text_increment = false;
-	}
-	else
-	{
-		_data->text_eva--;
-		if (_data->text_eva < 0)
-			_data->text_increment = true;
-	}
 }
 
 static void show(void)
@@ -107,6 +134,7 @@ static void show(void)
 	_data->eye_count = 300;
 	_data->text_fade_count = 300;
 	_data->text_eva = 0;
+	_data->text_state = FADED;
 	_data->grid_toggle = false;
 	_data->eye_toggle = false;
 
@@ -149,7 +177,7 @@ static void show(void)
 		&tile8_mem[SZ_SHARED_CB][text_tile],
 		szTextTiles, szTextTilesLen / 2);
 
-	//Map
+	// Map
 	memset16(&se_mem[SZ_GRID_SBB], grid_background_tile, SB_SIZE);
 	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
 
@@ -172,7 +200,22 @@ static void show(void)
 	REG_BG1CNT = BG_PRIO(SZ_EYE_LAYER) | BG_8BPP | BG_SBB(SZ_EYE_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
 	REG_BG2CNT = BG_PRIO(SZ_TEXT_LAYER) | BG_8BPP | BG_SBB(SZ_TEXT_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
 
-	update_text_fade();
+	// Transparent
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG2,					 // Top layers
+		BLD_BG0 | BLD_BG1 | BLD_OBJ, // Bottom layers
+		1							 // Mode (std)
+	);
+
+	/* Update blend weights
+		Left EVA: Top weight max of 15 (4 bits)
+		Right EVB: Bottom wieght max of 15 (4 bits)
+		almost complete fade
+	*/
+	REG_BLDALPHA = BLDA_BUILD(0, 15);
+	REG_BLDY = BLDY_BUILD(0);
+
+	update_text_fade(1);
 
 	// enable hblank register and set the mode7 type
 	irq_init(NULL);
@@ -223,13 +266,7 @@ static void update(void)
 	REG_BG1VOFS = -fx2int(fxmul(_data->bg0_y, 0.5f * FIX_SCALEF));
 
 	// Text
-	_data->text_fade_count++;
-
-	if (_data->text_fade_count > 5 + fx2int(fxmul(5 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
-	{
-		update_text_fade();
-		_data->text_fade_count = 0;
-	}
+	update_text_fade(max);
 }
 
 static void hide(void)

@@ -12,13 +12,20 @@
 #define SZ_EYE_LAYER (SZ_GRID_LAYER - 1)
 #define SZ_TEXT_LAYER (SZ_EYE_LAYER - 1)
 
+typedef enum sz_text_state_e
+{
+	FADING,
+	FADED,
+	UNFDAING
+} sz_text_state_e;
+
 typedef struct sz_data_t
 {
 	FIXED bg0_x, bg0_y;
 	FIXED bg0_dir_x, bg0_dir_y;
 	int grid_count, eye_count, text_fade_count;
 	int text_eva;
-	BOOL text_increment;
+	sz_text_state_e text_state;
 	BOOL grid_toggle;
 	BOOL eye_toggle;
 } sz_data_t;

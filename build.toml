@@ -257,7 +257,9 @@ options=[
 ]
 files=[
     "speical_zone/szGrid00",
-    "speical_zone/szGrid01"
+    "speical_zone/szGrid01",
+    "speical_zone/szEye00",
+    "speical_zone/szEye01",
 ]
 
 [[Targets]]

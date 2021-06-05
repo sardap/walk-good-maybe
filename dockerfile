@@ -14,6 +14,7 @@ FROM golang:latest as builder-builder
 
 WORKDIR /app
 COPY ./tools/builder/go.mod . 
+COPY ./tools/builder/go.sum . 
 RUN go mod download
 
 COPY ./tools/builder/*.go ./

@@ -260,6 +260,7 @@ files=[
     "speical_zone/szGrid01",
     "speical_zone/szEye00",
     "speical_zone/szEye01",
+    "speical_zone/szText",
 ]
 
 [[Targets]]

@@ -7,11 +7,14 @@
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
+#include "../debug.h"
+
 #include "../assets/szSharedBackground.h"
 #include "../assets/szGrid00.h"
 #include "../assets/szGrid01.h"
 #include "../assets/szEye00.h"
 #include "../assets/szEye01.h"
+#include "../assets/szText.h"
 
 static const int eye_map_row_len = 4;
 static const int eye_map_col_len = 8;
@@ -24,6 +27,7 @@ static const unsigned int *eye_map[] = {
 static const FIXED sz_max_scroll_speed = 0.75f * FIX_SCALEF;
 static const int grid_background_tile = 1;
 static const int eye_tile = 7;
+static const int text_tile = 40;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
@@ -64,12 +68,45 @@ static void make_eye(int x_ofs, int y_ofs)
 	}
 }
 
+static void update_text_fade()
+{
+	// Transparent
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG2,					 // Top layers
+		BLD_BG0 | BLD_BG1 | BLD_OBJ, // Bottom layers
+		1							 // Mode (std)
+	);
+
+	/* Update blend weights
+		Left EVA: Top weight max of 15 (4 bits)
+		Right EVB: Bottom wieght max of 15 (4 bits)
+		almost complete fade
+	*/
+	REG_BLDALPHA = BLDA_BUILD(_data->text_eva, 15 - _data->text_eva);
+	REG_BLDY = BLDY_BUILD(0);
+
+	if (_data->text_increment)
+	{
+		_data->text_eva++;
+		if (_data->text_eva >= 15)
+			_data->text_increment = false;
+	}
+	else
+	{
+		_data->text_eva--;
+		if (_data->text_eva < 0)
+			_data->text_increment = true;
+	}
+}
+
 static void show(void)
 {
 	_data->bg0_x = 0 / FIX_SCALE;
 	_data->bg0_y = 0 / FIX_SCALE;
 	_data->grid_count = 300;
 	_data->eye_count = 300;
+	_data->text_fade_count = 300;
+	_data->text_eva = 0;
 	_data->grid_toggle = false;
 	_data->eye_toggle = false;
 
@@ -83,45 +120,65 @@ static void show(void)
 		_data->bg0_dir_x = -_data->bg0_dir_x;
 
 	// Set RegX scroll to 0
-	REG_BG0HOFS = _data->bg0_x;
-	REG_BG0VOFS = _data->bg0_y;
+	REG_BG0HOFS = fx2int(_data->bg0_x);
+	REG_BG0VOFS = fx2int(_data->bg0_y);
 
-	// Set RegX scroll to 0
-	REG_BG1HOFS = 0;
-	REG_BG1VOFS = 0;
+	REG_BG1HOFS = fx2int(_data->bg0_x);
+	REG_BG1VOFS = fx2int(_data->bg0_y);
+
+	REG_BG3HOFS = fx2int(_data->bg0_x);
+	REG_BG3VOFS = fx2int(_data->bg0_y);
 
 	/* Load palettes */
 	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	/* Load background tiles into SZ_SHARED_CB */
+#ifdef DEBUG
 	memset16(
 		&tile_mem[SZ_SHARED_CB],
 		0, 800 * 64);
-
+#endif
 	memcpy16(
 		&tile8_mem[SZ_SHARED_CB],
 		szGrid01Tiles, szGrid00TilesLen / 2);
+
 	memcpy16(
 		&tile8_mem[SZ_SHARED_CB][eye_tile],
 		szEye00Tiles, szEye00TilesLen / 2);
+
+	memcpy16(
+		&tile8_mem[SZ_SHARED_CB][text_tile],
+		szTextTiles, szTextTilesLen / 2);
+
 	//Map
 	memset16(&se_mem[SZ_GRID_SBB], grid_background_tile, SB_SIZE);
 	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
 
+	// Spawn eyes
 	for (int i = 0; i < gba_rand_range(4, 6); i++)
 	{
-		int x_ofs = gba_rand_range(0, 32 - eye_map_row_len);
-		int y_ofs = gba_rand_range(0, 32 - eye_map_col_len);
+		int x_ofs = gba_rand_range(0, 30 - eye_map_col_len);
+		int y_ofs = gba_rand_range(0, 30 - eye_map_row_len);
 		make_eye(x_ofs, y_ofs);
 	}
 
+	for (int i = 0; i < szTextMapLen / 2; i++)
+	{
+		unsigned int tile = szTextMap[i] ? szTextMap[i] + text_tile : 0;
+		se_mem[SZ_TEXT_SBB][i] = tile;
+	}
+
+	// BG regs
 	REG_BG0CNT = BG_PRIO(SZ_GRID_LAYER) | BG_8BPP | BG_SBB(SZ_GRID_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(SZ_EYE_LAYER) | BG_8BPP | BG_SBB(SZ_EYE_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
+	REG_BG2CNT = BG_PRIO(SZ_TEXT_LAYER) | BG_8BPP | BG_SBB(SZ_TEXT_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
+
+	update_text_fade();
 
 	// enable hblank register and set the mode7 type
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
-	REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1;
+	REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
 }
 
 static void update(void)
@@ -147,31 +204,43 @@ static void update(void)
 		_data->grid_count = 0;
 	}
 
-	_data->eye_count++;
-
-	// Blinking
-	if (_data->eye_count > 50)
-	{
-		blink_eye();
-
-		_data->eye_count = 0;
-	}
-
-	// Grid
 	_data->bg0_x += _data->bg0_dir_x;
 	_data->bg0_y += _data->bg0_dir_y;
 
 	REG_BG0HOFS = fx2int(_data->bg0_x);
 	REG_BG0VOFS = fx2int(_data->bg0_y);
 
-	// Eye
+	// Blinking
+	_data->eye_count++;
+
+	if (_data->eye_count > 10 + fx2int(fxmul(60 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
+	{
+		blink_eye();
+		_data->eye_count = 0;
+	}
+
 	REG_BG1HOFS = -fx2int(fxmul(_data->bg0_x, 0.5f * FIX_SCALEF));
 	REG_BG1VOFS = -fx2int(fxmul(_data->bg0_y, 0.5f * FIX_SCALEF));
+
+	// Text
+	_data->text_fade_count++;
+
+	if (_data->text_fade_count > 5 + fx2int(fxmul(5 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
+	{
+		update_text_fade();
+		_data->text_fade_count = 0;
+	}
 }
 
 static void hide(void)
 {
 	REG_DISPCNT = 0;
+
+	REG_BLDCNT = BLD_BUILD(
+		BLD_OFF, // Top layers
+		BLD_OFF, // Bottom layers
+		BLD_OFF	 // Mode (off)
+	);
 }
 
 const scene_t special_zone_scene = {

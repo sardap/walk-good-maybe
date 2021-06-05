@@ -98,7 +98,9 @@
 		"game_intro.h": "c",
 		"tonc_memmap.h": "c",
 		"szgrid00.h": "c",
-		"szeye00.h": "c"
+		"szeye00.h": "c",
+		"sztext.h": "c",
+		"szeye01.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

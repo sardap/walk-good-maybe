@@ -48,7 +48,7 @@ func ConvertImg(img image.Image) image.Image {
 	for y := 0; y < img.Bounds().Max.Y; y++ {
 		for x := 0; x < img.Bounds().Max.X; x++ {
 			clr := img.At(x, y)
-			if _, _, _, a := clr.RGBA(); a == 255 {
+			if _, _, _, a := clr.RGBA(); a == 256 {
 				newImg.Set(x, y, ToGBAColour(transparentColour))
 			} else {
 				//Replace with GBA colour

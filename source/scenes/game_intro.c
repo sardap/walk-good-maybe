@@ -125,7 +125,7 @@ static void show(mg_mode_t mode)
 	_data->g_cosf = lu_cos(_data->cam_phi) >> 4;
 	_data->g_sinf = lu_sin(_data->cam_phi) >> 4;
 
-	//setup whale
+	// setup whale
 	obj_set_attr(
 		&_obj_buffer[0],
 		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF | ATTR0_AFF_DBL_BIT,
@@ -135,7 +135,7 @@ static void show(mg_mode_t mode)
 	obj_set_pos(&_obj_buffer[0], GBA_WIDTH / 2 - 64, GBA_HEIGHT / 2 - 64);
 	obj_aff_identity(&_data->obj_aff_buffer[0]);
 
-	//Start sound
+	// start sound
 	_data->state = GI_S_READY;
 
 	mmEffectEx(&_ready_sound);
@@ -153,14 +153,14 @@ static void update(void)
 		&_data->anime_cycle, 0);
 
 	--_data->countdown;
-	//This is a magic number that makes it roate fast
+	// This is a magic number that makes it roate fast
 	_data->whale_rotate -= 128 * 5;
 	_data->cam_pos.y -= 1.8f * FIX_SCALE;
 	_data->whale_scale -= fxdiv(GI_WHALE_START_SCALE, GI_STARTING_COUNTDOWN * FIX_SCALE);
 
 	obj_aff_rotscale(
 		&_data->obj_aff_buffer[0],
-		//This fucky math inverts it
+		// This fucky math inverts it
 		((1 << 24) / fx2int(_data->whale_scale)) >> 8,
 		((1 << 24) / fx2int(_data->whale_scale)) >> 8,
 		_data->whale_rotate);

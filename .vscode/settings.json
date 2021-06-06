@@ -100,7 +100,9 @@
 		"szgrid00.h": "c",
 		"szeye00.h": "c",
 		"sztext.h": "c",
-		"szeye01.h": "c"
+		"szeye01.h": "c",
+		"szwhalefloat00.h": "c",
+		"szsharedsprite.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -264,6 +264,24 @@ files=[
 ]
 
 [[Targets]]
+name="speical zone background"
+options=[
+    "-ftc",					# Create C file
+    "-gt",					# output tiled graphics
+    "-gT ff00f7",			# RGB 24 BIT
+    "-gB8",					# output 8bpp graphics
+    "-gu32",				# output data as byte array
+    "-pS",					# speical_zone Share pallet
+    "-O szSharedSprite",	# Shared pallet name
+]
+files=[
+    "speical_zone/szWhaleFloat00",
+    "speical_zone/szGoodCoin00",
+    "speical_zone/szBadCoin00",
+    "speical_zone/szDebugBox",
+]
+
+[[Targets]]
 name="sound_test background"
 options=[
     "-ftc",					# Create C file

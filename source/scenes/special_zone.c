@@ -15,19 +15,27 @@
 #include "../assets/szEye00.h"
 #include "../assets/szEye01.h"
 #include "../assets/szText.h"
+#include "../assets/szWhaleFloat00.h"
+#include "../assets/szSharedSprite.h"
+#include "../assets/szGoodCoin00.h"
+#include "../assets/szBadCoin00.h"
+#include "../assets/szDebugBox.h"
 
-static const int eye_map_row_len = 4;
-static const int eye_map_col_len = 8;
-static const unsigned int *eye_map[] = {
+static const int _eye_map_row_len = 4;
+static const int _eye_map_col_len = 8;
+static const unsigned int *_eye_map[] = {
 	(unsigned int[]){0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0000},
 	(unsigned int[]){0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F},
 	(unsigned int[]){0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017},
 	(unsigned int[]){0x0000, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E}};
 
-static const FIXED sz_max_scroll_speed = 0.75f * FIX_SCALEF;
-static const int grid_background_tile = 1;
-static const int eye_tile = 7;
-static const int text_tile = 40;
+static const FIXED _sz_max_scroll_speed = 0.75f * FIX_SCALEF;
+static const int _bg_grid_tile = 1;
+static const int _bg_eye_tile = 7;
+static const int _bg_text_tile = 40;
+static const int _obj_whale_tile = 0;
+static const int _obj_coin_tile = 50;
+static const int _obj_debug_box_tile = 100;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
@@ -36,11 +44,11 @@ static void blink_eye()
 {
 	if (_data->eye_toggle)
 		memcpy16(
-			&tile8_mem[SZ_SHARED_CB][eye_tile],
+			&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
 			szEye00Tiles, szEye00TilesLen / 2);
 	else
 		memcpy16(
-			&tile8_mem[SZ_SHARED_CB][eye_tile],
+			&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
 			szEye01Tiles, szEye01TilesLen / 2);
 
 	_data->eye_toggle = !_data->eye_toggle;
@@ -49,20 +57,20 @@ static void blink_eye()
 static void make_eye(int x_ofs, int y_ofs)
 {
 	// Check to see if it's empty space
-	for (int y = 0; y < eye_map_row_len; y++)
+	for (int y = 0; y < _eye_map_row_len; y++)
 	{
-		for (int x = 0; x < eye_map_col_len; x++)
+		for (int x = 0; x < _eye_map_col_len; x++)
 		{
 			if (se_mem[SZ_EYE_SBB][32 * (y + y_ofs) + (x + x_ofs)])
 				return;
 		}
 	}
 
-	for (int y = 0; y < eye_map_row_len; y++)
+	for (int y = 0; y < _eye_map_row_len; y++)
 	{
-		for (int x = 0; x < eye_map_col_len; x++)
+		for (int x = 0; x < _eye_map_col_len; x++)
 		{
-			unsigned int tile = eye_map[y][x] ? eye_map[y][x] + eye_tile : 0;
+			unsigned int tile = _eye_map[y][x] ? _eye_map[y][x] + _bg_eye_tile : 0;
 			se_mem[SZ_EYE_SBB][32 * (y + y_ofs) + (x + x_ofs)] = tile;
 		}
 	}
@@ -70,52 +78,57 @@ static void make_eye(int x_ofs, int y_ofs)
 
 static void update_text_fade(FIXED max)
 {
-	int base;
+	int base = 0;
 	switch (_data->text_state)
 	{
-	case FADED:
-		base = 120;
+	case SZ_TS_FADED:
+		base = 240;
 		break;
-	case UNFDAING:
-	case FADING:
-		base = 5;
-	default:
+	case SZ_TS_SOLID:
+		base = 9000;
 		break;
+	case SZ_TS_UNFDAING:
+	case SZ_TS_FADING:
+		base = 7;
 	}
 
 	_data->text_fade_count++;
 
-	if (_data->text_fade_count < base + fx2int(fxmul(base * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
+	if (_data->text_fade_count < base + fx2int(fxmul(base * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, _sz_max_scroll_speed)))))
 		return;
 
 	_data->text_fade_count = 0;
 
 	switch (_data->text_state)
 	{
-	case FADED:
-		_data->text_state = UNFDAING;
+	case SZ_TS_FADED:
+		_data->text_state = SZ_TS_UNFDAING;
+		REG_DISPCNT |= DCNT_BG2;
+		// Switch coins to be bad
 		break;
-	case UNFDAING:
+	case SZ_TS_UNFDAING:
 		_data->text_eva++;
 		if (_data->text_eva >= 15)
-			_data->text_state = FADING;
+		{
+			GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
+			_data->text_state = SZ_TS_SOLID;
+		}
 		break;
-	case FADING:
+	case SZ_TS_SOLID:
+		_data->text_state = SZ_TS_FADING;
+		// Switch coins to be bad
+		GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szBadCoin00Tiles);
+		break;
+	case SZ_TS_FADING:
 		_data->text_eva--;
 		if (_data->text_eva < 0)
 		{
 			_data->text_eva = 0;
-			_data->text_state = FADED;
+			REG_DISPCNT ^= DCNT_BG2;
+			_data->text_state = SZ_TS_FADED;
 		}
 		break;
 	}
-
-	// Transparent
-	REG_BLDCNT = BLD_BUILD(
-		BLD_BG2,					 // Top layers
-		BLD_BG0 | BLD_BG1 | BLD_OBJ, // Bottom layers
-		1							 // Mode (std)
-	);
 
 	/* Update blend weights
 		Left EVA: Top weight max of 15 (4 bits)
@@ -123,7 +136,93 @@ static void update_text_fade(FIXED max)
 		almost complete fade
 	*/
 	REG_BLDALPHA = BLDA_BUILD(_data->text_eva, 15 - _data->text_eva);
-	REG_BLDY = BLDY_BUILD(0);
+}
+
+static void update_player()
+{
+	// Rotation
+	if (key_tri_shoulder())
+	{
+		int change = fx2int(fxmul(int2fx(key_tri_shoulder()), _data->player.turning_speed));
+		_data->player.angle = WRAP(
+			_data->player.angle - change,
+			0, 0xFFFF);
+		obj_aff_rotate(_data->player.aff, _data->player.angle);
+	}
+	// accelerate
+	FIXED next_vel = key_held(KEY_A) ? SZ_PLAYER_VELOCITY : -(0.00625f * FIX_SCALEF);
+	_data->player.velocity = CLAMP(_data->player.velocity + next_vel, 0.0125f * FIX_SCALEF, _data->player.max_velocity);
+
+	FIXED nx = _data->player.x - fxmul(lu_sin(_data->player.angle), _data->player.velocity);
+	FIXED ny = _data->player.y - fxmul(lu_cos(_data->player.angle), _data->player.velocity);
+
+	// Check bounds
+	if (
+		nx + SZ_PLAYER_WIDTH_FX < SCREEN_WIDTH * FIX_SCALE &&
+		nx > 0 - fxdiv(SZ_PLAYER_WIDTH_FX, 1.3f * FIX_SCALEF) &&
+		ny > 0 - fxdiv(SZ_PLAYER_HEIGHT_FX, 1.3f * FIX_SCALEF) &&
+		ny + SZ_PLAYER_HEIGHT_FX < SCREEN_HEIGHT * FIX_SCALE)
+	{
+		_data->player.x = nx;
+		_data->player.y = ny;
+	}
+
+	obj_set_pos(_data->player.attr, fx2int(_data->player.x), fx2int(_data->player.y));
+	obj_set_pos(&_obj_buffer[1], fx2int(_data->player.x), fx2int(_data->player.y));
+	// obj_set_pos(
+	// 	&_obj_buffer[1],
+	// 	fx2int(_data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE)),
+	// 	fx2int(_data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE)));
+}
+
+static void update_obs()
+{
+	FIXED pl = _data->player.x;
+	FIXED pr = _data->player.x + SZ_PLAYER_WIDTH_FX;
+	FIXED pt = _data->player.y;
+	FIXED pb = _data->player.y + SZ_PLAYER_HEIGHT_FX;
+
+	for (int i = 0; i < SZ_OBS_COUNT; i++)
+	{
+		sz_obs_t *top = &_data->obs[i];
+
+		if (!top->enabled)
+			continue;
+
+		top->x += top->dx;
+		top->y += top->dy;
+
+		obj_set_pos(top->attr, fx2int(top->x), fx2int(top->y));
+
+		if (
+			pl > top->x + SZ_OBS_WIDTH_FX &&
+			pr < top->x &&
+			pt < top->y + SZ_OBS_HEIGHT_FX &&
+			pb > top->y)
+		{
+			switch (_data->text_state)
+			{
+			case SZ_TS_SOLID:
+				top->enabled = false;
+				obj_hide(top->attr);
+				break;
+			default:
+				write_to_log(LOG_LEVEL_DEBUG, "Bad things");
+				break;
+			}
+		}
+
+		if (
+			!(
+				top->x + SZ_OBS_WIDTH_FX < int2fx(SCREEN_WIDTH) &&
+				top->x > 0 &&
+				top->y > 0 &&
+				top->y + SZ_OBS_HEIGHT_FX < int2fx(SCREEN_HEIGHT)))
+		{
+			top->dx = -top->dx;
+			top->dy = -top->dy;
+		}
+	}
 }
 
 static void show(void)
@@ -132,9 +231,9 @@ static void show(void)
 	_data->bg0_y = 0 / FIX_SCALE;
 	_data->grid_count = 300;
 	_data->eye_count = 300;
-	_data->text_fade_count = 300;
-	_data->text_eva = 0;
-	_data->text_state = FADED;
+	_data->text_fade_count = 0;
+	_data->text_eva = 15;
+	_data->text_state = SZ_TS_SOLID;
 	_data->grid_toggle = false;
 	_data->eye_toggle = false;
 
@@ -157,9 +256,11 @@ static void show(void)
 	REG_BG3HOFS = fx2int(_data->bg0_x);
 	REG_BG3VOFS = fx2int(_data->bg0_y);
 
-	/* Load palettes */
+	// Load palettes
 	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
-	/* Load background tiles into SZ_SHARED_CB */
+	GRIT_CPY(pal_obj_mem, szSharedSpritePal);
+
+	// Load background tiles into SZ_SHARED_CB
 #ifdef DEBUG
 	memset16(
 		&tile_mem[SZ_SHARED_CB],
@@ -170,28 +271,76 @@ static void show(void)
 		szGrid01Tiles, szGrid00TilesLen / 2);
 
 	memcpy16(
-		&tile8_mem[SZ_SHARED_CB][eye_tile],
+		&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
 		szEye00Tiles, szEye00TilesLen / 2);
 
 	memcpy16(
-		&tile8_mem[SZ_SHARED_CB][text_tile],
+		&tile8_mem[SZ_SHARED_CB][_bg_text_tile],
 		szTextTiles, szTextTilesLen / 2);
 
 	// Map
-	memset16(&se_mem[SZ_GRID_SBB], grid_background_tile, SB_SIZE);
+	memset16(&se_mem[SZ_GRID_SBB], _bg_grid_tile, SB_SIZE);
 	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
+
+	// Obj tiles
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB], szWhaleFloat00Tiles);
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_debug_box_tile], szDebugBoxTiles);
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
+
+	OAM_CLEAR();
+	_data->obj_aff_buffer = (OBJ_AFFINE *)_obj_buffer;
+
+	_data->player.attr = &_obj_buffer[0];
+	_data->player.aff = &_data->obj_aff_buffer[0];
+	_data->player.x = int2fx(240 / 2 - 16);
+	_data->player.y = int2fx(160 / 2 - 16);
+	_data->player.angle = 0;
+	_data->player.max_velocity = float2fx(0.125f);
+	_data->player.velocity = 0;
+	_data->player.turning_speed = float2fx(800);
+	obj_set_attr(
+		_data->player.attr,
+		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF | ATTR0_AFF_DBL_BIT,
+		ATTR1_SIZE_32 | ATTR1_AFF_ID(_obj_whale_tile),
+		ATTR2_PRIO(SZ_OBJECT_LAYER));
+	obj_aff_identity(_data->player.aff);
+	obj_set_attr(
+		&_obj_buffer[1],
+		ATTR0_SQUARE | ATTR0_8BPP,
+		ATTR1_SIZE_32,
+		ATTR2_PRIO(SZ_OBJECT_LAYER) | ATTR2_ID(_obj_debug_box_tile));
+
+	for (int i = 0; i < SZ_OBS_COUNT; i++)
+	{
+		_data->obs[i].attr = &_obj_buffer[i + 2];
+		_data->obs[i].enabled = true;
+		_data->obs[i].x = int2fx(gba_rand_range(0, SCREEN_WIDTH));
+		_data->obs[i].y = int2fx(gba_rand_range(0, SCREEN_HEIGHT));
+		_data->obs[i].dx = 4 + gba_rand_range(0, 4);
+		if (gba_rand() % 2 == 0)
+			_data->obs[i].dx = -_data->obs[i].dx;
+		_data->obs[i].dy = 4 + gba_rand_range(0, 4);
+		if (gba_rand() % 2 == 0)
+			_data->obs[i].dy = -_data->obs[i].dy;
+
+		obj_set_attr(
+			_data->obs[i].attr,
+			ATTR0_SQUARE | ATTR0_8BPP,
+			ATTR1_SIZE_8,
+			ATTR2_PRIO(SZ_OBJECT_LAYER) | ATTR2_ID(_obj_coin_tile));
+	}
 
 	// Spawn eyes
 	for (int i = 0; i < gba_rand_range(4, 6); i++)
 	{
-		int x_ofs = gba_rand_range(0, 30 - eye_map_col_len);
-		int y_ofs = gba_rand_range(0, 30 - eye_map_row_len);
+		int x_ofs = gba_rand_range(0, 30 - _eye_map_col_len);
+		int y_ofs = gba_rand_range(0, 30 - _eye_map_row_len);
 		make_eye(x_ofs, y_ofs);
 	}
 
 	for (int i = 0; i < szTextMapLen / 2; i++)
 	{
-		unsigned int tile = szTextMap[i] ? szTextMap[i] + text_tile : 0;
+		unsigned int tile = szTextMap[i] ? szTextMap[i] + _bg_text_tile : 0;
 		se_mem[SZ_TEXT_SBB][i] = tile;
 	}
 
@@ -212,7 +361,7 @@ static void show(void)
 		Right EVB: Bottom wieght max of 15 (4 bits)
 		almost complete fade
 	*/
-	REG_BLDALPHA = BLDA_BUILD(0, 15);
+	REG_BLDALPHA = BLDA_BUILD(_data->text_eva, 15 - _data->text_eva);
 	REG_BLDY = BLDY_BUILD(0);
 
 	update_text_fade(1);
@@ -221,7 +370,7 @@ static void show(void)
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
-	REG_DISPCNT = DCNT_MODE0 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
+	REG_DISPCNT = DCNT_MODE0 | DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
 }
 
 static void update(void)
@@ -231,7 +380,7 @@ static void update(void)
 	// Grid
 	FIXED max = MAX(_data->bg0_dir_x, _data->bg0_dir_y) - 0.25f * FIX_SCALEF;
 
-	if (_data->grid_count > 10 + fx2int(fxmul(30 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
+	if (_data->grid_count > 10 + fx2int(fxmul(30 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, _sz_max_scroll_speed)))))
 	{
 		if (_data->grid_toggle)
 			memcpy16(
@@ -256,7 +405,7 @@ static void update(void)
 	// Blinking
 	_data->eye_count++;
 
-	if (_data->eye_count > 10 + fx2int(fxmul(60 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, sz_max_scroll_speed)))))
+	if (_data->eye_count > 10 + fx2int(fxmul(60 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, _sz_max_scroll_speed)))))
 	{
 		blink_eye();
 		_data->eye_count = 0;
@@ -267,6 +416,14 @@ static void update(void)
 
 	// Text
 	update_text_fade(max);
+
+	// Objs
+
+	update_player();
+	update_obs();
+
+	obj_copy(obj_mem, _obj_buffer, 22);
+	obj_aff_copy(obj_aff_mem, _data->obj_aff_buffer, 1);
 }
 
 static void hide(void)

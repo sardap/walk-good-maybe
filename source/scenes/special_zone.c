@@ -19,7 +19,6 @@
 #include "../assets/szSharedSprite.h"
 #include "../assets/szGoodCoin00.h"
 #include "../assets/szBadCoin00.h"
-#include "../assets/szDebugBox.h"
 
 static const int _eye_map_row_len = 4;
 static const int _eye_map_col_len = 8;
@@ -35,14 +34,13 @@ static const int _bg_eye_tile = 7;
 static const int _bg_text_tile = 40;
 static const int _obj_whale_tile = 0;
 static const int _obj_coin_tile = 50;
-static const int _obj_debug_box_tile = 100;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
 
 static void blink_eye()
 {
-	if (_data->eye_toggle)
+	if (_data->eyes_looking)
 		memcpy16(
 			&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
 			szEye00Tiles, szEye00TilesLen / 2);
@@ -51,7 +49,7 @@ static void blink_eye()
 			&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
 			szEye01Tiles, szEye01TilesLen / 2);
 
-	_data->eye_toggle = !_data->eye_toggle;
+	_data->eyes_looking = !_data->eyes_looking;
 }
 
 static void make_eye(int x_ofs, int y_ofs)
@@ -85,8 +83,10 @@ static void update_text_fade(FIXED max)
 		base = 240;
 		break;
 	case SZ_TS_SOLID:
-		base = 9000;
+		base = 80;
 		break;
+	case SZ_TS_EYES_OPEN:
+		base = 80;
 	case SZ_TS_UNFDAING:
 	case SZ_TS_FADING:
 		base = 7;
@@ -112,11 +112,16 @@ static void update_text_fade(FIXED max)
 		{
 			GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
 			_data->text_state = SZ_TS_SOLID;
+			blink_eye();
 		}
 		break;
 	case SZ_TS_SOLID:
+		_data->text_state = SZ_TS_EYES_OPEN;
+		blink_eye();
+		_data->text_eva = 13;
+		break;
+	case SZ_TS_EYES_OPEN:
 		_data->text_state = SZ_TS_FADING;
-		// Switch coins to be bad
 		GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szBadCoin00Tiles);
 		break;
 	case SZ_TS_FADING:
@@ -168,10 +173,6 @@ static void update_player()
 	}
 
 	obj_set_pos(_data->player.attr, fx2int(_data->player.x), fx2int(_data->player.y));
-	obj_set_pos(
-		&_obj_buffer[1],
-		fx2int(_data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE)),
-		fx2int(_data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE)));
 }
 
 static void update_obs()
@@ -230,12 +231,11 @@ static void show(void)
 	_data->bg0_x = 0 / FIX_SCALE;
 	_data->bg0_y = 0 / FIX_SCALE;
 	_data->grid_count = 300;
-	_data->eye_count = 300;
 	_data->text_fade_count = 0;
 	_data->text_eva = 15;
 	_data->text_state = SZ_TS_SOLID;
 	_data->grid_toggle = false;
-	_data->eye_toggle = false;
+	_data->eyes_looking = false;
 
 	// Set direction
 	_data->bg0_dir_x = float2fx(RAND_FLOAT(0.75f)) + 0.25f * FIX_SCALEF;
@@ -270,9 +270,7 @@ static void show(void)
 		&tile8_mem[SZ_SHARED_CB],
 		szGrid01Tiles, szGrid00TilesLen / 2);
 
-	memcpy16(
-		&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
-		szEye00Tiles, szEye00TilesLen / 2);
+	blink_eye();
 
 	memcpy16(
 		&tile8_mem[SZ_SHARED_CB][_bg_text_tile],
@@ -284,7 +282,6 @@ static void show(void)
 
 	// Obj tiles
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB], szWhaleFloat00Tiles);
-	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_debug_box_tile], szDebugBoxTiles);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
 
 	OAM_CLEAR();
@@ -295,7 +292,7 @@ static void show(void)
 	_data->player.x = int2fx(240 / 2 - 16);
 	_data->player.y = int2fx(160 / 2 - 16);
 	_data->player.angle = 0;
-	_data->player.max_velocity = float2fx(0.125f);
+	_data->player.max_velocity = float2fx(0.1f);
 	_data->player.velocity = 0;
 	_data->player.turning_speed = float2fx(800);
 	obj_set_attr(
@@ -304,15 +301,10 @@ static void show(void)
 		ATTR1_SIZE_32 | ATTR1_AFF_ID(_obj_whale_tile),
 		ATTR2_PRIO(SZ_OBJECT_LAYER));
 	obj_aff_identity(_data->player.aff);
-	obj_set_attr(
-		&_obj_buffer[1],
-		ATTR0_SQUARE | ATTR0_8BPP,
-		ATTR1_SIZE_32,
-		ATTR2_PRIO(SZ_OBJECT_LAYER) | ATTR2_ID(_obj_debug_box_tile));
 
 	for (int i = 0; i < SZ_OBS_COUNT; i++)
 	{
-		_data->obs[i].attr = &_obj_buffer[i + 2];
+		_data->obs[i].attr = &_obj_buffer[i + 1];
 		_data->obs[i].enabled = true;
 		_data->obs[i].x = int2fx(gba_rand_range(0, SCREEN_WIDTH));
 		_data->obs[i].y = int2fx(gba_rand_range(0, SCREEN_HEIGHT));
@@ -402,15 +394,7 @@ static void update(void)
 	REG_BG0HOFS = fx2int(_data->bg0_x);
 	REG_BG0VOFS = fx2int(_data->bg0_y);
 
-	// Blinking
-	_data->eye_count++;
-
-	if (_data->eye_count > 10 + fx2int(fxmul(60 * FIX_SCALE, 1 * FIX_SCALE - (fxdiv(max, _sz_max_scroll_speed)))))
-	{
-		blink_eye();
-		_data->eye_count = 0;
-	}
-
+	// Eyes
 	REG_BG1HOFS = -fx2int(fxmul(_data->bg0_x, 0.5f * FIX_SCALEF));
 	REG_BG1VOFS = -fx2int(fxmul(_data->bg0_y, 0.5f * FIX_SCALEF));
 
@@ -422,7 +406,7 @@ static void update(void)
 	update_player();
 	update_obs();
 
-	obj_copy(obj_mem, _obj_buffer, 22);
+	obj_copy(obj_mem, _obj_buffer, 21);
 	obj_aff_copy(obj_aff_mem, _data->obj_aff_buffer, 1);
 }
 

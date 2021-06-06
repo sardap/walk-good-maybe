@@ -15,18 +15,19 @@
 
 #define SZ_PLAYER_WIDTH_FX (30 * FIX_SCALE)
 #define SZ_PLAYER_HEIGHT_FX SZ_PLAYER_WIDTH_FX
-#define SZ_PLAYER_VELOCITY (0.025f * FIX_SCALEF)
+#define SZ_PLAYER_VELOCITY (0.01f * FIX_SCALEF)
 
-#define SZ_OBS_COUNT 1
+#define SZ_OBS_COUNT 20
 #define SZ_OBS_WIDTH_FX (8 * FIX_SCALE)
 #define SZ_OBS_HEIGHT_FX (8 * FIX_SCALE)
 
 typedef enum sz_text_state_e
 {
+	SZ_TS_SOLID,
+	SZ_TS_EYES_OPEN,
 	SZ_TS_FADING,
 	SZ_TS_FADED,
-	SZ_TS_UNFDAING,
-	SZ_TS_SOLID
+	SZ_TS_UNFDAING
 } sz_text_state_e;
 
 typedef struct sz_player_t
@@ -58,11 +59,11 @@ typedef struct sz_data_t
 	OBJ_AFFINE *obj_aff_buffer;
 	FIXED bg0_x, bg0_y;
 	FIXED bg0_dir_x, bg0_dir_y;
-	int grid_count, eye_count, text_fade_count;
+	int grid_count, text_fade_count;
 	int text_eva;
 	sz_text_state_e text_state;
 	BOOL grid_toggle;
-	BOOL eye_toggle;
+	BOOL eyes_looking;
 	sz_player_t player;
 	sz_obs_t obs[SZ_OBS_COUNT];
 } sz_data_t;

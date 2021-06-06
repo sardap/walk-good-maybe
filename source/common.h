@@ -23,6 +23,8 @@
 
 #define RAND_FLOAT(max) ((float)gba_rand_range(0, 8000) / (float)(8000) * max)
 
+#define RECT_INTERSECTION(al, ar, at, ab, bl, br, bt, bb) (al < br && ar > bl && at < bb && ab > bt)
+
 typedef struct scene_t
 {
 	void (*show)(void);

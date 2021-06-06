@@ -168,19 +168,18 @@ static void update_player()
 	}
 
 	obj_set_pos(_data->player.attr, fx2int(_data->player.x), fx2int(_data->player.y));
-	obj_set_pos(&_obj_buffer[1], fx2int(_data->player.x), fx2int(_data->player.y));
-	// obj_set_pos(
-	// 	&_obj_buffer[1],
-	// 	fx2int(_data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE)),
-	// 	fx2int(_data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE)));
+	obj_set_pos(
+		&_obj_buffer[1],
+		fx2int(_data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE)),
+		fx2int(_data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE)));
 }
 
 static void update_obs()
 {
-	FIXED pl = _data->player.x;
-	FIXED pr = _data->player.x + SZ_PLAYER_WIDTH_FX;
-	FIXED pt = _data->player.y;
-	FIXED pb = _data->player.y + SZ_PLAYER_HEIGHT_FX;
+	FIXED pl = _data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE);
+	FIXED pr = _data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE) + SZ_PLAYER_WIDTH_FX;
+	FIXED pt = _data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE);
+	FIXED pb = _data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE) + SZ_PLAYER_HEIGHT_FX;
 
 	for (int i = 0; i < SZ_OBS_COUNT; i++)
 	{
@@ -194,11 +193,12 @@ static void update_obs()
 
 		obj_set_pos(top->attr, fx2int(top->x), fx2int(top->y));
 
-		if (
-			pl > top->x + SZ_OBS_WIDTH_FX &&
-			pr < top->x &&
-			pt < top->y + SZ_OBS_HEIGHT_FX &&
-			pb > top->y)
+		FIXED tl = top->x;
+		FIXED tr = top->x + int2fx(8);
+		FIXED tt = top->y;
+		FIXED tb = top->y + int2fx(8);
+
+		if (RECT_INTERSECTION(pl, pr, pt, pb, tl, tr, tt, tb))
 		{
 			switch (_data->text_state)
 			{

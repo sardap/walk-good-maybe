@@ -12,8 +12,10 @@
 #include "../assets/szSharedBackground.h"
 #include "../assets/szGrid00.h"
 #include "../assets/szGrid01.h"
-#include "../assets/szEye00.h"
-#include "../assets/szEye01.h"
+#include "../assets/szEye00Open.h"
+#include "../assets/szEye00Closed.h"
+#include "../assets/szEye01Open.h"
+#include "../assets/szEye01Closed.h"
 #include "../assets/szText.h"
 #include "../assets/szWhaleFloat00.h"
 #include "../assets/szSharedSprite.h"
@@ -30,8 +32,9 @@ static const unsigned int *_eye_map[] = {
 
 static const FIXED _sz_max_scroll_speed = 0.75f * FIX_SCALEF;
 static const int _bg_grid_tile = 1;
-static const int _bg_eye_tile = 7;
-static const int _bg_text_tile = 40;
+static const int _bg_eye00_tile = 7;
+static const int _bg_eye01_tile = 40;
+static const int _bg_text_tile = 100;
 static const int _obj_whale_tile = 0;
 static const int _obj_coin_tile = 50;
 
@@ -41,13 +44,23 @@ static sz_data_t *_data = &_tmp;
 static void blink_eye()
 {
 	if (_data->eyes_looking)
+	{
 		memcpy16(
-			&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
-			szEye00Tiles, szEye00TilesLen / 2);
+			&tile8_mem[SZ_SHARED_CB][_bg_eye00_tile],
+			szEye00OpenTiles, szEye00OpenTilesLen / 2);
+		memcpy16(
+			&tile8_mem[SZ_SHARED_CB][_bg_eye01_tile],
+			szEye01OpenTiles, szEye01OpenTilesLen / 2);
+	}
 	else
+	{
 		memcpy16(
-			&tile8_mem[SZ_SHARED_CB][_bg_eye_tile],
-			szEye01Tiles, szEye01TilesLen / 2);
+			&tile8_mem[SZ_SHARED_CB][_bg_eye00_tile],
+			szEye00ClosedTiles, szEye00ClosedTilesLen / 2);
+		memcpy16(
+			&tile8_mem[SZ_SHARED_CB][_bg_eye01_tile],
+			szEye01ClosedTiles, szEye01ClosedTilesLen / 2);
+	}
 
 	_data->eyes_looking = !_data->eyes_looking;
 }
@@ -64,11 +77,12 @@ static void make_eye(int x_ofs, int y_ofs)
 		}
 	}
 
+	int tile_offset = gba_rand() % 2 == 0 ? _bg_eye00_tile : _bg_eye01_tile;
 	for (int y = 0; y < _eye_map_row_len; y++)
 	{
 		for (int x = 0; x < _eye_map_col_len; x++)
 		{
-			unsigned int tile = _eye_map[y][x] ? _eye_map[y][x] + _bg_eye_tile : 0;
+			unsigned int tile = _eye_map[y][x] ? _eye_map[y][x] + tile_offset : 0;
 			se_mem[SZ_EYE_SBB][32 * (y + y_ofs) + (x + x_ofs)] = tile;
 		}
 	}
@@ -308,10 +322,10 @@ static void show(void)
 		_data->obs[i].enabled = true;
 		_data->obs[i].x = int2fx(gba_rand_range(0, SCREEN_WIDTH));
 		_data->obs[i].y = int2fx(gba_rand_range(0, SCREEN_HEIGHT));
-		_data->obs[i].dx = 4 + gba_rand_range(0, 4);
+		_data->obs[i].dx = 4 + gba_rand_range(0, 20);
 		if (gba_rand() % 2 == 0)
 			_data->obs[i].dx = -_data->obs[i].dx;
-		_data->obs[i].dy = 4 + gba_rand_range(0, 4);
+		_data->obs[i].dy = 4 + gba_rand_range(0, 20);
 		if (gba_rand() % 2 == 0)
 			_data->obs[i].dy = -_data->obs[i].dy;
 

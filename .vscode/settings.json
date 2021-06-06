@@ -102,7 +102,11 @@
 		"sztext.h": "c",
 		"szeye01.h": "c",
 		"szwhalefloat00.h": "c",
-		"szsharedsprite.h": "c"
+		"szsharedsprite.h": "c",
+		"szeye00closed.h": "c",
+		"szbadcoin00.h": "c",
+		"szgoodcoin00.h": "c",
+		"szeye00open.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

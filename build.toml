@@ -258,8 +258,10 @@ options=[
 files=[
     "speical_zone/szGrid00",
     "speical_zone/szGrid01",
-    "speical_zone/szEye00",
-    "speical_zone/szEye01",
+    "speical_zone/szEye00Open",
+    "speical_zone/szEye00Closed",
+	"speical_zone/szEye01Open",
+    "speical_zone/szEye01Closed",
     "speical_zone/szText",
 ]
 

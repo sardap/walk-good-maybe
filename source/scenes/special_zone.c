@@ -97,13 +97,15 @@ static void update_text_fade(FIXED max)
 		base = 240;
 		break;
 	case SZ_TS_SOLID:
-		base = 80;
+		base = 140;
 		break;
 	case SZ_TS_EYES_OPEN:
-		base = 80;
+		base = 30;
+		break;
 	case SZ_TS_UNFDAING:
 	case SZ_TS_FADING:
 		base = 7;
+		break;
 	}
 
 	_data->text_fade_count++;
@@ -203,8 +205,18 @@ static void update_obs()
 		if (!top->enabled)
 			continue;
 
-		top->x += top->dx;
-		top->y += top->dy;
+		switch (_data->text_state)
+		{
+		case SZ_TS_SOLID:
+		case SZ_TS_EYES_OPEN:
+			top->x += top->dx;
+			top->y += top->dy;
+			break;
+		default:
+			top->x += fxmul(top->dx, float2fx(4.5f));
+			top->y += fxmul(top->dy, float2fx(4.5f));
+			break;
+		}
 
 		obj_set_pos(top->attr, fx2int(top->x), fx2int(top->y));
 
@@ -218,6 +230,7 @@ static void update_obs()
 			switch (_data->text_state)
 			{
 			case SZ_TS_SOLID:
+			case SZ_TS_EYES_OPEN:
 				top->enabled = false;
 				obj_hide(top->attr);
 				break;
@@ -273,6 +286,9 @@ static void show(void)
 	// Load palettes
 	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	GRIT_CPY(pal_obj_mem, szSharedSpritePal);
+
+	pal_bg_mem[1] = (u16)gba_rand();
+	pal_bg_mem[2] = (u16)gba_rand();
 
 	// Load background tiles into SZ_SHARED_CB
 #ifdef DEBUG
@@ -337,7 +353,7 @@ static void show(void)
 	}
 
 	// Spawn eyes
-	for (int i = 0; i < gba_rand_range(4, 6); i++)
+	for (int i = 0; i < gba_rand_range(5, 10); i++)
 	{
 		int x_ofs = gba_rand_range(0, 30 - _eye_map_col_len);
 		int y_ofs = gba_rand_range(0, 30 - _eye_map_row_len);

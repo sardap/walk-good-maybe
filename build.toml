@@ -258,6 +258,7 @@ options=[
 files=[
     "speical_zone/szGrid00",
     "speical_zone/szGrid01",
+    "speical_zone/szUiOverlay",
     "speical_zone/szEye00Open",
     "speical_zone/szEye00Closed",
 	"speical_zone/szEye01Open",
@@ -281,6 +282,7 @@ files=[
     "speical_zone/szGoodCoin00",
     "speical_zone/szBadCoin00",
     "speical_zone/szDebugBox",
+    "speical_zone/szNumbers",
 ]
 
 [[Targets]]

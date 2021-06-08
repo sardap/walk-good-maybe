@@ -106,7 +106,14 @@
 		"szeye00closed.h": "c",
 		"szbadcoin00.h": "c",
 		"szgoodcoin00.h": "c",
-		"szeye00open.h": "c"
+		"szeye00open.h": "c",
+		"szscoretext.h": "c",
+		"szscoretextleft.h": "c",
+		"szscoretextright.h": "c",
+		"sznumbers.h": "c",
+		"typeinfo": "cpp",
+		"tonc_core.h": "c",
+		"tonc_nocash.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

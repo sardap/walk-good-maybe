@@ -21,6 +21,8 @@
 #include "../assets/szSharedSprite.h"
 #include "../assets/szGoodCoin00.h"
 #include "../assets/szBadCoin00.h"
+#include "../assets/szNumbers.h"
+#include "../assets/szUiOverlay.h"
 
 static const int _eye_map_row_len = 4;
 static const int _eye_map_col_len = 8;
@@ -35,8 +37,11 @@ static const int _bg_grid_tile = 1;
 static const int _bg_eye00_tile = 7;
 static const int _bg_eye01_tile = 40;
 static const int _bg_text_tile = 100;
+static const int _bg_ui_overlay = 215;
+
 static const int _obj_whale_tile = 0;
-static const int _obj_coin_tile = 50;
+static const int _obj_coin_tile = _obj_whale_tile + szWhaleFloat00TilesLen / 32 + 1;
+static const int _obj_numbers_tile = _obj_coin_tile + szGoodCoin00TilesLen / 32 + 1;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
@@ -191,6 +196,37 @@ static void update_player()
 	obj_set_pos(_data->player.attr, fx2int(_data->player.x), fx2int(_data->player.y));
 }
 
+static void update_score_display(int score)
+{
+	//Count number of digits
+	int w_score = score;
+	int digit_count = 0;
+	while (w_score != 0)
+	{
+		digit_count++;
+		w_score /= 10;
+	}
+
+	w_score = score;
+	for (int i = SZ_SCORE_DIGIT_COUNT - 1; i >= 0; i--)
+	{
+		int offset;
+		if (((SZ_SCORE_DIGIT_COUNT - 1) - i) < digit_count)
+			offset = (w_score % 10);
+		else
+			offset = 0;
+
+		w_score /= 10;
+
+		OBJ_ATTR *attr = &_obj_buffer[_data->ui.score_number_offset + i];
+		obj_set_attr(
+			attr,
+			attr->attr0,
+			attr->attr1,
+			ATTR2_PRIO(SZ_TEXT_LAYER) | ATTR2_ID(_obj_numbers_tile + (offset * 2)));
+	}
+}
+
 static void update_obs()
 {
 	FIXED pl = _data->player.x + fxdiv(SZ_PLAYER_WIDTH_FX, 2 * FIX_SCALE);
@@ -233,9 +269,11 @@ static void update_obs()
 			case SZ_TS_EYES_OPEN:
 				top->enabled = false;
 				obj_hide(top->attr);
+				_data->player.good_collected++;
+				update_score_display(_data->player.good_collected);
 				break;
 			default:
-				write_to_log(LOG_LEVEL_DEBUG, "Bad things");
+				// write_to_log(LOG_LEVEL_DEBUG, "Bad things");
 				break;
 			}
 		}
@@ -251,6 +289,34 @@ static void update_obs()
 			top->dy = -top->dy;
 		}
 	}
+}
+
+static void update_ui_border()
+{
+	_data->colour_dist += float2fx(0.05f);
+
+	if (_data->colour_dist >= int2fx(1))
+	{
+		_data->colour_dist = 0;
+		_data->border_colour_current = _data->border_colour_next;
+		_data->border_colour_next = (u16)gba_rand();
+	}
+
+	u16 current_red = GET_RED(_data->border_colour_current);
+	u16 current_green = GET_GREEN(_data->border_colour_current);
+	u16 current_blue = GET_BLUE(_data->border_colour_current);
+
+	u16 next_red = GET_RED(_data->border_colour_current);
+	u16 next_geen = GET_GREEN(_data->border_colour_next);
+	u16 next_blue = GET_BLUE(_data->border_colour_next);
+
+	int result_red = fx2int(int2fx(current_red) + fxmul(_data->colour_dist, int2fx(next_red - current_red)));
+	int result_green = fx2int(int2fx(current_green) + fxmul(_data->colour_dist, int2fx(next_geen - current_green)));
+	int result_blue = fx2int(int2fx(current_blue) + fxmul(_data->colour_dist, int2fx(next_blue - current_blue)));
+
+	u16 next_colour = CREATE_COLOUR(result_red, result_green, result_blue);
+
+	pal_bg_mem[SZ_BORDER_PAL_IDX] = next_colour;
 }
 
 static void show(void)
@@ -290,6 +356,11 @@ static void show(void)
 	pal_bg_mem[1] = (u16)gba_rand();
 	pal_bg_mem[2] = (u16)gba_rand();
 
+	_data->colour_dist = 0;
+	_data->border_colour_current = (u16)gba_rand();
+	_data->border_colour_next = (u16)gba_rand();
+	update_ui_border();
+
 	// Load background tiles into SZ_SHARED_CB
 #ifdef DEBUG
 	memset16(
@@ -302,29 +373,48 @@ static void show(void)
 
 	blink_eye();
 
-	memcpy16(
-		&tile8_mem[SZ_SHARED_CB][_bg_text_tile],
-		szTextTiles, szTextTilesLen / 2);
+	GRIT_CPY(&tile8_mem[SZ_SHARED_CB][_bg_text_tile], szTextTiles);
+	GRIT_CPY(&tile8_mem[SZ_SHARED_CB][_bg_ui_overlay], szUiOverlayTiles);
 
 	// Map
+
 	memset16(&se_mem[SZ_GRID_SBB], _bg_grid_tile, SB_SIZE);
 	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
+	memset16(&se_mem[SZ_TEXT_SBB], 0, SB_SIZE);
+
+	// Spawn eyes
+	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
+	for (int i = 0; i < gba_rand_range(5, 10); i++)
+	{
+		int x_ofs = gba_rand_range(0, 30 - _eye_map_col_len);
+		int y_ofs = gba_rand_range(0, 30 - _eye_map_row_len);
+		make_eye(x_ofs, y_ofs);
+	}
+
+	MAP_COPY(se_mem[SZ_UI_SBB], szUiOverlayMap, _bg_ui_overlay);
+	MAP_COPY(se_mem[SZ_TEXT_SBB], szTextMap, _bg_text_tile);
 
 	// Obj tiles
-	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB], szWhaleFloat00Tiles);
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_whale_tile], szWhaleFloat00Tiles);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_numbers_tile], szNumbersTiles);
 
+	// Objs
 	OAM_CLEAR();
 	_data->obj_aff_buffer = (OBJ_AFFINE *)_obj_buffer;
 
-	_data->player.attr = &_obj_buffer[0];
-	_data->player.aff = &_data->obj_aff_buffer[0];
+	int top_obj = 0;
+
+	// Player
+	_data->player.attr = &_obj_buffer[top_obj];
+	_data->player.aff = &_data->obj_aff_buffer[top_obj++];
 	_data->player.x = int2fx(240 / 2 - 16);
 	_data->player.y = int2fx(160 / 2 - 16);
 	_data->player.angle = 0;
 	_data->player.max_velocity = float2fx(0.1f);
 	_data->player.velocity = 0;
 	_data->player.turning_speed = float2fx(800);
+	_data->player.good_collected = 0;
 	obj_set_attr(
 		_data->player.attr,
 		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF | ATTR0_AFF_DBL_BIT,
@@ -332,9 +422,10 @@ static void show(void)
 		ATTR2_PRIO(SZ_OBJECT_LAYER));
 	obj_aff_identity(_data->player.aff);
 
+	// Obs
 	for (int i = 0; i < SZ_OBS_COUNT; i++)
 	{
-		_data->obs[i].attr = &_obj_buffer[i + 1];
+		_data->obs[i].attr = &_obj_buffer[top_obj++];
 		_data->obs[i].enabled = true;
 		_data->obs[i].x = int2fx(gba_rand_range(0, SCREEN_WIDTH));
 		_data->obs[i].y = int2fx(gba_rand_range(0, SCREEN_HEIGHT));
@@ -352,30 +443,33 @@ static void show(void)
 			ATTR2_PRIO(SZ_OBJECT_LAYER) | ATTR2_ID(_obj_coin_tile));
 	}
 
-	// Spawn eyes
-	for (int i = 0; i < gba_rand_range(5, 10); i++)
+	// UI
+	_data->ui.score_number_offset = ++top_obj;
+	for (int i = 0; i < SZ_SCORE_DIGIT_COUNT; i++)
 	{
-		int x_ofs = gba_rand_range(0, 30 - _eye_map_col_len);
-		int y_ofs = gba_rand_range(0, 30 - _eye_map_row_len);
-		make_eye(x_ofs, y_ofs);
+		obj_set_attr(
+			&_obj_buffer[_data->ui.score_number_offset + i],
+			ATTR0_SQUARE | ATTR0_8BPP,
+			ATTR1_SIZE_8,
+			ATTR2_PRIO(SZ_UI_LAYER) | ATTR2_ID(_obj_numbers_tile));
+		obj_set_pos(&_obj_buffer[_data->ui.score_number_offset + i], 65 + (i * 10), 10);
 	}
+	top_obj += SZ_SCORE_DIGIT_COUNT;
+	update_score_display(0);
 
-	for (int i = 0; i < szTextMapLen / 2; i++)
-	{
-		unsigned int tile = szTextMap[i] ? szTextMap[i] + _bg_text_tile : 0;
-		se_mem[SZ_TEXT_SBB][i] = tile;
-	}
+	_data->obj_count = top_obj + 1;
 
 	// BG regs
 	REG_BG0CNT = BG_PRIO(SZ_GRID_LAYER) | BG_8BPP | BG_SBB(SZ_GRID_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(SZ_EYE_LAYER) | BG_8BPP | BG_SBB(SZ_EYE_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
 	REG_BG2CNT = BG_PRIO(SZ_TEXT_LAYER) | BG_8BPP | BG_SBB(SZ_TEXT_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
+	REG_BG3CNT = BG_PRIO(SZ_UI_LAYER) | BG_8BPP | BG_SBB(SZ_UI_SBB) | BG_CBB(SZ_SHARED_CB) | BG_REG_32x32;
 
 	// Transparent
 	REG_BLDCNT = BLD_BUILD(
-		BLD_BG2,					 // Top layers
-		BLD_BG0 | BLD_BG1 | BLD_OBJ, // Bottom layers
-		1							 // Mode (std)
+		BLD_BG2,							   // Top layers
+		BLD_BG0 | BLD_BG1 | BLD_BG3 | BLD_OBJ, // Bottom layers
+		1									   // Mode (std)
 	);
 
 	/* Update blend weights
@@ -397,6 +491,9 @@ static void show(void)
 
 static void update(void)
 {
+	if (frame_count() % 15 == 0)
+		update_ui_border();
+
 	_data->grid_count++;
 
 	// Grid
@@ -436,7 +533,7 @@ static void update(void)
 	update_player();
 	update_obs();
 
-	obj_copy(obj_mem, _obj_buffer, 21);
+	obj_copy(obj_mem, _obj_buffer, _data->obj_count);
 	obj_aff_copy(obj_aff_mem, _data->obj_aff_buffer, 1);
 }
 

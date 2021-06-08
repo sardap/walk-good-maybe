@@ -100,7 +100,6 @@ void update_speed_level_display(FIXED speed)
 
 void init_jump_level_display()
 {
-
 	visual_ent_t *ent = allocate_visual_ent();
 
 	ent->type = TYPE_VISUAL_SPEED_LEVEL;

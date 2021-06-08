@@ -7,11 +7,13 @@
 #define SZ_GRID_SBB 24
 #define SZ_EYE_SBB (SZ_GRID_SBB + 2)
 #define SZ_TEXT_SBB (SZ_EYE_SBB + 2)
+#define SZ_UI_SBB (SZ_TEXT_SBB + 2)
 
 #define SZ_GRID_LAYER 3
 #define SZ_EYE_LAYER (SZ_GRID_LAYER - 1)
 #define SZ_OBJECT_LAYER (SZ_EYE_LAYER - 1)
 #define SZ_TEXT_LAYER (SZ_OBJECT_LAYER - 1)
+#define SZ_UI_LAYER SZ_TEXT_LAYER
 
 #define SZ_PLAYER_WIDTH_FX (30 * FIX_SCALE)
 #define SZ_PLAYER_HEIGHT_FX SZ_PLAYER_WIDTH_FX
@@ -20,6 +22,10 @@
 #define SZ_OBS_COUNT 20
 #define SZ_OBS_WIDTH_FX (8 * FIX_SCALE)
 #define SZ_OBS_HEIGHT_FX (8 * FIX_SCALE)
+
+#define SZ_SCORE_DIGIT_COUNT (2)
+
+#define SZ_BORDER_PAL_IDX 4
 
 typedef enum sz_text_state_e
 {
@@ -39,6 +45,7 @@ typedef struct sz_player_t
 	FIXED turning_speed;
 	FIXED max_velocity;
 	FIXED velocity;
+	int good_collected;
 } sz_player_t;
 
 typedef enum sz_obs_e
@@ -54,6 +61,11 @@ typedef struct sz_obs_t
 	BOOL enabled;
 } sz_obs_t;
 
+typedef struct sz_ui_t
+{
+	int score_number_offset;
+} sz_ui_t;
+
 typedef struct sz_data_t
 {
 	OBJ_AFFINE *obj_aff_buffer;
@@ -64,8 +76,13 @@ typedef struct sz_data_t
 	sz_text_state_e text_state;
 	BOOL grid_toggle;
 	BOOL eyes_looking;
+	sz_ui_t ui;
 	sz_player_t player;
 	sz_obs_t obs[SZ_OBS_COUNT];
+	int obj_count;
+	FIXED colour_dist;
+	u16 border_colour_current;
+	u16 border_colour_next;
 } sz_data_t;
 
 extern const scene_t special_zone_scene;

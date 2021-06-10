@@ -27,6 +27,8 @@
 
 #define SZ_BORDER_PAL_IDX 4
 
+#define SZ_MOTUH_OPEN_TIME 72
+
 typedef enum sz_text_state_e
 {
 	SZ_TS_SOLID,
@@ -76,6 +78,7 @@ typedef struct sz_data_t
 	sz_text_state_e text_state;
 	BOOL grid_toggle;
 	BOOL eyes_looking;
+	int mouth_open_countdown;
 	sz_ui_t ui;
 	sz_player_t player;
 	sz_obs_t obs[SZ_OBS_COUNT];

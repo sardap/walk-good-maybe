@@ -263,11 +263,13 @@ files=[
     "speical_zone/szEye00Closed",
 	"speical_zone/szEye01Open",
     "speical_zone/szEye01Closed",
+	"speical_zone/szMouth00Open",
+    "speical_zone/szMouth00Closed",
     "speical_zone/szText",
 ]
 
 [[Targets]]
-name="speical zone background"
+name="speical zone Objects"
 options=[
     "-ftc",					# Create C file
     "-gt",					# output tiled graphics
@@ -283,6 +285,7 @@ files=[
     "speical_zone/szBadCoin00",
     "speical_zone/szDebugBox",
     "speical_zone/szNumbers",
+    "speical_zone/szLoseSymbol",
 ]
 
 [[Targets]]

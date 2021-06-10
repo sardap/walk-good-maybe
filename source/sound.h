@@ -6,6 +6,7 @@
 #define PLAYER_WALK_SOUND_HANDLER (mm_sfxhand)3
 #define ENEMY_SOUND_HANDLER (mm_sfxhand)4
 #define TOKEN_SOUND_HANDLER (mm_sfxhand)5
+#define CROC_SOUND_HANDLER (mm_sfxhand)6
 
 #include <mm_types.h>
 
@@ -39,6 +40,9 @@ extern mm_sound_effect _speed_pick_up_sound;
 extern mm_sound_effect _ready_sound;
 extern mm_sound_effect _set_sound;
 extern mm_sound_effect _go_sound;
+
+// Animal noises
+extern mm_sound_effect _croc_sound;
 
 #define SOUND_SET_LENGTH 17
 extern const sound_fx_info_t _sound_fx_set[SOUND_SET_LENGTH];

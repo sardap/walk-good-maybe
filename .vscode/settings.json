@@ -113,7 +113,8 @@
 		"sznumbers.h": "c",
 		"typeinfo": "cpp",
 		"tonc_core.h": "c",
-		"tonc_nocash.h": "c"
+		"tonc_nocash.h": "c",
+		"szmouth00open.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

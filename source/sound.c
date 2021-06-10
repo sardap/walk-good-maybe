@@ -143,6 +143,15 @@ mm_sound_effect _go_sound = {
 	127,
 };
 
+// Animal Sounds
+mm_sound_effect _croc_sound = {
+	{SFX_TZ_CROC_GROAL},
+	(int)(1.0f * (1 << 10)),
+	CROC_SOUND_HANDLER,
+	120,
+	127,
+};
+
 const sound_fx_info_t _sound_fx_set[] = {
 	{&_player_damage, "Player Dmg"},
 	{&_player_shoot_sound, "Player Shoot"},
@@ -161,4 +170,5 @@ const sound_fx_info_t _sound_fx_set[] = {
 	{&_ready_sound, "Voice Ready"},
 	{&_set_sound, "Voice Set"},
 	{&_go_sound, "Voice Go"},
+	{&_croc_sound, "Croc Groal"},
 };

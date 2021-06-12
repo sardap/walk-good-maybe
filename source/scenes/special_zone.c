@@ -10,6 +10,7 @@
 
 #include "../debug.h"
 #include "../sound.h"
+#include "../anime.h"
 
 #include "../assets/szSharedBackground.h"
 #include "../assets/szGrid00.h"
@@ -28,6 +29,13 @@
 #include "../assets/szLoseSymbol.h"
 #include "../assets/szMouth00Open.h"
 #include "../assets/szMouth00Closed.h"
+#include "../assets/szWhaleFly00.h"
+#include "../assets/szWhaleFly01.h"
+#include "../assets/szWhaleFly02.h"
+#include "../assets/szWhaleSmoke00.h"
+#include "../assets/szWhaleSmoke01.h"
+#include "../assets/szWhaleSmoke02.h"
+#include "../assets/szWhaleSmoke03.h"
 
 static const int _eye_map_row_len = 4;
 static const int _eye_map_col_len = 8;
@@ -44,6 +52,27 @@ static const unsigned int *_mouth_map[] = {
 	(unsigned int[]){0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D},
 	(unsigned int[]){0x000E, 0x000F, 0x0010, 0x0011, 0x0012, 0x0013},
 	(unsigned int[]){0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019}};
+
+static const int _whale_fly_anime_length = 3;
+static const unsigned int *_whale_fly_anime[] = {
+	szWhaleFly00Tiles,
+	szWhaleFly01Tiles,
+	szWhaleFly02Tiles,
+};
+
+static const int _whale_smoke_anime_length = 10;
+static const unsigned int *_whale_smoke_anime[] = {
+	szWhaleSmoke00Tiles,
+	szWhaleSmoke01Tiles,
+	szWhaleSmoke01Tiles,
+	szWhaleSmoke02Tiles,
+	szWhaleSmoke02Tiles,
+	szWhaleSmoke02Tiles,
+	szWhaleSmoke03Tiles,
+	szWhaleSmoke03Tiles,
+	szWhaleSmoke03Tiles,
+	szWhaleSmoke03Tiles,
+};
 
 static const FIXED _sz_max_scroll_speed = 0.75f * FIX_SCALEF;
 static const int _bg_grid_tile = 1;
@@ -240,8 +269,49 @@ static void update_player()
 			0, 0xFFFF);
 		obj_aff_rotate(_data->player.aff, _data->player.angle);
 	}
+
+	FIXED next_vel;
 	// accelerate
-	FIXED next_vel = key_held(KEY_A) ? SZ_PLAYER_VELOCITY : -(0.00625f * FIX_SCALEF);
+	if (key_held(KEY_A))
+	{
+		next_vel = SZ_PLAYER_VELOCITY;
+		if (frame_count() % 3 == 0)
+		{
+			_data->player.anime_cycle = WRAP(_data->player.anime_cycle, 0, _whale_fly_anime_length);
+
+			step_anime(
+				&_data->player.anime_cycle,
+				_whale_fly_anime, _whale_fly_anime_length,
+				_obj_whale_tile, szWhaleFloat00TilesLen);
+		}
+	}
+	else
+	{
+		// Play smoke anime
+		if (key_released(KEY_A))
+		{
+			_data->player.anime_cycle = 0;
+			GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_whale_tile], szWhaleSmoke00Tiles);
+		}
+
+		if (_data->player.anime_cycle < _whale_smoke_anime_length - 1)
+		{
+			if (frame_count() % 3 == 0)
+			{
+				step_anime(
+					&_data->player.anime_cycle,
+					_whale_smoke_anime, _whale_smoke_anime_length,
+					_obj_whale_tile, szWhaleSmoke00TilesLen);
+			}
+		}
+		else
+		{
+			GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_whale_tile], szWhaleFloat00Tiles);
+		}
+
+		next_vel = SZ_PLAYER_FLOATING_VELOCITY;
+	}
+
 	_data->player.velocity = CLAMP(_data->player.velocity + next_vel, 0.0125f * FIX_SCALEF, _data->player.max_velocity);
 
 	FIXED nx = _data->player.x - fxmul(lu_sin(_data->player.angle), _data->player.velocity);
@@ -351,8 +421,8 @@ static void update_obs()
 			top->y += top->dy;
 			break;
 		default:
-			top->x += fxmul(top->dx, float2fx(4.5f));
-			top->y += fxmul(top->dy, float2fx(4.5f));
+			top->x += fxmul(top->dx, SZ_OBS_SPEED_MULTIPLIER);
+			top->y += fxmul(top->dy, SZ_OBS_SPEED_MULTIPLIER);
 			break;
 		}
 
@@ -407,17 +477,17 @@ static void update_ui_border()
 		_data->border_colour_next = (u16)gba_rand();
 	}
 
-	u16 current_red = GET_RED(_data->border_colour_current);
-	u16 current_green = GET_GREEN(_data->border_colour_current);
-	u16 current_blue = GET_BLUE(_data->border_colour_current);
+	FIXED current_red = int2fx(GET_RED(_data->border_colour_current));
+	FIXED current_green = int2fx(GET_GREEN(_data->border_colour_current));
+	FIXED current_blue = int2fx(GET_BLUE(_data->border_colour_current));
 
-	u16 next_red = GET_RED(_data->border_colour_current);
-	u16 next_geen = GET_GREEN(_data->border_colour_next);
-	u16 next_blue = GET_BLUE(_data->border_colour_next);
+	FIXED next_red = int2fx(GET_RED(_data->border_colour_current));
+	FIXED next_geen = int2fx(GET_GREEN(_data->border_colour_next));
+	FIXED next_blue = int2fx(GET_BLUE(_data->border_colour_next));
 
-	int result_red = fx2int(int2fx(current_red) + fxmul(_data->colour_dist, int2fx(next_red - current_red)));
-	int result_green = fx2int(int2fx(current_green) + fxmul(_data->colour_dist, int2fx(next_geen - current_green)));
-	int result_blue = fx2int(int2fx(current_blue) + fxmul(_data->colour_dist, int2fx(next_blue - current_blue)));
+	int result_red = fx2int(current_red + fxmul(_data->colour_dist, next_red - current_red));
+	int result_green = fx2int(current_green + fxmul(_data->colour_dist, next_geen - current_green));
+	int result_blue = fx2int(current_blue + fxmul(_data->colour_dist, next_blue - current_blue));
 
 	u16 next_colour = CREATE_COLOUR(result_red, result_green, result_blue);
 
@@ -497,11 +567,12 @@ static void show(void)
 	if (eyes % 2 != 0)
 		eyes++;
 
-	for (int i = 0; i < gba_rand_range(3, 7); i++)
+	for (int i = 0; i < gba_rand_range(3, 7);)
 	{
 		int x_ofs = gba_rand_range(0, 30 - _eye_map_col_len);
 		int y_ofs = gba_rand_range(0, 30 - _eye_map_row_len);
-		make_eye(x_ofs, y_ofs);
+		if (make_eye(x_ofs, y_ofs))
+			i++;
 	}
 
 	// Spawn mouth
@@ -509,7 +580,8 @@ static void show(void)
 	{
 		int x_ofs = gba_rand_range(0, 30 - _mouth_map_col_len);
 		int y_ofs = gba_rand_range(0, 30 - _mouth_map_row_len);
-		make_mouth(x_ofs, y_ofs);
+		if (make_mouth(x_ofs, y_ofs))
+			i++;
 	}
 
 	MAP_COPY(se_mem[SZ_UI_SBB], szUiOverlayMap, _bg_ui_overlay_tile);
@@ -537,6 +609,7 @@ static void show(void)
 	_data->player.velocity = 0;
 	_data->player.turning_speed = float2fx(800);
 	_data->player.good_collected = 0;
+	_data->player.anime_cycle = _whale_smoke_anime_length;
 	obj_set_attr(
 		_data->player.attr,
 		ATTR0_SQUARE | ATTR0_8BPP | ATTR0_AFF | ATTR0_AFF_DBL_BIT,

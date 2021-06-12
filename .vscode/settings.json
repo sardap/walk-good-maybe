@@ -114,7 +114,9 @@
 		"typeinfo": "cpp",
 		"tonc_core.h": "c",
 		"tonc_nocash.h": "c",
-		"szmouth00open.h": "c"
+		"szmouth00open.h": "c",
+		"szwhalefly01.h": "c",
+		"szwhalefly00.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

@@ -18,6 +18,7 @@
 #define SZ_PLAYER_WIDTH_FX (30 * FIX_SCALE)
 #define SZ_PLAYER_HEIGHT_FX SZ_PLAYER_WIDTH_FX
 #define SZ_PLAYER_VELOCITY (0.01f * FIX_SCALEF)
+#define SZ_PLAYER_FLOATING_VELOCITY (-(0.00625f * FIX_SCALEF))
 
 #define SZ_OBS_COUNT 20
 #define SZ_OBS_WIDTH_FX (8 * FIX_SCALE)
@@ -28,6 +29,7 @@
 #define SZ_BORDER_PAL_IDX 4
 
 #define SZ_MOTUH_OPEN_TIME 72
+#define SZ_OBS_SPEED_MULTIPLIER (5.7f * FIX_SCALEF)
 
 typedef enum sz_text_state_e
 {
@@ -48,6 +50,7 @@ typedef struct sz_player_t
 	FIXED max_velocity;
 	FIXED velocity;
 	int good_collected;
+	int anime_cycle;
 } sz_player_t;
 
 typedef enum sz_obs_e

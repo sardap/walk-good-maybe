@@ -281,6 +281,13 @@ options=[
 ]
 files=[
     "speical_zone/szWhaleFloat00",
+    "speical_zone/szWhaleFly00",
+    "speical_zone/szWhaleFly01",
+    "speical_zone/szWhaleFly02",
+	"speical_zone/szWhaleSmoke00",
+	"speical_zone/szWhaleSmoke01",
+	"speical_zone/szWhaleSmoke02",
+	"speical_zone/szWhaleSmoke03",
     "speical_zone/szGoodCoin00",
     "speical_zone/szBadCoin00",
     "speical_zone/szDebugBox",

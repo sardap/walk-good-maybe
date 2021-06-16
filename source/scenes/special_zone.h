@@ -25,11 +25,30 @@
 #define SZ_OBS_HEIGHT_FX (8 * FIX_SCALE)
 
 #define SZ_SCORE_DIGIT_COUNT (2)
+#define SZ_TIMER_DIGIT_COUNT (2)
 
 #define SZ_BORDER_PAL_IDX 4
 
 #define SZ_MOTUH_OPEN_TIME 72
 #define SZ_OBS_SPEED_MULTIPLIER (5.7f * FIX_SCALEF)
+
+#define SZ_MAX_VELOCITY (0.1f * FIX_SCALEF)
+#define SZ_TURNING_SPEED (800 * FIX_SCALEF)
+#define SZ_TIMER_SEC_END (15 * FIX_SCALE)
+
+typedef struct sz_transfer_in_t
+{
+	FIXED max_velocity;
+	FIXED turing_speed;
+	FIXED timer_start;
+	BOOL entered_via_debug;
+} sz_transfer_in_t;
+
+typedef struct sz_transfer_out_t
+{
+	int good_collected;
+	int bad_collected;
+} sz_transfer_out_t;
 
 typedef enum sz_text_state_e
 {
@@ -50,6 +69,7 @@ typedef struct sz_player_t
 	FIXED max_velocity;
 	FIXED velocity;
 	int good_collected;
+	int bad_collected;
 	int anime_cycle;
 } sz_player_t;
 
@@ -69,6 +89,7 @@ typedef struct sz_obs_t
 typedef struct sz_ui_t
 {
 	int score_number_offset;
+	int timer_number_offset;
 } sz_ui_t;
 
 typedef struct sz_data_t
@@ -89,7 +110,12 @@ typedef struct sz_data_t
 	FIXED colour_dist;
 	u16 border_colour_current;
 	u16 border_colour_next;
+	FIXED timer;
 } sz_data_t;
+
+void set_sz_in(sz_transfer_in_t data);
+
+sz_transfer_out_t get_sz_out();
 
 extern const scene_t special_zone_scene;
 

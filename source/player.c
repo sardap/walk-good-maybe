@@ -53,7 +53,7 @@ static FIXED _sx, _sy;
 static int _shrinking;
 ent_t _player = {};
 
-void load_player_tile()
+void load_player_tiles()
 {
 	_tile_start_idx = allocate_obj_tile_idx(whale_smallTilesLen / 64);
 	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
@@ -61,10 +61,13 @@ void load_player_tile()
 	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 }
 
+void free_player_tiles()
+{
+	free_obj_tile_idx(_tile_start_idx, whale_smallTilesLen / 64);
+}
+
 void init_player()
 {
-	load_player_tile();
-
 	//Reserved for player
 	_player.ent_idx = 0;
 	_player_anime_cycle = 0;
@@ -94,7 +97,7 @@ void init_player()
 	_sy = 1 * FIX_SCALE;
 }
 
-void unload_player()
+void free_player()
 {
 	free_obj_tile_idx(_tile_start_idx, 4);
 }

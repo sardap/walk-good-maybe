@@ -172,6 +172,12 @@ static void update(void)
 			scene_set(sound_test_scene);
 			break;
 		case TS_SPECIAL_ZONE:
+			sz_transfer_in_t data;
+			data.max_velocity = SZ_MAX_VELOCITY;
+			data.turing_speed = SZ_TURNING_SPEED;
+			data.timer_start = SZ_TIMER_SEC_END;
+			data.entered_via_debug = TRUE;
+			set_sz_in(data);
 			scene_set(special_zone_scene);
 			break;
 		}

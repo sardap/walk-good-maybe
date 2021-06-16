@@ -4,7 +4,7 @@
 #include "ent.h"
 
 void load_gun_0_tiles();
-void unload_gun_0_tiles();
+void free_gun_0_tiles();
 
 int gun_0_tiles();
 

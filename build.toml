@@ -293,6 +293,7 @@ files=[
     "speical_zone/szDebugBox",
     "speical_zone/szNumbers",
     "speical_zone/szLoseSymbol",
+    "speical_zone/szNumbersLarge",
 ]
 
 [[Targets]]

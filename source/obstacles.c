@@ -25,9 +25,11 @@ void load_speed_up()
 {
 	_speed_up_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_speed_up_tile_idx], speedUpTiles);
+}
 
-	_speed_lines_idx = allocate_obj_tile_idx(4);
-	GRIT_CPY(&tile_mem[4][_speed_lines_idx], speedLineTiles);
+void free_speed_up()
+{
+	free_obj_tile_idx(_speed_up_tile_idx, 1);
 }
 
 void load_health_up()
@@ -36,16 +38,31 @@ void load_health_up()
 	GRIT_CPY(&tile_mem[4][_health_up_tile_idx], healthUpTiles);
 }
 
+void free_health_up()
+{
+	free_obj_tile_idx(_health_up_tile_idx, 1);
+}
+
 void load_jump_up()
 {
 	_jump_up_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_jump_up_tile_idx], jumpUpTiles);
 }
 
+void free_jump_up()
+{
+	free_obj_tile_idx(_jump_up_tile_idx, 1);
+}
+
 void load_shrink_token()
 {
 	_shrink_token_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_shrink_token_tile_idx], shrinkTokenTiles);
+}
+
+void free_shrink_token()
+{
+	free_obj_tile_idx(_shrink_token_tile_idx, 1);
 }
 
 void create_speed_up(ent_t *ent, FIXED x, FIXED y)

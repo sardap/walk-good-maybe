@@ -206,17 +206,13 @@ static void hide(void)
 
 static void show_city(void)
 {
-	mg_parm_t parm;
-	parm.mode = MG_MODE_CITY;
-	setMgParmters(parm);
+	set_mg_in(defualt_mg_data(MG_MODE_CITY));
 	show(MG_MODE_CITY);
 }
 
 static void show_beach(void)
 {
-	mg_parm_t parm;
-	parm.mode = MG_MODE_BEACH;
-	setMgParmters(parm);
+	set_mg_in(defualt_mg_data(MG_MODE_BEACH));
 	show(MG_MODE_BEACH);
 }
 

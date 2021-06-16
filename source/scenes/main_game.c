@@ -8,6 +8,7 @@
 
 #include "title_screen.h"
 #include "scene_shared.h"
+#include "special_zone.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -40,12 +41,42 @@ static const tile_map_set_t fog_water_cycle[] = {
 	{mgBeachWaterFog01Tiles, mgBeachWaterFog01TilesLen,
 	 mgBeachWaterFog01Map, mgBeachWaterFog01MapLen}};
 
-static mg_parm_t _parm;
 static mg_data_t *_data = &_shared_data.mg;
 
-void setMgParmters(mg_parm_t parm)
+EWRAM_DATA static mg_data_in_t _in_data;
+EWRAM_DATA static mg_data_out_t _out_data;
+
+mg_data_in_t defualt_mg_data(mg_mode_t mode)
 {
-	_parm = parm;
+	mg_data_in_t result;
+	mg_data_t *data = &result.new_data;
+
+	data->mode = mode;
+
+	data->bg_0_scroll = int2fx(gba_rand());
+	data->bg_2_scroll = int2fx(gba_rand());
+
+	data->next_building_spawn = 0;
+	data->building_spawn_x = 0;
+	data->state = MG_S_STARTING;
+	data->water_pal_idx = 0;
+	data->splash_active = 0;
+	data->fog_tiles_cycle_idx = 0;
+	data->starting_scroll_x = 0;
+
+	data->fresh_game = TRUE;
+
+	return result;
+}
+
+void set_mg_in(mg_data_in_t data)
+{
+	_in_data = data;
+}
+
+mg_data_out_t get_mg_out()
+{
+	return _out_data;
 }
 
 static FIXED wrap_x(FIXED x)
@@ -180,12 +211,18 @@ static void free_foreground_tiles()
 
 static void show(void)
 {
-	_data->mode = _parm.mode;
+	*_data = _in_data.new_data;
 
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
-	init_gen();
+	if (_data->fresh_game)
+	{
+		free_all_ents();
+		init_gen();
+		init_level();
+		init_player();
+	}
 
 	// Load palette
 	switch (_data->mode)
@@ -197,10 +234,6 @@ static void show(void)
 		GRIT_CPY(pal_bg_mem, mainGameBeachSharedPal);
 		break;
 	}
-
-	//Init bg offsets
-	_data->bg_0_scroll = int2fx(gba_rand());
-	_data->bg_2_scroll = int2fx(gba_rand());
 
 	int pause_tile_offset = 0;
 	switch (_data->mode)
@@ -316,18 +349,10 @@ static void show(void)
 		break;
 	}
 
-	_data->next_building_spawn = 0;
-	_scroll_x = 0;
-	_data->building_spawn_x = 0;
-	_data->state = MG_S_STARTING;
-	_data->water_pal_idx = 0;
-	_data->splash_active = 0;
-	_data->fog_tiles_cycle_idx = 0;
+	_scroll_x = _data->starting_scroll_x;
 
-	init_level();
-
-	init_player();
-
+	// Tiles!
+	load_player_tiles();
 	load_life_display();
 	load_health_up();
 	load_gun_0_tiles();
@@ -337,7 +362,7 @@ static void show(void)
 	load_shrink_token();
 	load_enemy_bullets_tiles();
 	load_speed_level_display();
-	init_jump_level_display();
+	load_jump_level_display();
 
 	init_score();
 
@@ -417,7 +442,19 @@ static void update(void)
 		return;
 	}
 
-	//Back to title screen
+	if (key_held(KEY_SELECT) && key_held(KEY_A) && key_hit(KEY_START))
+	{
+		sz_transfer_in_t data;
+		data.max_velocity = SZ_MAX_VELOCITY;
+		data.turing_speed = SZ_TURNING_SPEED;
+		data.timer_start = SZ_TIMER_SEC_END;
+		data.entered_via_debug = FALSE;
+		set_sz_in(data);
+		scene_set(special_zone_scene);
+		return;
+	}
+
+	// Back to title screen
 	if (key_held(KEY_SELECT) && key_hit(KEY_START))
 	{
 		scene_set(title_screen);
@@ -532,6 +569,9 @@ static void update(void)
 
 static void hide(void)
 {
+	_data->starting_scroll_x = _scroll_x;
+	_out_data.last_data = *_data;
+
 	REG_DISPCNT = 0;
 	dma3_fill(se_mem[MG_CLOUD_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_FAR_SB], 0x0, SB_SIZE);
@@ -541,11 +581,17 @@ static void hide(void)
 
 	free_foreground_tiles();
 	free_score_display();
-	unload_gun_0_tiles();
+	free_player_tiles();
+	free_life_display();
+	free_health_up();
+	free_gun_0_tiles();
+	free_number_tiles();
+	free_speed_up();
+	free_jump_up();
+	free_shrink_token();
+	free_enemy_bullets_tiles();
+	free_speed_level_display();
 	free_jump_level_display();
-	unload_player();
-
-	free_all_ents();
 
 	mmStop();
 
@@ -560,8 +606,6 @@ static void hide(void)
 	CBB_CLEAR(MG_SHARED_CB);
 
 	REG_BLDCNT = 0;
-
-	SoftReset();
 }
 
 const scene_t main_game = {

@@ -16,6 +16,7 @@ extern const unsigned int *enemy_biscut_ufo_death_cycle[];
 #define ENEMY_UFO_BISCUT_SCORE 15
 
 void load_enemy_bullets_tiles();
+void free_enemy_bullets_tiles();
 
 void create_enemy_biscut(ent_t *ent, FIXED x, FIXED y);
 void update_enemy_biscut(ent_t *ent);

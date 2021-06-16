@@ -8,6 +8,8 @@
 #include "soundbank.h"
 #include "soundbank_bin.h"
 
+#include "main_game.h"
+#include "title_screen.h"
 #include "../debug.h"
 #include "../sound.h"
 #include "../anime.h"
@@ -36,6 +38,7 @@
 #include "../assets/szWhaleSmoke01.h"
 #include "../assets/szWhaleSmoke02.h"
 #include "../assets/szWhaleSmoke03.h"
+#include "../assets/szNumbersLarge.h"
 
 static const int _eye_map_row_len = 4;
 static const int _eye_map_col_len = 8;
@@ -85,10 +88,24 @@ static const int _bg_mouth_tile = _bg_ui_overlay_tile + szUiOverlayTilesLen / 32
 static const int _obj_whale_tile = 0;
 static const int _obj_coin_tile = _obj_whale_tile + szWhaleFloat00TilesLen / 32 + 1;
 static const int _obj_numbers_tile = _obj_coin_tile + szGoodCoin00TilesLen / 32 + 1;
-static const int _obj_lose_symbol = _obj_numbers_tile + szNumbersTilesLen / 32 + 1;
+static const int _obj_lose_symbol_tile = _obj_numbers_tile + szNumbersTilesLen / 32 + 1;
+static const int _obj_numbers_large_tile = _obj_lose_symbol_tile + szLoseSymbolTilesLen / 32 + 1;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
+
+EWRAM_DATA static sz_transfer_in_t _in_data;
+EWRAM_DATA static sz_transfer_out_t _out_data;
+
+void set_sz_in(sz_transfer_in_t in_data)
+{
+	_in_data = in_data;
+}
+
+sz_transfer_out_t get_sz_out()
+{
+	return _out_data;
+}
 
 static void blink_eye()
 {
@@ -362,13 +379,45 @@ static void update_score_display(int score)
 	}
 }
 
+static void update_timer_display(FIXED time)
+{
+	int w_time = CLAMP(fx2int(time), 0, 99);
+
+	//Count number of digits
+	int digit_count = 0;
+	while (w_time != 0)
+	{
+		digit_count++;
+		w_time /= 10;
+	}
+
+	w_time = CLAMP(fx2int(time), 0, 99);
+	for (int i = SZ_TIMER_DIGIT_COUNT - 1; i >= 0; i--)
+	{
+		int offset;
+		if (((SZ_TIMER_DIGIT_COUNT - 1) - i) < digit_count)
+			offset = (w_time % 10);
+		else
+			offset = 0;
+
+		w_time /= 10;
+
+		OBJ_ATTR *attr = &_obj_buffer[_data->ui.timer_number_offset + i];
+		obj_set_attr(
+			attr,
+			attr->attr0,
+			attr->attr1,
+			ATTR2_PRIO(SZ_TEXT_LAYER) | ATTR2_ID(_obj_numbers_large_tile + (offset * 8)));
+	}
+}
+
 static void create_lose_symbol()
 {
 	obj_set_attr(
 		&_obj_buffer[++_data->obj_count],
 		ATTR0_SQUARE | ATTR0_8BPP,
 		ATTR1_SIZE_16,
-		ATTR2_PRIO(SZ_UI_LAYER) | ATTR2_ID(_obj_lose_symbol));
+		ATTR2_PRIO(SZ_UI_LAYER) | ATTR2_ID(_obj_lose_symbol_tile));
 
 	int x = 0;
 	int y = 0;
@@ -439,12 +488,13 @@ static void update_obs()
 			{
 			case SZ_TS_SOLID:
 			case SZ_TS_EYES_OPEN:
+				_data->player.good_collected++;
 				top->enabled = FALSE;
 				obj_hide(top->attr);
-				_data->player.good_collected++;
 				update_score_display(_data->player.good_collected);
 				break;
 			default:
+				_data->player.bad_collected++;
 				top->enabled = FALSE;
 				obj_hide(top->attr);
 				create_lose_symbol();
@@ -505,6 +555,7 @@ static void show(void)
 	_data->grid_toggle = FALSE;
 	_data->eyes_looking = FALSE;
 	_data->mouth_open_countdown = 0;
+	_data->timer = _in_data.timer_start;
 
 	// Set direction
 	_data->bg0_dir_x = float2fx(RAND_FLOAT(0.75f)) + 0.25f * FIX_SCALEF;
@@ -591,7 +642,8 @@ static void show(void)
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_whale_tile], szWhaleFloat00Tiles);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_numbers_tile], szNumbersTiles);
-	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_lose_symbol], szLoseSymbolTiles);
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_lose_symbol_tile], szLoseSymbolTiles);
+	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_numbers_large_tile], szNumbersLargeTiles);
 
 	// Objs
 	OAM_CLEAR();
@@ -605,10 +657,11 @@ static void show(void)
 	_data->player.x = int2fx(240 / 2 - 16);
 	_data->player.y = int2fx(160 / 2 - 16);
 	_data->player.angle = 0;
-	_data->player.max_velocity = float2fx(0.1f);
+	_data->player.max_velocity = _in_data.max_velocity;
 	_data->player.velocity = 0;
-	_data->player.turning_speed = float2fx(800);
+	_data->player.turning_speed = _in_data.turing_speed;
 	_data->player.good_collected = 0;
+	_data->player.bad_collected = 0;
 	_data->player.anime_cycle = _whale_smoke_anime_length;
 	obj_set_attr(
 		_data->player.attr,
@@ -652,6 +705,19 @@ static void show(void)
 	top_obj += SZ_SCORE_DIGIT_COUNT;
 	update_score_display(0);
 
+	_data->ui.timer_number_offset = ++top_obj;
+	for (int i = 0; i < SZ_SCORE_DIGIT_COUNT; i++)
+	{
+		obj_set_attr(
+			&_obj_buffer[_data->ui.timer_number_offset + i],
+			ATTR0_SQUARE | ATTR0_8BPP,
+			ATTR1_SIZE_16,
+			ATTR2_PRIO(SZ_UI_LAYER) | ATTR2_ID(_obj_numbers_large_tile));
+		obj_set_pos(&_obj_buffer[_data->ui.timer_number_offset + i], 100 + (i * 20), 140);
+	}
+	top_obj += SZ_TIMER_DIGIT_COUNT;
+	update_timer_display(_data->timer + 1 * FIX_SCALE);
+
 	_data->obj_count = top_obj;
 
 	// BG regs
@@ -686,6 +752,9 @@ static void show(void)
 
 static void update(void)
 {
+	// increment timer
+	_data->timer -= fxdiv(1, 60);
+
 	if (frame_count() % 15 == 0)
 		update_ui_border();
 
@@ -713,6 +782,7 @@ static void update(void)
 	_data->bg0_x += _data->bg0_dir_x;
 	_data->bg0_y += _data->bg0_dir_y;
 
+	// Grid
 	REG_BG0HOFS = fx2int(_data->bg0_x);
 	REG_BG0VOFS = fx2int(_data->bg0_y);
 
@@ -720,8 +790,12 @@ static void update(void)
 	REG_BG1HOFS = -fx2int(fxmul(_data->bg0_x, 0.5f * FIX_SCALEF));
 	REG_BG1VOFS = -fx2int(fxmul(_data->bg0_y, 0.5f * FIX_SCALEF));
 
-	// Text
+	// UI
+	REG_BG2HOFS = 0;
+	REG_BG2VOFS = 0;
+
 	update_text_fade(max);
+	update_timer_display(_data->timer + 1 * FIX_SCALE);
 
 	// Objs
 
@@ -731,10 +805,45 @@ static void update(void)
 
 	obj_copy(obj_mem, _obj_buffer, _data->obj_count + 1);
 	obj_aff_copy(obj_aff_mem, _data->obj_aff_buffer, 1);
+
+	// Check failure
+	BOOL objects_exist = FALSE;
+
+	// This can be moved into the update_obs loop if need be
+	for (int i = 0; i < SZ_OBS_COUNT; i++)
+	{
+		if (_data->obs[i].enabled)
+		{
+			objects_exist = TRUE;
+			break;
+		}
+	}
+
+	if (!objects_exist || _data->timer <= 0)
+	{
+		if (_in_data.entered_via_debug)
+		{
+			scene_set(title_screen);
+		}
+		else
+		{
+			mg_data_in_t mg_in_data;
+			mg_in_data.new_data = get_mg_out().last_data;
+			mg_in_data.new_data.fresh_game = FALSE;
+			set_mg_in(mg_in_data);
+			scene_set(main_game);
+		}
+	}
 }
 
 static void hide(void)
 {
+	_out_data.good_collected = _data->player.good_collected;
+	_out_data.bad_collected = _data->player.bad_collected;
+
+	obj_hide_multi(_obj_buffer, 128);
+	obj_copy(obj_mem, _obj_buffer, 128);
+
 	REG_DISPCNT = 0;
 
 	REG_BLDCNT = BLD_BUILD(

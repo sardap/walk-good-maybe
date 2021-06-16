@@ -46,8 +46,9 @@ int main()
 
 	start_game();
 
-	while (1)
-		;
+	for (;;)
+	{
+	}
 
 	return 0;
 }

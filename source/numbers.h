@@ -2,7 +2,7 @@
 #define NUMBERS_H
 
 void load_number_tiles();
-void unload_numbers();
+void free_number_tiles();
 int get_number_tile_start();
 
 #endif

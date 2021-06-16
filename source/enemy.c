@@ -74,6 +74,11 @@ void load_enemy_bullets_tiles()
 	GRIT_CPY(&tile_mem[4][_enemy_bullet_0_tile_idx], enemyBullet00Tiles);
 }
 
+void free_enemy_bullets_tiles()
+{
+	free_obj_tile_idx(_enemy_bullet_0_tile_idx, 1);
+}
+
 void create_enemy_biscut(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_ENEMY_BISCUT;

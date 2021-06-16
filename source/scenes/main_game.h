@@ -48,14 +48,26 @@ typedef struct mg_data_t
 	mg_mode_t mode;
 
 	int splash_active;
+
+	int starting_scroll_x;
+	BOOL fresh_game;
 } mg_data_t;
 
-typedef struct mg_parm_t
+typedef struct mg_data_in_t
 {
-	mg_mode_t mode;
-} mg_parm_t;
+	mg_data_t new_data;
+} mg_data_in_t;
 
-void setMgParmters(mg_parm_t parm);
+mg_data_in_t defualt_mg_data(mg_mode_t mode);
+
+typedef struct mg_data_out_t
+{
+	mg_data_t last_data;
+} mg_data_out_t;
+
+void set_mg_in(mg_data_in_t data);
+
+mg_data_out_t get_mg_out();
 
 extern const scene_t main_game;
 

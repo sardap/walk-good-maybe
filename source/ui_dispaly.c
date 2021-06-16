@@ -60,7 +60,7 @@ void update_life_display(int life)
 	dma3_cpy(&tile_mem[4][_life_tile_start_idx], tiles, lifeAmmount3TilesLen);
 }
 
-void unload_life_display()
+void free_life_display()
 {
 	free_obj_tile_idx(_life_tile_start_idx, 4);
 }
@@ -98,7 +98,12 @@ void update_speed_level_display(FIXED speed)
 	dma3_cpy(&tile_mem[4][_speed_level_tile_idx], _speed_level_tiles[_speed_level_tiles_length - 1], speedLevel0TilesLen);
 }
 
-void init_jump_level_display()
+void free_speed_level_display()
+{
+	free_obj_tile_idx(_speed_level_tile_idx, 4);
+}
+
+void load_jump_level_display()
 {
 	visual_ent_t *ent = allocate_visual_ent();
 

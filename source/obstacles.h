@@ -4,9 +4,16 @@
 #include "ent.h"
 
 void load_speed_up();
+void free_speed_up();
+
 void load_health_up();
+void free_health_up();
+
 void load_jump_up();
+void free_jump_up();
+
 void load_shrink_token();
+void free_shrink_token();
 
 void create_speed_up(ent_t *ent, FIXED x, FIXED y);
 void update_speed_up(ent_t *ent);

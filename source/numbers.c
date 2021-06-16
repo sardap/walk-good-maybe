@@ -20,7 +20,7 @@ void load_number_tiles()
 	_number = 0;
 }
 
-void unload_numbers()
+void free_number_tiles()
 {
 	free_obj_tile_idx(_tile_start_idx, 10);
 }

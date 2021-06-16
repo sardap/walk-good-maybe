@@ -29,7 +29,8 @@ extern ent_t _player;
 
 void init_player();
 
-void unload_player();
+void load_player_tiles();
+void free_player_tiles();
 
 void update_player();
 

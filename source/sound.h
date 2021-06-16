@@ -44,7 +44,7 @@ extern mm_sound_effect _go_sound;
 // Animal noises
 extern mm_sound_effect _croc_sound;
 
-#define SOUND_SET_LENGTH 17
+#define SOUND_SET_LENGTH 18
 extern const sound_fx_info_t _sound_fx_set[SOUND_SET_LENGTH];
 
 #endif

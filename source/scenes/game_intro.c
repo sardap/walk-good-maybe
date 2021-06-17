@@ -7,6 +7,7 @@
 #include "soundbank_bin.h"
 
 #include "main_game.h"
+#include "special_zone.h"
 #include "scene_shared.h"
 #include "../graphics.h"
 #include "../debug.h"
@@ -27,6 +28,8 @@
 #include "../assets/giWhale_air_1.h"
 #include "../assets/giWhale_air_2.h"
 #include "../assets/giWhale_air_3.h"
+#include "../assets/giSZTop.h"
+#include "../assets/giSZAffShared.h"
 
 static const uint *air_anime_cycle[] = {giWhale_air_0Tiles, giWhale_air_0Tiles, giWhale_air_1Tiles, giWhale_air_3Tiles};
 
@@ -67,8 +70,10 @@ static void m7_hbl()
 	REG_BG2Y = _data->cam_pos.z - lxr - lyr;
 }
 
-static void show(mg_mode_t mode)
+static void show(gi_mode_t mode)
 {
+	_data->mode = mode;
+
 	_data->obj_aff_buffer = (OBJ_AFFINE *)_obj_buffer;
 
 	// Set RegX scroll to 0
@@ -77,16 +82,16 @@ static void show(mg_mode_t mode)
 
 	/* Load palettes */
 	GRIT_CPY(pal_obj_mem, giSpriteSharedPal);
-	/* Load background tiles into GI_SHARED_CB */
-	//reg background
+	// Load background tiles into GI_SHARED_CB
+	// reg background
 	GRIT_CPY(&tile_mem[GI_SHARED_CB][450 * 2], giBackgroundSharedTiles);
-	//Load object tiles
+	// Load object tiles
 	GRIT_CPY(&tile_mem[4][0], giWhale_air_0Tiles);
 
-	//afine background
+	// afine background
 	switch (mode)
 	{
-	case MG_MODE_BEACH:
+	case GI_MODE_BEACH:
 		GRIT_CPY(pal_bg_mem, giBeachAffSharedPal);
 		//The fucking grit is being a stupid fucking bitch fucking asshole
 		pal_bg_mem[7] = 0x76eb;
@@ -94,10 +99,17 @@ static void show(mg_mode_t mode)
 		GRIT_CPY(&se_mem[GI_COOL_BACKGROUND_SSB], giBeachTopMap);
 		break;
 
-	case MG_MODE_CITY:
+	case GI_MODE_CITY:
 		GRIT_CPY(pal_bg_mem, giCityAffSharedPal);
 		LZ77UnCompVram(giCityAffSharedTiles, &tile_mem[GI_SHARED_CB]);
 		GRIT_CPY(&se_mem[GI_COOL_BACKGROUND_SSB], giCityTopMap);
+		break;
+	case GI_MODE_SPEICAL_ZONE:
+		// Random paltte
+		for (int i = 0; i < giSZAffSharedPalLen; i++)
+			pal_bg_mem[i] = (u16)gba_rand();
+		LZ77UnCompVram(giSZAffSharedTiles, &tile_mem[GI_SHARED_CB]);
+		GRIT_CPY(&se_mem[GI_COOL_BACKGROUND_SSB], giSZTopMap);
 		break;
 	}
 	GRIT_CPY(&se_mem[GI_TEXT_SSB], readyMap);
@@ -188,14 +200,33 @@ static void update(void)
 		GRIT_CPY(&se_mem[GI_TEXT_SSB], goMap);
 		mmEffectEx(&_go_sound);
 		mmSetModuleVolume(300);
-		mmStart(MOD_INTRO, MM_PLAY_ONCE);
+		switch (_data->mode)
+		{
+		case GI_MODE_BEACH:
+		case GI_MODE_CITY:
+			mmStart(MOD_INTRO, MM_PLAY_ONCE);
+			break;
+		case GI_MODE_SPEICAL_ZONE:
+			mmStart(MOD_PD_ROCK_BACKGROUND, MM_PLAY_ONCE);
+			break;
+		}
 		_data->state = GI_S_GO;
 		break;
 	}
 	case GI_S_GO:
 		if (_data->countdown <= 0)
-			scene_set(main_game);
-		break;
+		{
+			switch (_data->mode)
+			{
+			case GI_MODE_BEACH:
+			case GI_MODE_CITY:
+				scene_set(main_game);
+				break;
+			case GI_MODE_SPEICAL_ZONE:
+				scene_set(special_zone_scene);
+				break;
+			}
+		}
 	}
 }
 
@@ -206,14 +237,17 @@ static void hide(void)
 
 static void show_city(void)
 {
-	set_mg_in(defualt_mg_data(MG_MODE_CITY));
-	show(MG_MODE_CITY);
+	show(GI_MODE_CITY);
 }
 
 static void show_beach(void)
 {
-	set_mg_in(defualt_mg_data(MG_MODE_BEACH));
-	show(MG_MODE_BEACH);
+	show(GI_MODE_BEACH);
+}
+
+static void show_speical_zone(void)
+{
+	show(GI_MODE_SPEICAL_ZONE);
 }
 
 const scene_t city_game_intro = {
@@ -223,5 +257,10 @@ const scene_t city_game_intro = {
 
 const scene_t beach_game_intro = {
 	.show = show_beach,
+	.update = update,
+	.hide = hide};
+
+const scene_t _speical_zone_intro_scene = {
+	.show = show_speical_zone,
 	.update = update,
 	.hide = hide};

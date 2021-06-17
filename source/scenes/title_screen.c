@@ -160,9 +160,11 @@ static void update(void)
 		switch (_options[_active_opt_idx].type)
 		{
 		case TS_MENU_CITY:
+			set_mg_in(defualt_mg_data(MG_MODE_CITY));
 			scene_set(city_game_intro);
 			break;
 		case TS_MENU_BEACH:
+			set_mg_in(defualt_mg_data(MG_MODE_BEACH));
 			scene_set(beach_game_intro);
 			break;
 		case TS_MENU_CREDITS:

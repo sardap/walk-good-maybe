@@ -181,6 +181,26 @@ files=[
 ]
 
 [[Targets]]
+name="game intro speical zone affine background"
+options=[
+    "-ftc",					# Create C file
+    "-gT ff00f7",			# RGB 24 BIT
+    "-gB8",					# Bit depth 8
+    "-gzl",					# LZ77 compressed
+    "-m",					# Export map
+    "-mLa",					# Map Affine
+    "-mRa",					# Tile reudciton needs this to stop from that stupid flip tile reduciotn
+    "-pS",					# Share pallet
+    "-gS",					# Share tiles
+    "-O giSZAffShared",	# Shared pallet name
+]
+files=[
+    "game_intro/giEmpty",
+    "game_intro/giSZTop"
+]
+
+
+[[Targets]]
 name="game intro objects"
 options=[
     "-ftc",

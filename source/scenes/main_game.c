@@ -543,7 +543,7 @@ static void update(void)
 		data.timer_start = SZ_TIMER_SEC_END;
 		data.entered_via_debug = FALSE;
 		set_sz_in(data);
-		scene_set(special_zone_scene);
+		scene_set(_speical_zone_intro_scene);
 		return;
 	}
 

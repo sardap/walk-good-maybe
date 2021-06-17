@@ -10,6 +10,7 @@
 
 #include "main_game.h"
 #include "title_screen.h"
+#include "game_intro.h"
 #include "../debug.h"
 #include "../sound.h"
 #include "../anime.h"
@@ -841,7 +842,15 @@ static void update(void)
 			mg_in_data.new_data = get_mg_out().last_data;
 			mg_in_data.new_data.fresh_game = FALSE;
 			set_mg_in(mg_in_data);
-			scene_set(main_game);
+			switch (mg_in_data.new_data.mode)
+			{
+			case MG_MODE_BEACH:
+				scene_set(beach_game_intro);
+				break;
+			case MG_MODE_CITY:
+				scene_set(city_game_intro);
+				break;
+			}
 		}
 	}
 }

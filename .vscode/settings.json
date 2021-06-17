@@ -120,7 +120,9 @@
 		"tonc_memdef.h": "c",
 		"cstdio": "c",
 		"cerrno": "cpp",
-		"cstdarg": "cpp"
+		"cstdarg": "cpp",
+		"mgportal00.h": "c",
+		"ent.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

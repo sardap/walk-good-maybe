@@ -13,6 +13,7 @@
 #include "../debug.h"
 #include "../sound.h"
 #include "../anime.h"
+#include "../graphics.h"
 
 #include "../assets/szSharedBackground.h"
 #include "../assets/szGrid00.h"
@@ -85,11 +86,11 @@ static const int _bg_text_tile = 100;
 static const int _bg_ui_overlay_tile = 215;
 static const int _bg_mouth_tile = _bg_ui_overlay_tile + szUiOverlayTilesLen / 32 + 1;
 
-static const int _obj_whale_tile = 0;
-static const int _obj_coin_tile = _obj_whale_tile + szWhaleFloat00TilesLen / 32 + 1;
-static const int _obj_numbers_tile = _obj_coin_tile + szGoodCoin00TilesLen / 32 + 1;
-static const int _obj_lose_symbol_tile = _obj_numbers_tile + szNumbersTilesLen / 32 + 1;
-static const int _obj_numbers_large_tile = _obj_lose_symbol_tile + szLoseSymbolTilesLen / 32 + 1;
+static int _obj_whale_tile;			// = 0;
+static int _obj_coin_tile;			// = _obj_whale_tile + szWhaleFloat00TilesLen / 32 + 1;
+static int _obj_numbers_tile;		// = _obj_coin_tile + szGoodCoin00TilesLen / 32 + 1;
+static int _obj_lose_symbol_tile;	// = _obj_numbers_tile + szNumbersTilesLen / 32 + 1;
+static int _obj_numbers_large_tile; // = _obj_lose_symbol_tile + szLoseSymbolTilesLen / 32 + 1;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
@@ -639,10 +640,19 @@ static void show(void)
 	MAP_COPY(se_mem[SZ_TEXT_SBB], szTextMap, _bg_text_tile);
 
 	// Obj tiles
+	_obj_whale_tile = allocate_obj_tile_idx(szWhaleFloat00TilesLen / 64);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_whale_tile], szWhaleFloat00Tiles);
+
+	_obj_coin_tile = allocate_obj_tile_idx(szGoodCoin00TilesLen / 64);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_coin_tile], szGoodCoin00Tiles);
+
+	_obj_numbers_tile = allocate_obj_tile_idx(szNumbersTilesLen / 64);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_numbers_tile], szNumbersTiles);
+
+	_obj_lose_symbol_tile = allocate_obj_tile_idx(szLoseSymbolTilesLen / 64);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_lose_symbol_tile], szLoseSymbolTiles);
+
+	_obj_numbers_large_tile = allocate_obj_tile_idx(szNumbersLargeTilesLen / 64);
 	GRIT_CPY(&tile_mem_obj[SZ_SHARED_CB][_obj_numbers_large_tile], szNumbersLargeTiles);
 
 	// Objs
@@ -843,6 +853,12 @@ static void hide(void)
 
 	obj_hide_multi(_obj_buffer, 128);
 	obj_copy(obj_mem, _obj_buffer, 128);
+
+	free_obj_tile_idx(_obj_whale_tile, szWhaleFloat00TilesLen / 64);
+	free_obj_tile_idx(_obj_coin_tile, szGoodCoin00TilesLen / 64);
+	free_obj_tile_idx(_obj_numbers_tile, szNumbersTilesLen / 64);
+	free_obj_tile_idx(_obj_lose_symbol_tile, szLoseSymbolTilesLen / 64);
+	free_obj_tile_idx(_obj_numbers_large_tile, szNumbersLargeTilesLen / 64);
 
 	REG_DISPCNT = 0;
 

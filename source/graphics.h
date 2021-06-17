@@ -6,6 +6,8 @@
 
 #define OBJ_TILE_ALLC_SIZE 127
 #define BG_TILE_ALLC_SIZE 1024
+#define OBJ_PAL_ALLC_SIZE 250
+#define BG_PAL_ALLC_SIZE 250
 
 #define TILES_COUNT(x) (x / 64)
 #define TILE_COUNT(x) TILES_COUNT(x)
@@ -25,6 +27,9 @@ void free_obj_tile_idx(int idx, int size);
 
 int allocate_bg_tile_idx(int size);
 void free_bg_tile_idx(int idx, int size);
+
+int allocate_obj_pal_idx(int size);
+void free_obj_pal_idx(int idx, int size);
 
 inline void cycle_palate(COLOR *target_pal, const int target_pal_start, const u16 *cycle_pal, int *current_idx, const int length)
 {

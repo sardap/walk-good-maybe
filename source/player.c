@@ -304,7 +304,7 @@ void update_player()
 		update_jump_level_display(_player_jump_power);
 	}
 
-	//Shrink Token
+	// Shrink Token
 	if (_player.ent_cols & (TYPE_SHRINK_TOKEN))
 	{
 		if (!_shrinking)
@@ -312,6 +312,9 @@ void update_player()
 
 		_shrinking = PLAYER_SHRINKING_TIME;
 	}
+
+	// Speical zone checking happens within the main_game becuase this is
+	// A bowel of spaghtiti
 
 	FIXED size_step = PLAYER_SHRINK_STEP;
 	if (_shrinking)

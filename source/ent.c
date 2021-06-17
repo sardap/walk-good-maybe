@@ -364,6 +364,9 @@ void update_ents()
 		case TYPE_SHRINK_TOKEN:
 			update_shrink_token(&_ents[i]);
 			break;
+		case TYPE_SPEICAL_ZONE_PORTAL:
+			update_speical_zone_portal(&_ents[i]);
+			break;
 		}
 	}
 }

@@ -8,8 +8,11 @@
 
 const u16 _water_cycle[] = {0x7FFF, 0x7FC6, 0x7B80, 0x7FD0, 0x7FB2, 0x7FD7};
 
+// Tiles
 static byte _obj_tile_allc[OBJ_TILE_ALLC_SIZE];
 static byte _bg_tile_allc[BG_TILE_ALLC_SIZE];
+// Pallettes
+static byte _obj_pal_allc[OBJ_PAL_ALLC_SIZE];
 
 void init_graphics()
 {
@@ -24,7 +27,7 @@ void init_graphics()
 	}
 }
 
-static int allocate_tile_idx(byte *allc, int len, int size)
+static int allocate_idx(byte *allc, int len, int size)
 {
 	for (int i = 0; i < len;)
 	{
@@ -66,7 +69,7 @@ static int allocate_tile_idx(byte *allc, int len, int size)
 	return -1;
 }
 
-void free_tile_idx(byte *allc, int len, int idx, int size)
+void free_idx(byte *allc, int len, int idx, int size)
 {
 	//remeber that the idx returned from alloc is x2
 	idx /= 2;
@@ -78,20 +81,30 @@ void free_tile_idx(byte *allc, int len, int idx, int size)
 
 int allocate_obj_tile_idx(int size)
 {
-	return allocate_tile_idx(_obj_tile_allc, OBJ_TILE_ALLC_SIZE, size);
+	return allocate_idx(_obj_tile_allc, OBJ_TILE_ALLC_SIZE, size);
 }
 
 void free_obj_tile_idx(int idx, int size)
 {
-	free_tile_idx(_obj_tile_allc, OBJ_TILE_ALLC_SIZE, idx, size);
+	free_idx(_obj_tile_allc, OBJ_TILE_ALLC_SIZE, idx, size);
 }
 
 int allocate_bg_tile_idx(int size)
 {
-	return allocate_tile_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, size);
+	return allocate_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, size);
 }
 
 void free_bg_tile_idx(int idx, int size)
 {
-	free_tile_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, idx, size);
+	free_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, idx, size);
+}
+
+int allocate_obj_pal_idx(int size)
+{
+	return allocate_idx(_obj_pal_allc, OBJ_PAL_ALLC_SIZE, size) / 2;
+}
+
+void free_obj_pal_idx(int idx, int size)
+{
+	free_idx(_obj_pal_allc, OBJ_PAL_ALLC_SIZE, idx / 2, size);
 }

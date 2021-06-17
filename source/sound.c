@@ -143,11 +143,19 @@ mm_sound_effect _go_sound = {
 	127,
 };
 
+mm_sound_effect _always_backwards_sound = {
+	{SFX_EG_ALWAYS},
+	(int)(1.0f * (1 << 10)),
+	MISC_SOUND_HANDLER,
+	120,
+	127,
+};
+
 // Animal Sounds
 mm_sound_effect _croc_sound = {
 	{SFX_TZ_CROC_GROAL},
 	(int)(1.0f * (1 << 10)),
-	CROC_SOUND_HANDLER,
+	MISC_SOUND_HANDLER,
 	120,
 	127,
 };
@@ -171,4 +179,5 @@ const sound_fx_info_t _sound_fx_set[] = {
 	{&_set_sound, "Voice Set"},
 	{&_go_sound, "Voice Go"},
 	{&_croc_sound, "Croc Groal"},
+	{&_always_backwards_sound, "Always Backwards"},
 };

@@ -125,7 +125,7 @@ static void blink_eye()
 	_data->eyes_looking = !_data->eyes_looking;
 }
 
-static void open_mouth()
+static void open_mouth(mm_sound_effect *sound)
 {
 	// Mouth already open
 	if (_data->mouth_open_countdown > 0)
@@ -135,7 +135,7 @@ static void open_mouth()
 
 	GRIT_CPY(&tile8_mem[SZ_SHARED_CB][_bg_mouth_tile], szMouth00OpenTiles);
 
-	mmEffectEx(&_croc_sound);
+	mmEffectEx(sound);
 }
 
 static void update_mouth()
@@ -489,18 +489,20 @@ static void update_obs()
 			switch (_data->text_state)
 			{
 			case SZ_TS_SOLID:
+			// Eyes open a bit before to signal that danger is coming
 			case SZ_TS_EYES_OPEN:
 				_data->player.good_collected++;
 				top->enabled = FALSE;
 				obj_hide(top->attr);
 				update_score_display(_data->player.good_collected);
+				open_mouth(&_always_backwards_sound);
 				break;
 			default:
 				_data->player.bad_collected++;
 				top->enabled = FALSE;
 				obj_hide(top->attr);
 				create_lose_symbol();
-				open_mouth();
+				open_mouth(&_croc_sound);
 				break;
 			}
 		}
@@ -876,6 +878,8 @@ static void hide(void)
 		BLD_OFF, // Bottom layers
 		BLD_OFF	 // Mode (off)
 	);
+
+	mmStop();
 }
 
 const scene_t special_zone_scene = {

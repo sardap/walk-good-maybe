@@ -20,7 +20,7 @@
 #define SZ_PLAYER_VELOCITY (0.01f * FIX_SCALEF)
 #define SZ_PLAYER_FLOATING_VELOCITY (-(0.00625f * FIX_SCALEF))
 
-#define SZ_OBS_COUNT 20
+#define SZ_OBS_MAX_COUNT 25
 #define SZ_OBS_WIDTH_FX (8 * FIX_SCALE)
 #define SZ_OBS_HEIGHT_FX (8 * FIX_SCALE)
 
@@ -42,12 +42,14 @@ typedef struct sz_transfer_in_t
 	FIXED turing_speed;
 	FIXED timer_start;
 	BOOL entered_via_debug;
+	int obs_count;
 } sz_transfer_in_t;
 
 typedef struct sz_transfer_out_t
 {
 	int good_collected;
 	int bad_collected;
+	BOOL dirty;
 } sz_transfer_out_t;
 
 typedef enum sz_text_state_e
@@ -105,7 +107,8 @@ typedef struct sz_data_t
 	int mouth_open_countdown;
 	sz_ui_t ui;
 	sz_player_t player;
-	sz_obs_t obs[SZ_OBS_COUNT];
+	int obs_count;
+	sz_obs_t obs[SZ_OBS_MAX_COUNT];
 	int obj_count;
 	FIXED colour_dist;
 	u16 border_colour_current;
@@ -116,6 +119,8 @@ typedef struct sz_data_t
 void set_sz_in(sz_transfer_in_t data);
 
 sz_transfer_out_t get_sz_out();
+
+void sz_out_clear_dirty();
 
 extern const scene_t special_zone_scene;
 

@@ -53,19 +53,6 @@ static FIXED _sx, _sy;
 static int _shrinking;
 ent_t _player = {};
 
-void load_player_tiles()
-{
-	_tile_start_idx = allocate_obj_tile_idx(whale_smallTilesLen / 64);
-	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
-	//This really shouldn't happen here
-	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
-}
-
-void free_player_tiles()
-{
-	free_obj_tile_idx(_tile_start_idx, whale_smallTilesLen / 64);
-}
-
 void init_player()
 {
 	//Reserved for player
@@ -95,6 +82,47 @@ void init_player()
 
 	_sx = 1 * FIX_SCALE;
 	_sy = 1 * FIX_SCALE;
+}
+
+void load_player_tiles()
+{
+	_tile_start_idx = allocate_obj_tile_idx(whale_smallTilesLen / 64);
+	dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
+	//This really shouldn't happen here
+	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
+}
+
+void free_player_tiles()
+{
+	free_obj_tile_idx(_tile_start_idx, whale_smallTilesLen / 64);
+}
+
+FIXED get_player_jump()
+{
+	return _player_jump_power;
+}
+
+void add_player_jump(FIXED amount)
+{
+	_player_jump_power = clamp(
+		_player_jump_power + amount,
+		PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
+
+	update_jump_level_display(_player_jump_power);
+}
+
+FIXED get_player_speed()
+{
+	return _player_air_slowdown;
+}
+
+void add_player_speed(FIXED amount)
+{
+	_player_air_slowdown = clamp(
+		_player_air_slowdown - amount,
+		PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
+
+	update_speed_level_display(_player_air_slowdown);
 }
 
 void free_player()
@@ -142,6 +170,7 @@ static void player_shoot()
 
 void update_player()
 {
+	// What the fuck is this?
 	// static int scale = 1;
 	// if (key_held(KEY_L) || key_held(KEY_R))
 	// {
@@ -274,34 +303,27 @@ void update_player()
 	{
 		_speed_up_active = 120;
 		_scroll_x += 0.5f * FIX_SCALEF;
-		//Lower air slowdown spee
-		_player_air_slowdown = clamp(
-			_player_air_slowdown - (int)(0.2f * FIX_SCALEF),
-			PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
-		update_speed_level_display(_player_air_slowdown);
+		// Lower air slowdown speed
+		add_player_speed(PLAYER_ADD_SPEED_STEP);
 	}
 	else if (_speed_up_active > 0)
 	{
 		--_speed_up_active;
-		//Check ended and handle ended
+		// Check ended and handle ended
 		if (_speed_up_active <= 0)
 			_scroll_x -= 0.5f * FIX_SCALEF;
 	}
 
-	//Health up
+	// Health up
 	if (_player.ent_cols & (TYPE_HEALTH_UP))
 	{
 		_player_life = clamp(_player_life + 1, 0, PLAYER_LIFE_START + 1);
 	}
 
-	//Jump up
+	// Jump up
 	if (_player.ent_cols & (TYPE_JUMP_UP))
 	{
-		_player_jump_power = clamp(
-			_player_jump_power + (int)(0.07f * FIX_SCALE),
-			PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
-
-		update_jump_level_display(_player_jump_power);
+		add_player_jump(PLAYER_ADD_JUMP_STEP);
 	}
 
 	// Shrink Token
@@ -316,6 +338,7 @@ void update_player()
 	// Speical zone checking happens within the main_game becuase this is
 	// A bowel of spaghtiti
 
+	// Shirnking
 	FIXED size_step = PLAYER_SHRINK_STEP;
 	if (_shrinking)
 	{
@@ -334,7 +357,7 @@ void update_player()
 	_player.w = fx2int(fxmul(_sx, 16 * FIX_SCALE));
 	_player.h = fx2int(fxmul(_sy, 16 * FIX_SCALE));
 
-	//Handles player anime
+	// Handles player anime
 	switch (_move_state)
 	{
 	case MOVEMENT_GROUNDED:

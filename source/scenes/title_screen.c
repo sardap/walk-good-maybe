@@ -178,6 +178,7 @@ static void update(void)
 			data.max_velocity = SZ_MAX_VELOCITY;
 			data.turing_speed = SZ_TURNING_SPEED;
 			data.timer_start = SZ_TIMER_SEC_END;
+			data.obs_count = SZ_OBS_MAX_COUNT;
 			data.entered_via_debug = TRUE;
 			set_sz_in(data);
 			scene_set(special_zone_scene);

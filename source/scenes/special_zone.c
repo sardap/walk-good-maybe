@@ -87,17 +87,17 @@ static const int _bg_text_tile = 100;
 static const int _bg_ui_overlay_tile = 215;
 static const int _bg_mouth_tile = _bg_ui_overlay_tile + szUiOverlayTilesLen / 32 + 1;
 
-static int _obj_whale_tile;			// = 0;
-static int _obj_coin_tile;			// = _obj_whale_tile + szWhaleFloat00TilesLen / 32 + 1;
-static int _obj_numbers_tile;		// = _obj_coin_tile + szGoodCoin00TilesLen / 32 + 1;
-static int _obj_lose_symbol_tile;	// = _obj_numbers_tile + szNumbersTilesLen / 32 + 1;
-static int _obj_numbers_large_tile; // = _obj_lose_symbol_tile + szLoseSymbolTilesLen / 32 + 1;
+static int _obj_whale_tile;
+static int _obj_coin_tile;
+static int _obj_numbers_tile;
+static int _obj_lose_symbol_tile;
+static int _obj_numbers_large_tile;
 
 static sz_data_t _tmp;
 static sz_data_t *_data = &_tmp;
 
 EWRAM_DATA static sz_transfer_in_t _in_data;
-EWRAM_DATA static sz_transfer_out_t _out_data;
+EWRAM_DATA static sz_transfer_out_t _out_data = {0, 0, FALSE};
 
 void set_sz_in(sz_transfer_in_t in_data)
 {
@@ -107,6 +107,11 @@ void set_sz_in(sz_transfer_in_t in_data)
 sz_transfer_out_t get_sz_out()
 {
 	return _out_data;
+}
+
+void sz_out_clear_dirty()
+{
+	_out_data.dirty = FALSE;
 }
 
 static void blink_eye()
@@ -212,10 +217,10 @@ static void update_text_fade(FIXED max)
 	switch (_data->text_state)
 	{
 	case SZ_TS_FADED:
-		base = 240;
+		base = 60;
 		break;
 	case SZ_TS_SOLID:
-		base = 140;
+		base = 90;
 		break;
 	case SZ_TS_EYES_OPEN:
 		base = 30;
@@ -457,7 +462,7 @@ static void update_obs()
 	FIXED pt = _data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE);
 	FIXED pb = _data->player.y + fxdiv(SZ_PLAYER_HEIGHT_FX, 2 * FIX_SCALE) + SZ_PLAYER_HEIGHT_FX;
 
-	for (int i = 0; i < SZ_OBS_COUNT; i++)
+	for (int i = 0; i < _data->obs_count; i++)
 	{
 		sz_obs_t *top = &_data->obs[i];
 
@@ -550,6 +555,7 @@ static void update_ui_border()
 
 static void show(void)
 {
+	_data->obs_count = _in_data.obs_count;
 	_data->bg0_x = 0 / FIX_SCALE;
 	_data->bg0_y = 0 / FIX_SCALE;
 	_data->grid_count = 300;
@@ -684,7 +690,7 @@ static void show(void)
 	obj_aff_identity(_data->player.aff);
 
 	// Obs
-	for (int i = 0; i < SZ_OBS_COUNT; i++)
+	for (int i = 0; i < _data->obs_count; i++)
 	{
 		_data->obs[i].attr = &_obj_buffer[top_obj++];
 		_data->obs[i].enabled = TRUE;
@@ -823,7 +829,7 @@ static void update(void)
 	BOOL objects_exist = FALSE;
 
 	// This can be moved into the update_obs loop if need be
-	for (int i = 0; i < SZ_OBS_COUNT; i++)
+	for (int i = 0; i < SZ_OBS_MAX_COUNT; i++)
 	{
 		if (_data->obs[i].enabled)
 		{
@@ -861,6 +867,7 @@ static void hide(void)
 {
 	_out_data.good_collected = _data->player.good_collected;
 	_out_data.bad_collected = _data->player.bad_collected;
+	_out_data.dirty = TRUE;
 
 	obj_hide_multi(_obj_buffer, 128);
 	obj_copy(obj_mem, _obj_buffer, 128);

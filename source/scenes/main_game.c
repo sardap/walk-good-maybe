@@ -216,6 +216,37 @@ static void show(void)
 {
 	*_data = _in_data.new_data;
 
+	// Apply speical zone bonuses
+	sz_transfer_out_t sz_out = get_sz_out();
+	if (sz_out.dirty)
+	{
+		sz_out_clear_dirty();
+
+		char str[50];
+		sprintf(str, "Count: %d", sz_out.good_collected - sz_out.bad_collected);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+
+		for (int i = 0; i < sz_out.good_collected - sz_out.bad_collected; i++)
+		{
+			if (gba_rand_range(0, 100) >= 80)
+			{
+				write_to_log(LOG_LEVEL_DEBUG, "Hit skill boost");
+				switch (gba_rand_range(0, 1))
+				{
+				case 0:
+					add_player_jump(PLAYER_ADD_JUMP_STEP);
+					write_to_log(LOG_LEVEL_DEBUG, "Player Jump");
+					break;
+
+				case 1:
+					add_player_speed(PLAYER_ADD_SPEED_STEP);
+					write_to_log(LOG_LEVEL_DEBUG, "Speed boost");
+					break;
+				}
+			}
+		}
+	}
+
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
@@ -360,7 +391,6 @@ static void show(void)
 
 	// Tiles!
 	load_player_tiles();
-	load_life_display();
 	load_health_up();
 	load_gun_0_tiles();
 	load_number_tiles();
@@ -368,8 +398,9 @@ static void show(void)
 	load_jump_up();
 	load_shrink_token();
 	load_enemy_bullets_tiles();
-	load_speed_level_display();
-	load_jump_level_display();
+	load_life_display(get_player_life());
+	load_speed_level_display(get_player_speed());
+	load_jump_level_display(get_player_jump());
 
 	init_score();
 
@@ -540,7 +571,8 @@ static void update(void)
 		sz_transfer_in_t data;
 		data.max_velocity = SZ_MAX_VELOCITY;
 		data.turing_speed = SZ_TURNING_SPEED;
-		data.timer_start = SZ_TIMER_SEC_END;
+		data.timer_start = SZ_TIMER_SEC_END + int2fx(gba_rand_range(0, 5));
+		data.obs_count = SZ_OBS_MAX_COUNT - gba_rand_range(0, 10);
 		data.entered_via_debug = FALSE;
 		set_sz_in(data);
 		scene_set(_speical_zone_intro_scene);

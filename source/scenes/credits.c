@@ -33,8 +33,8 @@ static const uint *whale_air_anime[] = {
 static const int star_pal_cycle_length = 4;
 static const u16 star_pal_cycle[] = {0x77bd, 0x77ff, 0x7bff, 0x7fff};
 
-static const int creditsCount = 8;
-static const cr_credit_t credits[] = {
+static const int _credits_count = 11;
+static const cr_credit_t _credits[] = {
 	{
 		"Programming:\n\tPaul Sarda\n\n"
 		"Art:\n\tPaul Sarda\n\n\0",
@@ -56,6 +56,14 @@ static const cr_credit_t credits[] = {
 		crWhaleLargeStandingPal,
 		crWhaleLargeStandingTiles,
 		crWhaleLargeStandingMap,
+	},
+	{
+		"More Sounds:\n\n"
+		"TerraZoo:\n\tCroc Growl\n\n"
+		"Eternity Games:\n\tAlways Backwards\n\n",
+		crEmptyPal,
+		crEmptyTiles,
+		crEmptyMap,
 	},
 	{
 		"More Sounds:\n\n"
@@ -115,6 +123,31 @@ static const cr_credit_t credits[] = {
 		crEmptyTiles,
 		crEmptyMap,
 	},
+	{
+		"Assets by\n"
+		"TerraZoo\n"
+		"are from\n"
+		"Reptiles and more\n (SOE009)\n"
+		"and has no direct\n"
+		"association with this\n"
+		"game\0",
+		crEmptyPal,
+		crEmptyTiles,
+		crEmptyMap,
+	},
+	{
+		"Assets by\n"
+		"Eternity Games\n"
+		"are from\n"
+		"Old Man WAV\n"
+		"and has no direct\n"
+		"association with this\n"
+		"game\0",
+		crEmptyPal,
+		crEmptyTiles,
+		crEmptyMap,
+	},
+
 };
 
 static cr_data_t *data = &_shared_data.cr;
@@ -124,7 +157,7 @@ static void load_next_credit()
 	data->eva = 0 * FIX_SCALE;
 	data->evb = 128 * FIX_SCALE;
 
-	data->active.crd = &credits[data->active_idx];
+	data->active.crd = &_credits[data->active_idx];
 	data->active.x = 50 * FIX_SCALE;
 	data->active.y = GBA_HEIGHT * FIX_SCALE;
 	data->state = CR_STATE_SCROLLING_UP;
@@ -302,7 +335,7 @@ static void update(void)
 
 		if (compelte)
 		{
-			if (data->active_idx < creditsCount)
+			if (data->active_idx < _credits_count)
 				load_next_credit();
 			else
 				scene_set(title_screen);

@@ -8,12 +8,24 @@
 #include "graphics.h"
 #include "ent.h"
 #include "sound.h"
+#include "debug.h"
+#include "anime.h"
 
 #include "assets/speedUp.h"
 #include "assets/speedLine.h"
 #include "assets/healthUp.h"
 #include "assets/jumpUp.h"
 #include "assets/shrinkToken.h"
+// Yes This could be done with paltte swaps
+// but that will come when I run out of space
+#include "assets/mgPortal00.h"
+#include "assets/mgPortal01.h"
+#include "assets/mgPortal02.h"
+#include "assets/mgPortal03.h"
+#include "assets/mgPortal04.h"
+#include "assets/mgPortal05.h"
+#include "assets/mgPortal06.h"
+#include "assets/mgPortal07.h"
 
 static int _speed_up_tile_idx;
 static int _speed_lines_idx;
@@ -21,13 +33,27 @@ static int _health_up_tile_idx;
 static int _jump_up_tile_idx;
 static int _shrink_token_tile_idx;
 
+static const uint *_sz_portal_anime_cycle[] = {
+	mgPortal00Tiles,
+	mgPortal01Tiles,
+	mgPortal02Tiles,
+	mgPortal03Tiles,
+	mgPortal04Tiles,
+	mgPortal05Tiles,
+	mgPortal06Tiles,
+	mgPortal07Tiles};
+
+static const int _sz_portal_anime_cycle_count = 8;
+
 void load_speed_up()
 {
 	_speed_up_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_speed_up_tile_idx], speedUpTiles);
+}
 
-	_speed_lines_idx = allocate_obj_tile_idx(4);
-	GRIT_CPY(&tile_mem[4][_speed_lines_idx], speedLineTiles);
+void free_speed_up()
+{
+	free_obj_tile_idx(_speed_up_tile_idx, 1);
 }
 
 void load_health_up()
@@ -36,16 +62,31 @@ void load_health_up()
 	GRIT_CPY(&tile_mem[4][_health_up_tile_idx], healthUpTiles);
 }
 
+void free_health_up()
+{
+	free_obj_tile_idx(_health_up_tile_idx, 1);
+}
+
 void load_jump_up()
 {
 	_jump_up_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_jump_up_tile_idx], jumpUpTiles);
 }
 
+void free_jump_up()
+{
+	free_obj_tile_idx(_jump_up_tile_idx, 1);
+}
+
 void load_shrink_token()
 {
 	_shrink_token_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_shrink_token_tile_idx], shrinkTokenTiles);
+}
+
+void free_shrink_token()
+{
+	free_obj_tile_idx(_shrink_token_tile_idx, 1);
 }
 
 void create_speed_up(ent_t *ent, FIXED x, FIXED y)
@@ -207,6 +248,50 @@ void update_shrink_token(ent_t *ent)
 {
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
+		free_ent(ent);
+		return;
+	}
+
+	ent->vx += -_scroll_x;
+	ent_move_x_dirty(ent);
+	//Take back scroll for next loop
+	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
+}
+
+void create_speical_zone_portal(ent_t *ent, FIXED x, FIXED y)
+{
+	ent->ent_type = TYPE_SPEICAL_ZONE_PORTAL;
+
+	ent->x = x;
+	ent->w = 16;
+	ent->y = y - int2fx(16);
+	ent->h = 16;
+	ent->vx = 0;
+	ent->vy = 0;
+
+	// allocate
+	ent->szp_tile_idx = allocate_obj_tile_idx(4);
+
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_16;
+	ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(ent->szp_tile_idx);
+}
+
+void update_speical_zone_portal(ent_t *ent)
+{
+	if (frame_count() % 2 == 0)
+	{
+		step_anime(
+			&ent->szp_cycle,
+			_sz_portal_anime_cycle, _sz_portal_anime_cycle_count,
+			ent->szp_tile_idx, mgPortal00TilesLen);
+	}
+
+	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
+	{
+		free_obj_tile_idx(ent->szp_tile_idx, 4);
 		free_ent(ent);
 		return;
 	}

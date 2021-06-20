@@ -23,11 +23,23 @@
 
 #define PLAYER_SHRINK_STEP ((PLAYER_SHRINK_SIZE)*FIX_SCALE) / (48 * FIX_SCALE)
 
+#define PLAYER_ADD_JUMP_STEP (0.07f * FIX_SCALEF)
+#define PLAYER_ADD_SPEED_STEP (0.2f * FIX_SCALEF)
+
+#define PLAYER_PRIO (2)
+
 extern ent_t _player;
 
 void init_player();
 
-void unload_player();
+void load_player_tiles();
+void free_player_tiles();
+
+FIXED get_player_jump();
+void add_player_jump(FIXED amount);
+
+FIXED get_player_speed();
+void add_player_speed(FIXED amount);
 
 void update_player();
 

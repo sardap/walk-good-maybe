@@ -14,9 +14,13 @@ FROM golang:latest as builder-builder
 
 WORKDIR /app
 COPY ./tools/builder/go.mod . 
+COPY ./tools/builder/go.sum . 
 RUN go mod download
 
 COPY ./tools/builder/*.go ./
+COPY ./tools/builder/assets/*.go ./assets/
+COPY ./tools/builder/gbacolour/*.go ./gbacolour/
+
 
 RUN go build -o main .
 
@@ -35,24 +39,8 @@ RUN go build -o main .
 
 ##################################################
 
-FROM golang:latest as gba-colourer-builder
-
-WORKDIR /app
-COPY ./tools/gba-colourer/go.mod . 
-RUN go mod download
-
-COPY ./tools/gba-colourer/*.go ./
-
-RUN go build -o main .
-
-##################################################
-
 #Devkit pro image is out of date also deabain is fucked here for some reason
 FROM devkitpro/devkitarm:latest as GBA-builder
-
-# Needed for creating assets
-RUN apt-get update \
-	&& apt-get install -y imagemagick
 
 #Copy colour agg tool
 COPY --from=colour-agg-builder /app/main /bin/colour-agg.exe
@@ -65,13 +53,9 @@ RUN chmod +x /bin/builder
 COPY --from=version-img-gen-builder /app/main /bin/version-img-gen
 RUN chmod +x /bin/version-img-gen
 
-#Copy gba-colourer
-COPY --from=gba-colourer-builder /app/main /bin/gba-colourer
-RUN chmod +x /bin/gba-colourer
-
 RUN mkdir /app
 
 WORKDIR /app
 
 ENTRYPOINT [ "builder" ]
-CMD [ "build" ]
+CMD [ "/app/build.toml", "/app/assets", "/app/source/assets", "build" ]

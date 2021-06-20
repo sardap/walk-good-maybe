@@ -18,17 +18,19 @@
 #include "assets/building6TileSet.h"
 
 #include "assets/mgBeachIsland00.h"
+#include "assets/mgBeachIsland01.h"
 
-//Maybe do Probability math here
-//enemy_chance, lava_chance, token_chance
-static t_spawn_info _building_0 = {80, 20, 70};
-static t_spawn_info _building_1 = {80, 20, 70};
-static t_spawn_info _building_2 = {80, 20, 70};
-static t_spawn_info _building_3 = {80, 20, 70};
-static t_spawn_info _building_4 = {80, 20, 70};
-static t_spawn_info _building_5 = {0, 0, 100};
+// Maybe do Probability math here
+// enemy chance, lava chance, token chance, sz portal chance
+static t_spawn_info _building_0 = {70, 20, 60, 20};
+static t_spawn_info _building_1 = {70, 20, 60, 20};
+static t_spawn_info _building_2 = {70, 20, 60, 20};
+static t_spawn_info _building_3 = {70, 20, 60, 20};
+static t_spawn_info _building_4 = {70, 20, 60, 20};
+static t_spawn_info _building_5 = {0, 0, 50, 100};
 
-static t_spawn_info _island_00 = {80, 0, 70};
+static t_spawn_info _island_00 = {80, 0, 70, 0};
+static t_spawn_info _island_01 = {80, 0, 90, 0};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -39,7 +41,8 @@ static int _building_4_idx;
 static int _building_5_idx;
 static int _building_6_idx;
 
-static int _island_0_idx;
+static int _island_00_idx;
+static int _island_01_idx;
 
 static int _lowest_tile_idx;
 static int _highest_tile_idx;
@@ -168,6 +171,15 @@ static bool spawn_shrink_token(int start_x, int width, int y)
 	return true;
 }
 
+static bool spawn_speical_zone_portal(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
+
+	create_speical_zone_portal(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 6));
+
+	return true;
+}
+
 static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 {
 	//early return to avoid that awesome wraping bug
@@ -202,6 +214,10 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 			spawn_shrink_token(start_x, width, y);
 			break;
 		}
+	}
+	else if (gba_rand_range(1, 100) > 100 - info->sz_portal_chance)
+	{
+		spawn_speical_zone_portal(start_x, width, y);
 	}
 }
 
@@ -621,36 +637,87 @@ int spawn_building_6(int start_x)
 
 void load_island_00(int cb)
 {
-	_island_0_idx = allocate_bg_tile_idx(TILE_COUNT(mgBeachIsland00TilesLen) - 1);
-	dma3_cpy(&tile_mem[cb][_island_0_idx], mgBeachIsland00Tiles + 32, mgBeachIsland00TilesLen - 64);
+	_island_00_idx = allocate_bg_tile_idx(TILE_COUNT(mgBeachIsland00TilesLen) - 1);
+	dma3_cpy(&tile_mem[cb][_island_00_idx], mgBeachIsland00Tiles + 32, mgBeachIsland00TilesLen - 64);
 
-	update_high_low_tile(_island_0_idx, TILE_COUNT(mgBeachIsland00TilesLen) - 1);
+	update_high_low_tile(_island_00_idx, TILE_COUNT(mgBeachIsland00TilesLen) - 1);
 }
 
 void free_island_00()
 {
-	free_bg_tile_idx(_island_0_idx, TILE_COUNT(mgBeachIsland00TilesLen) - 1);
+	free_bg_tile_idx(_island_00_idx, TILE_COUNT(mgBeachIsland00TilesLen) - 1);
 }
 
 int spawn_island_00(int start_x)
 {
 	int x_base = start_x;
-	int x;
 	int y = BEACH_ISLAND_Y_TILE_SPAWN;
 
-	int tile = _island_0_idx / 2;
+	int tile = _island_00_idx / 2;
 
-	int width = 10;
+	int width = gba_rand_range(3, 6);
+	set_level_at(level_wrap_x(x_base), y, ISLAND_00_LEFT + tile);
 
 	//MIDDLE SECTION
-	for (int i = 0; i < width; ++i)
+	for (int i = 1; i < width - 1; ++i)
 	{
-		x = level_wrap_x(x_base + i);
-		set_level_at(x, y, ISLAND_0_TOP + tile);
-		set_level_at(x, y + 1, ISLAND_0_MIDDLE + tile);
+		set_level_at(level_wrap_x(x_base + i), y, ISLAND_00_TOP + tile);
 	}
 
+	set_level_at(level_wrap_x(x_base + width - 1), y, ISLAND_00_RIGHT + tile);
+
 	spawn_obstacles(start_x, width, y, &_island_00);
+
+	return width;
+}
+
+void load_island_01(int cb)
+{
+	_island_01_idx = allocate_bg_tile_idx(TILE_COUNT(mgBeachIsland01TilesLen) - 1);
+	dma3_cpy(&tile_mem[cb][_island_01_idx], mgBeachIsland01Tiles + 32, mgBeachIsland01TilesLen - 64);
+
+	update_high_low_tile(_island_01_idx, TILE_COUNT(mgBeachIsland01TilesLen) - 1);
+}
+
+void free_island_01()
+{
+	free_bg_tile_idx(_island_01_idx, TILE_COUNT(mgBeachIsland01TilesLen) - 1);
+}
+
+int spawn_island_01(int start_x)
+{
+	int x_base = start_x;
+	int y = BEACH_ISLAND_Y_TILE_SPAWN;
+
+	int tile = _island_01_idx / 2;
+
+	int width = 10;
+	set_level_at(level_wrap_x(x_base), y, ISLAND_01_LEFT + tile);
+	set_level_at(level_wrap_x(x_base + 1), y, ISLAND_01_MIDDLE_EDGE + tile);
+
+	//MIDDLE SECTION
+	for (int i = 2; i < width - 2; i++)
+	{
+		set_level_at(level_wrap_x(x_base + i), y, ISLAND_01_MIDDLE + tile);
+	}
+
+	set_level_at(level_wrap_x(x_base + width - 2), y, ISLAND_01_MIDDLE_EDGE + tile);
+	set_level_at(level_wrap_x(x_base + width - 1), y, ISLAND_01_RIGHT + tile);
+
+	//Rock
+	if (gba_rand_range(1, 100) > 30)
+	{
+		int rock_start = x_base + 2 + gba_rand_range(0, (width - 2) / 3) + gba_rand_range(0, 2);
+		int rock_spawn = level_wrap_x(rock_start);
+
+		set_level_at(level_wrap_x(rock_spawn), y - 1, ISLAND_01_ROCK_LEFT + tile);
+		set_level_at(level_wrap_x(rock_spawn + 1), y - 1, ISLAND_01_ROCK_TOP + tile);
+		set_level_at(level_wrap_x(rock_spawn + 2), y - 1, ISLAND_01_ROCK_RIGHT + tile);
+	}
+	else
+	{
+		spawn_obstacles(start_x, width, y, &_island_01);
+	}
 
 	return width;
 }

@@ -38,17 +38,6 @@
 			]
 		},
 		{
-			"name": "Launch builder",
-			"type": "go",
-			"request": "launch",
-			"mode": "debug",
-			"program": "${workspaceFolder}/tools/builder",
-			"cwd": "${workspaceFolder}",
-			"args": [
-				"build",
-			]
-		},
-		{
 			"name": "gba Colourer",
 			"type": "go",
 			"request": "launch",

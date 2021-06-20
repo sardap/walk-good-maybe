@@ -12,6 +12,13 @@
 //1.65 seconds 60 frames per second
 #define GI_WHALE_START_SCALE 512 * FIX_SCALE
 
+typedef enum gi_mode_t
+{
+	GI_MODE_CITY,
+	GI_MODE_BEACH,
+	GI_MODE_SPEICAL_ZONE,
+} gi_mode_t;
+
 typedef enum gi_states_t
 {
 	GI_S_READY,
@@ -30,9 +37,11 @@ typedef struct gi_data_t
 	FIXED whale_rotate;
 	int countdown;
 	int anime_cycle;
+	gi_mode_t mode;
 } gi_data_t;
 
 extern const scene_t city_game_intro;
 extern const scene_t beach_game_intro;
+extern const scene_t _speical_zone_intro_scene;
 
 #endif

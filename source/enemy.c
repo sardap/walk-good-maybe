@@ -74,6 +74,11 @@ void load_enemy_bullets_tiles()
 	GRIT_CPY(&tile_mem[4][_enemy_bullet_0_tile_idx], enemyBullet00Tiles);
 }
 
+void free_enemy_bullets_tiles()
+{
+	free_obj_tile_idx(_enemy_bullet_0_tile_idx, 1);
+}
+
 void create_enemy_biscut(ent_t *ent, FIXED x, FIXED y)
 {
 	ent->ent_type = TYPE_ENEMY_BISCUT;
@@ -131,19 +136,16 @@ void update_enemy_biscut(ent_t *ent)
 	if (!hit_y)
 	{
 		if (ent->vy < TERMINAL_VY)
-		{
 			ent->vy += GRAVITY;
-		}
+
 		ent->vx = 0;
 	}
 	else
 	{
 		if (ent->vx == 0)
-		{
-			ent->vx = float2fx(0.75);
-		}
-		int hit_x = ent_level_collision_at(ent, ent->vx, ent->vy);
-		if (!hit_x)
+			ent->vx = 0.75 * FIX_SCALEF;
+
+		if (!ent_level_collision_at(ent, ent->vx, ent->vy))
 		{
 			ent->vx = -ent->vx;
 		}

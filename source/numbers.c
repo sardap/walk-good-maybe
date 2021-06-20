@@ -4,7 +4,6 @@
 #include "ent.h"
 #include "graphics.h"
 #include "assets/numbersfont.h"
-#include "assets/spriteShared.h"
 #include "debug.h"
 #include "common.h"
 
@@ -15,12 +14,11 @@ void load_number_tiles()
 {
 	_tile_start_idx = allocate_obj_tile_idx(10);
 	dma3_cpy(&tile_mem[4][_tile_start_idx], numbersfontTiles, numbersfontTilesLen);
-	dma3_cpy(pal_obj_mem, spriteSharedPal, spriteSharedPalLen);
 
 	_number = 0;
 }
 
-void unload_numbers()
+void free_number_tiles()
 {
 	free_obj_tile_idx(_tile_start_idx, 10);
 }

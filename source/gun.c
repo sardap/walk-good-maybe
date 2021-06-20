@@ -13,7 +13,7 @@ void load_gun_0_tiles()
 	dma3_cpy(&tile_mem[4][_gun_0_tile], gun_0_bulletTiles, gun_0_bulletTilesLen);
 }
 
-void unload_gun_0_tiles()
+void free_gun_0_tiles()
 {
 	free_obj_tile_idx(_gun_0_tile, 1);
 }

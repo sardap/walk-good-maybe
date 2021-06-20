@@ -10,6 +10,7 @@
 #include "enemy.h"
 #include "player.h"
 #include "ui_display.h"
+#include "effect.h"
 
 OBJ_ATTR _obj_buffer[OBJ_COUNT] = {};
 ent_t _ents[ENT_COUNT] = {};
@@ -363,6 +364,9 @@ void update_ents()
 		case TYPE_SHRINK_TOKEN:
 			update_shrink_token(&_ents[i]);
 			break;
+		case TYPE_SPEICAL_ZONE_PORTAL:
+			update_speical_zone_portal(&_ents[i]);
+			break;
 		}
 	}
 }
@@ -389,6 +393,9 @@ void update_visual_ents()
 			break;
 		case TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH:
 			update_enemy_ufo_biscut_death(&_visual_ents[i]);
+			break;
+		case TYPE_VISUAL_SPLASH:
+			update_splash_effect(&_visual_ents[i]);
 			break;
 		}
 	}

@@ -4,6 +4,7 @@
 #include "level.h"
 
 #include <tonc_types.h>
+#include <tonc_math.h>
 
 #ifdef ISMAIN
 #define def
@@ -26,16 +27,17 @@
 */
 typedef enum ent_types_t
 {
-	TYPE_NONE = 0b0,
-	TYPE_PLAYER = 0b1,
-	TYPE_BULLET = 0b10,
-	TYPE_ENEMY_BISCUT = 0b100,
-	TYPE_SPEED_UP = 0b1000,
-	TYPE_ENEMY_BISCUT_UFO = 0b10000,
-	TYPE_ENEMY_BULLET = 0b100000,
-	TYPE_HEALTH_UP = 0b1000000,
-	TYPE_JUMP_UP = 0b10000000,
-	TYPE_SHRINK_TOKEN = 0b100000000,
+	TYPE_NONE = 0,
+	TYPE_PLAYER = (1 << 0),
+	TYPE_BULLET = (1 << 2),
+	TYPE_ENEMY_BISCUT = (1 << 3),
+	TYPE_SPEED_UP = (1 << 4),
+	TYPE_ENEMY_BISCUT_UFO = (1 << 5),
+	TYPE_ENEMY_BULLET = (1 << 6),
+	TYPE_HEALTH_UP = (1 << 7),
+	TYPE_JUMP_UP = (1 << 8),
+	TYPE_SHRINK_TOKEN = (1 << 9),
+	TYPE_SPEICAL_ZONE_PORTAL = (1 << 10),
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them
@@ -49,6 +51,7 @@ typedef enum ent_visual_types_t
 	TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH = 5,
 	TYPE_VISUAL_SPEED_LEVEL = 6,
 	TYPE_VISUAL_JUMP_LEVEL = 7,
+	TYPE_VISUAL_SPLASH = 8,
 } ent_visual_types_t;
 
 typedef enum movement_state_t
@@ -87,6 +90,12 @@ typedef struct ent_t
 	//Ent speifc vars
 	union
 	{
+		// Sepical zone portal
+		struct
+		{
+			int szp_tile_idx;
+			int szp_cycle;
+		};
 		//Bullet
 		struct
 		{
@@ -127,6 +136,12 @@ typedef struct visual_ent_t
 		{
 			int eb_tile_idx;
 			int eb_anime_cycle;
+		};
+		//Splash
+		struct
+		{
+			int sp_tile_idx;
+			int sp_anime_cycle;
 		};
 	};
 } visual_ent_t;

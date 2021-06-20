@@ -1,7 +1,7 @@
 #ifndef LEVEL_H
 #define LEVEL_H
 
-#include <tonc.h>
+#include <tonc_types.h>
 
 #define LEVEL_HEIGHT 32
 #define LEVEL_WIDTH 64

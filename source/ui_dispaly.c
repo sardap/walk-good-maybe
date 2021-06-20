@@ -28,21 +28,25 @@ static int _speed_level_tile_idx;
 static int _jump_level_tile_idx;
 static visual_ent_t *_score_digs[SCORE_DIGITS];
 
-void load_life_display()
+static visual_ent_t *_life_ent;
+static visual_ent_t *_speed_level_ent;
+static visual_ent_t *_jump_level_ent;
+
+void load_life_display(int life)
 {
 	_life_tile_start_idx = allocate_obj_tile_idx(4);
-	update_life_display(PLAYER_LIFE_START);
+	update_life_display(life);
 
-	visual_ent_t *ent = allocate_visual_ent();
+	_life_ent = allocate_visual_ent();
 
-	ent->type = TYPE_VISUAL_LIFE;
+	_life_ent->type = TYPE_VISUAL_LIFE;
 
-	ent->x = (GBA_WIDTH - 16) * FIX_SCALE;
-	ent->y = 0;
+	_life_ent->x = (GBA_WIDTH - 16) * FIX_SCALE;
+	_life_ent->y = 0;
 
-	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
-	ent->att.attr1 = ATTR1_SIZE_16x16;
-	ent->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_life_tile_start_idx);
+	_life_ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	_life_ent->att.attr1 = ATTR1_SIZE_16x16;
+	_life_ent->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_life_tile_start_idx);
 }
 
 void update_life_display(int life)
@@ -60,26 +64,27 @@ void update_life_display(int life)
 	dma3_cpy(&tile_mem[4][_life_tile_start_idx], tiles, lifeAmmount3TilesLen);
 }
 
-void unload_life_display()
+void free_life_display()
 {
 	free_obj_tile_idx(_life_tile_start_idx, 4);
+	free_visual_ent(_life_ent);
 }
 
-void load_speed_level_display()
+void load_speed_level_display(FIXED speed)
 {
 	_speed_level_tile_idx = allocate_obj_tile_idx(4);
-	update_speed_level_display(PLAYER_AIR_START_SLOWDOWN);
+	update_speed_level_display(speed);
 
-	visual_ent_t *ent = allocate_visual_ent();
+	_speed_level_ent = allocate_visual_ent();
 
-	ent->type = TYPE_VISUAL_SPEED_LEVEL;
+	_speed_level_ent->type = TYPE_VISUAL_SPEED_LEVEL;
 
-	ent->x = (GBA_WIDTH - 16 * 2) * FIX_SCALE;
-	ent->y = 0;
+	_speed_level_ent->x = (GBA_WIDTH - 16 * 2) * FIX_SCALE;
+	_speed_level_ent->y = 0;
 
-	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
-	ent->att.attr1 = ATTR1_SIZE_16x16;
-	ent->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_speed_level_tile_idx);
+	_speed_level_ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	_speed_level_ent->att.attr1 = ATTR1_SIZE_16x16;
+	_speed_level_ent->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_speed_level_tile_idx);
 }
 
 void update_speed_level_display(FIXED speed)
@@ -98,35 +103,37 @@ void update_speed_level_display(FIXED speed)
 	dma3_cpy(&tile_mem[4][_speed_level_tile_idx], _speed_level_tiles[_speed_level_tiles_length - 1], speedLevel0TilesLen);
 }
 
-void init_jump_level_display()
+void free_speed_level_display()
 {
+	free_obj_tile_idx(_speed_level_tile_idx, 4);
+	free_visual_ent(_speed_level_ent);
+}
 
-	visual_ent_t *ent = allocate_visual_ent();
+void load_jump_level_display(FIXED jump)
+{
+	_jump_level_ent = allocate_visual_ent();
 
-	ent->type = TYPE_VISUAL_SPEED_LEVEL;
+	_jump_level_ent->type = TYPE_VISUAL_SPEED_LEVEL;
 
 	_jump_level_tile_idx = allocate_obj_tile_idx(4);
 
-	ent->x = (GBA_WIDTH - 16 * 3) * FIX_SCALE;
-	ent->y = 0;
+	_jump_level_ent->x = (GBA_WIDTH - 16 * 3) * FIX_SCALE;
+	_jump_level_ent->y = 0;
 
-	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
-	ent->att.attr1 = ATTR1_SIZE_16x16;
-	ent->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_jump_level_tile_idx);
+	_jump_level_ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	_jump_level_ent->att.attr1 = ATTR1_SIZE_16x16;
+	_jump_level_ent->att.attr2 = ATTR2_PALBANK(0) | ATTR2_PRIO(0) | ATTR2_ID(_jump_level_tile_idx);
 
-	update_jump_level_display(PLAYER_START_JUMP_POWER);
+	update_jump_level_display(jump);
 }
 
-void update_jump_level_display(FIXED jump_power)
+void update_jump_level_display(FIXED jump)
 {
 	FIXED inc = fxdiv(PLAYER_MAX_JUMP_POWER - PLAYER_START_JUMP_POWER, 4 * FIX_SCALE);
 
-	char str[50];
 	for (int i = 0; i < 4; i++)
 	{
-		sprintf(str, "i:%d,p:%.2f,l:%.2f", i, fx2float(jump_power), fx2float(PLAYER_START_JUMP_POWER + inc * i));
-		write_to_log(LOG_LEVEL_DEBUG, str);
-		if (jump_power <= PLAYER_START_JUMP_POWER + inc * i)
+		if (jump <= PLAYER_START_JUMP_POWER + inc * i)
 		{
 			dma3_cpy(&tile_mem[4][_jump_level_tile_idx], jumpLevel0Tiles + i * 64, jumpLevel0TilesLen / 4);
 			return;
@@ -137,6 +144,7 @@ void update_jump_level_display(FIXED jump_power)
 void free_jump_level_display()
 {
 	free_obj_tile_idx(_jump_level_tile_idx, 4);
+	free_visual_ent(_jump_level_ent);
 }
 
 void init_score_display()

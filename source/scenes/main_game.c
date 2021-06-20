@@ -8,6 +8,7 @@
 
 #include "title_screen.h"
 #include "scene_shared.h"
+#include "special_zone.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -19,6 +20,8 @@
 #include "../ui_display.h"
 #include "../gen.h"
 #include "../obstacles.h"
+#include "../effect.h"
+#include "../anime.h"
 
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
@@ -28,13 +31,55 @@
 #include "../assets/mgBeach.h"
 #include "../assets/mgPauseBeach.h"
 #include "../assets/mgPauseCity.h"
+#include "../assets/mgBeachWaterFog00.h"
+#include "../assets/mgBeachWaterFog01.h"
+#include "../assets/spriteShared.h"
 
-static mg_parm_t _parm;
+static const int fog_water_cycle_length = 2;
+static const tile_map_set_t fog_water_cycle[] = {
+	{mgBeachWaterFog00Tiles, mgBeachWaterFog00TilesLen,
+	 mgBeachWaterFog00Map, mgBeachWaterFog00MapLen},
+	{mgBeachWaterFog01Tiles, mgBeachWaterFog01TilesLen,
+	 mgBeachWaterFog01Map, mgBeachWaterFog01MapLen}};
+
+EWRAM_DATA static int _obj_pal_idx;
+
 static mg_data_t *_data = &_shared_data.mg;
 
-void setMgParmters(mg_parm_t parm)
+EWRAM_DATA static mg_data_in_t _in_data;
+EWRAM_DATA static mg_data_out_t _out_data;
+
+mg_data_in_t defualt_mg_data(mg_mode_t mode)
 {
-	_parm = parm;
+	mg_data_in_t result;
+	mg_data_t *data = &result.new_data;
+
+	data->mode = mode;
+
+	data->bg_0_scroll = int2fx(gba_rand());
+	data->bg_2_scroll = int2fx(gba_rand());
+
+	data->next_building_spawn = 0;
+	data->building_spawn_x = 0;
+	data->state = MG_S_STARTING;
+	data->water_pal_idx = 0;
+	data->splash_active = 0;
+	data->fog_tiles_cycle_idx = 0;
+	data->starting_scroll_x = 0;
+
+	data->fresh_game = TRUE;
+
+	return result;
+}
+
+void set_mg_in(mg_data_in_t data)
+{
+	_in_data = data;
+}
+
+mg_data_out_t get_mg_out()
+{
+	return _out_data;
 }
 
 static FIXED wrap_x(FIXED x)
@@ -97,10 +142,14 @@ static void spawn_buildings()
 		}
 		break;
 	case MG_MODE_BEACH:
-		switch (gba_rand_range(1, 1))
+		switch (gba_rand_range(1, 2))
 		{
 		case 1:
 			width = spawn_island_00(start_x);
+			break;
+		case 2:
+		default:
+			width = spawn_island_01(start_x);
 			break;
 		}
 		break;
@@ -136,6 +185,7 @@ static void load_foreground_tiles()
 	case MG_MODE_BEACH:
 		load_lava_0(MG_SHARED_CB);
 		load_island_00(MG_SHARED_CB);
+		load_island_01(MG_SHARED_CB);
 		break;
 	}
 }
@@ -155,21 +205,53 @@ static void free_foreground_tiles()
 		free_building_6();
 		break;
 	case MG_MODE_BEACH:
+		unload_lava_0();
 		free_island_00();
+		free_island_01();
 		break;
 	}
 }
 
 static void show(void)
 {
-	_data->mode = _parm.mode;
+	*_data = _in_data.new_data;
+
+	// Apply speical zone bonuses
+	sz_transfer_out_t sz_out = get_sz_out();
+	if (sz_out.dirty)
+	{
+		sz_out_clear_dirty();
+
+		for (int i = 0; i < sz_out.good_collected - sz_out.bad_collected; i++)
+		{
+			if (gba_rand_range(0, 100) >= 80)
+			{
+				switch (gba_rand_range(0, 2))
+				{
+				case 1:
+					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2));
+					break;
+
+				case 2:
+					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 2));
+					break;
+				}
+			}
+		}
+	}
 
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
-	init_gen();
+	if (_data->fresh_game)
+	{
+		free_all_ents();
+		init_gen();
+		init_level();
+		init_player();
+	}
 
-	// Load palette
+	// Load palettes
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
@@ -180,20 +262,19 @@ static void show(void)
 		break;
 	}
 
-	//Init bg offsets
-	_data->bg_0_scroll = int2fx(gba_rand());
-	_data->bg_2_scroll = int2fx(gba_rand());
+	_obj_pal_idx = allocate_obj_pal_idx(spriteSharedPalLen);
+	GRIT_CPY(pal_obj_mem + _obj_pal_idx, spriteSharedPal);
 
+	// Tiles
 	int pause_tile_offset = 0;
-	int fog_tiles_idx = 0;
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
 		_data->far_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(backgroundCityTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->far_tiles_idx], backgroundCityTiles);
 
-		fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(fogTilesLen));
-		GRIT_CPY(&tile_mem[MG_SHARED_CB][fog_tiles_idx], fogTiles);
+		_data->fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(fogTilesLen));
+		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx], fogTiles);
 
 		pause_tile_offset = allocate_bg_tile_idx(TILES_COUNT(mgPauseCityTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][pause_tile_offset], mgPauseCityTiles);
@@ -201,6 +282,9 @@ static void show(void)
 	case MG_MODE_BEACH:
 		_data->far_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->far_tiles_idx], mgBeachTiles);
+
+		_data->fog_tiles_idx = allocate_bg_tile_idx(TILES_COUNT(mgBeachWaterFog00TilesLen));
+		GRIT_CPY(&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx], mgBeachWaterFog00Tiles);
 
 		pause_tile_offset = allocate_bg_tile_idx(TILES_COUNT(mgPauseBeachTilesLen));
 		GRIT_CPY(&tile_mem[MG_SHARED_CB][pause_tile_offset], mgPauseBeachTiles);
@@ -227,18 +311,18 @@ static void show(void)
 
 		//Fog
 		GRIT_CPY(se_mem[MG_CLOUD_SB], fogMap);
-		//TODO: stop this double iteration bullshit
-		for (int i = 0; i < fogMapLen; i++)
-			se_mem[MG_CLOUD_SB][i] += fog_tiles_idx / 2;
-
 		break;
 	case MG_MODE_BEACH:
 		GRIT_CPY(se_mem[MG_FAR_SB], mgBeachMap);
 
-		se_fill(se_mem[MG_CLOUD_SB], 0);
+		//Fog
+		GRIT_CPY(se_mem[MG_CLOUD_SB], mgBeachWaterFog00Map);
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
 	}
+	//TODO: stop this double iteration bullshit
+	for (int i = 0; i < mgBeachWaterFog00MapLen; i++)
+		se_mem[MG_CLOUD_SB][i] += _data->fog_tiles_idx / 2;
 
 	//Set bg postions
 	REG_BG0HOFS = fx2int(_data->bg_0_scroll / 6);
@@ -253,10 +337,24 @@ static void show(void)
 	REG_BG3HOFS = 0;
 	REG_BG3VOFS = 0;
 
+	int bg_1_prio = 0;
+	int bg_2_prio = 0;
+	switch (_data->mode)
+	{
+	case MG_MODE_BEACH:
+		bg_1_prio = 2;
+		bg_2_prio = 1;
+		break;
+	case MG_MODE_CITY:
+		bg_1_prio = 1;
+		bg_2_prio = 2;
+		break;
+	}
+
 	// Set bkg reg
 	REG_BG0CNT = BG_PRIO(3) | BG_8BPP | BG_SBB(MG_FAR_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
-	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(MG_PLATFROM_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
-	REG_BG2CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
+	REG_BG1CNT = BG_PRIO(bg_1_prio) | BG_8BPP | BG_SBB(MG_PLATFROM_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_64x32;
+	REG_BG2CNT = BG_PRIO(bg_2_prio) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_PAUSE_SBB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
@@ -282,17 +380,10 @@ static void show(void)
 		break;
 	}
 
-	_data->next_building_spawn = 0;
-	_scroll_x = 0;
-	_data->building_spawn_x = 0;
-	_data->state = MG_S_STARTING;
-	_data->water_pal_idx = 0;
+	_scroll_x = _data->starting_scroll_x;
 
-	init_level();
-
-	init_player();
-
-	load_life_display();
+	// Tiles!
+	load_player_tiles();
 	load_health_up();
 	load_gun_0_tiles();
 	load_number_tiles();
@@ -300,16 +391,18 @@ static void show(void)
 	load_jump_up();
 	load_shrink_token();
 	load_enemy_bullets_tiles();
-	load_speed_level_display();
-	init_jump_level_display();
+	load_life_display(get_player_life());
+	load_speed_level_display(get_player_speed());
+	load_jump_level_display(get_player_jump());
 
 	init_score();
 
-	obj_hide_multi(oam_mem, 128);
-
-	while (_data->building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
+	if (_data->fresh_game)
 	{
-		spawn_buildings();
+		obj_hide_multi(oam_mem, 128);
+
+		while (_data->building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
+			spawn_buildings();
 	}
 }
 
@@ -351,6 +444,21 @@ static void update(void)
 				4, _water_cycle,
 				&_data->water_pal_idx, WATER_PAL_LENGTH);
 		}
+		if (frame_count() % 30 == 0)
+		{
+			//Copy current frame into tile mem
+			dma3_cpy(
+				&tile_mem[MG_SHARED_CB][_data->fog_tiles_idx],
+				fog_water_cycle[_data->fog_tiles_cycle_idx].tiles,
+				fog_water_cycle[_data->fog_tiles_cycle_idx].tiles_length);
+
+			//Next frame
+			++_data->fog_tiles_cycle_idx;
+
+			//Check if need to wrap cycle
+			if (_data->fog_tiles_cycle_idx >= fog_water_cycle_length)
+				_data->fog_tiles_cycle_idx = 0;
+		}
 		break;
 	}
 
@@ -366,7 +474,7 @@ static void update(void)
 		return;
 	}
 
-	//Back to title screen
+	// Back to title screen
 	if (key_held(KEY_SELECT) && key_hit(KEY_START))
 	{
 		scene_set(title_screen);
@@ -397,7 +505,15 @@ static void update(void)
 
 	REG_BG0HOFS = fx2int(_data->bg_0_scroll / 6);
 	REG_BG1HOFS = fx2int(_bg_pos_x);
-	REG_BG2HOFS = fx2int(_data->bg_2_scroll / 4);
+	switch (_data->mode)
+	{
+	case MG_MODE_BEACH:
+		REG_BG2HOFS = fx2int(_bg_pos_x);
+		break;
+	case MG_MODE_CITY:
+		REG_BG2HOFS = fx2int(_data->bg_2_scroll / 4);
+		break;
+	}
 
 	_data->next_building_spawn -= _scroll_x;
 
@@ -430,6 +546,32 @@ static void update(void)
 	update_visual_ents();
 	copy_ents_to_oam();
 
+	//Player visual effect
+	if (_data->splash_active > 0)
+		_data->splash_active--;
+
+	if (
+		_data->mode == MG_MODE_BEACH &&
+		_data->splash_active <= 0 &&
+		_player.y + int2fx(_player.h) > (BEACH_Y_SPAWN + 5) * FIX_SCALE)
+	{
+		create_splash_effect(allocate_visual_ent(), _player.x - 16, _player.y);
+		_data->splash_active = 60;
+	}
+
+	if ((key_held(KEY_SELECT) && key_held(KEY_A) && key_hit(KEY_START)) || _player.ent_cols & (TYPE_SPEICAL_ZONE_PORTAL))
+	{
+		sz_transfer_in_t data;
+		data.max_velocity = SZ_MAX_VELOCITY;
+		data.turing_speed = SZ_TURNING_SPEED;
+		data.timer_start = SZ_TIMER_SEC_END + int2fx(gba_rand_range(0, 5));
+		data.obs_count = SZ_OBS_MAX_COUNT - gba_rand_range(0, 10);
+		data.entered_via_debug = FALSE;
+		set_sz_in(data);
+		scene_set(_speical_zone_intro_scene);
+		return;
+	}
+
 	switch (_data->state)
 	{
 	case MG_S_STARTING:
@@ -460,6 +602,9 @@ static void update(void)
 
 static void hide(void)
 {
+	_data->starting_scroll_x = _scroll_x;
+	_out_data.last_data = *_data;
+
 	REG_DISPCNT = 0;
 	dma3_fill(se_mem[MG_CLOUD_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_FAR_SB], 0x0, SB_SIZE);
@@ -467,13 +612,21 @@ static void hide(void)
 
 	free_bg_tile_idx(0, BG_TILE_ALLC_SIZE);
 
+	free_obj_pal_idx(_obj_pal_idx, spriteSharedPalLen);
+
 	free_foreground_tiles();
 	free_score_display();
-	unload_gun_0_tiles();
+	free_player_tiles();
+	free_life_display();
+	free_health_up();
+	free_gun_0_tiles();
+	free_number_tiles();
+	free_speed_up();
+	free_jump_up();
+	free_shrink_token();
+	free_enemy_bullets_tiles();
+	free_speed_level_display();
 	free_jump_level_display();
-	unload_player();
-
-	free_all_ents();
 
 	mmStop();
 
@@ -488,8 +641,6 @@ static void hide(void)
 	CBB_CLEAR(MG_SHARED_CB);
 
 	REG_BLDCNT = 0;
-
-	SoftReset();
 }
 
 const scene_t main_game = {

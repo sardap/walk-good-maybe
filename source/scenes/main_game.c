@@ -222,25 +222,18 @@ static void show(void)
 	{
 		sz_out_clear_dirty();
 
-		char str[50];
-		sprintf(str, "Count: %d", sz_out.good_collected - sz_out.bad_collected);
-		write_to_log(LOG_LEVEL_DEBUG, str);
-
 		for (int i = 0; i < sz_out.good_collected - sz_out.bad_collected; i++)
 		{
 			if (gba_rand_range(0, 100) >= 80)
 			{
-				write_to_log(LOG_LEVEL_DEBUG, "Hit skill boost");
-				switch (gba_rand_range(0, 1))
+				switch (gba_rand_range(0, 2))
 				{
-				case 0:
-					add_player_jump(PLAYER_ADD_JUMP_STEP);
-					write_to_log(LOG_LEVEL_DEBUG, "Player Jump");
+				case 1:
+					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2));
 					break;
 
-				case 1:
-					add_player_speed(PLAYER_ADD_SPEED_STEP);
-					write_to_log(LOG_LEVEL_DEBUG, "Speed boost");
+				case 2:
+					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 2));
 					break;
 				}
 			}

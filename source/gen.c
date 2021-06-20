@@ -20,17 +20,17 @@
 #include "assets/mgBeachIsland00.h"
 #include "assets/mgBeachIsland01.h"
 
-//Maybe do Probability math here
-//enemy_chance, lava_chance, token_chance
-static t_spawn_info _building_0 = {80, 20, 70};
-static t_spawn_info _building_1 = {80, 20, 70};
-static t_spawn_info _building_2 = {80, 20, 70};
-static t_spawn_info _building_3 = {80, 20, 70};
-static t_spawn_info _building_4 = {80, 20, 70};
-static t_spawn_info _building_5 = {0, 0, 100};
+// Maybe do Probability math here
+// enemy chance, lava chance, token chance, sz portal chance
+static t_spawn_info _building_0 = {70, 20, 60, 20};
+static t_spawn_info _building_1 = {70, 20, 60, 20};
+static t_spawn_info _building_2 = {70, 20, 60, 20};
+static t_spawn_info _building_3 = {70, 20, 60, 20};
+static t_spawn_info _building_4 = {70, 20, 60, 20};
+static t_spawn_info _building_5 = {0, 0, 50, 100};
 
-static t_spawn_info _island_00 = {80, 0, 70};
-static t_spawn_info _island_01 = {80, 0, 90};
+static t_spawn_info _island_00 = {80, 0, 70, 0};
+static t_spawn_info _island_01 = {80, 0, 90, 0};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -186,10 +186,6 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	if (level_to_screen(start_x + width) < 0)
 		return;
 
-	spawn_speical_zone_portal(start_x, width, y);
-
-	return;
-
 	if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
 	{
 		spawn_lava(width, start_x, y);
@@ -218,6 +214,10 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 			spawn_shrink_token(start_x, width, y);
 			break;
 		}
+	}
+	else if (gba_rand_range(1, 100) > 100 - info->sz_portal_chance)
+	{
+		spawn_speical_zone_portal(start_x, width, y);
 	}
 }
 

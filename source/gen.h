@@ -139,6 +139,7 @@ typedef struct t_spawn_info
 	int enemy_chance;
 	int lava_chance;
 	int token_chance;
+	int sz_portal_chance;
 } t_spawn_info;
 
 void init_gen();

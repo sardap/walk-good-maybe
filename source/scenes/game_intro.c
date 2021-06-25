@@ -117,7 +117,7 @@ static void show(gi_mode_t mode)
 
 	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(GI_SKY_SSB) | BG_CBB(GI_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(GI_TEXT_SSB) | BG_CBB(GI_SHARED_CB) | BG_REG_32x32;
-	REG_BG2CNT = BG_PRIO(1) | BG_SBB(GI_COOL_BACKGROUND_SSB) | BG_CBB(GI_SHARED_CB) | BG_AFF_64x64;
+	REG_BG2CNT = BG_PRIO(1) | BG_SBB(GI_COOL_BACKGROUND_SSB) | BG_CBB(GI_SHARED_CB) | BG_AFF_64x64 | BG_WRAP;
 
 	// enable hblank register and set the mode7 type
 	irq_init(NULL);
@@ -130,10 +130,10 @@ static void show(gi_mode_t mode)
 	REG_DISPCNT = DCNT_MODE1 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
 
 	// Setup cam
-	_data->cam_pos.x = 257.89f * FIX_SCALEF;
+	_data->cam_pos.x = gba_rand(); // 257.89f * FIX_SCALEF
 	_data->cam_pos.y = 200.0f * FIX_SCALEF;
-	_data->cam_pos.z = 496.38f * FIX_SCALE;
-	_data->cam_phi = 0;
+	_data->cam_pos.z = gba_rand();
+	_data->cam_phi = gba_rand();
 	_data->g_cosf = lu_cos(_data->cam_phi) >> 4;
 	_data->g_sinf = lu_sin(_data->cam_phi) >> 4;
 

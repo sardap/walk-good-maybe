@@ -88,7 +88,7 @@ void common_step();
 void init_seed(int seed);
 int gba_rand();
 
-//Min and max incluscive
+// Min and max incluscive
 inline int gba_rand_range(int min, int max)
 {
 	return (gba_rand() % (max - min + 1)) + min;

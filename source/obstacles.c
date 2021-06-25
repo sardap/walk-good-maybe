@@ -49,11 +49,15 @@ void load_speed_up()
 {
 	_speed_up_tile_idx = allocate_obj_tile_idx(1);
 	GRIT_CPY(&tile_mem[4][_speed_up_tile_idx], speedUpTiles);
+
+	_speed_lines_idx = allocate_obj_tile_idx(4);
+	GRIT_CPY(&tile_mem[4][_speed_lines_idx], speedLineTiles);
 }
 
 void free_speed_up()
 {
 	free_obj_tile_idx(_speed_up_tile_idx, 1);
+	free_obj_tile_idx(_speed_lines_idx, 4);
 }
 
 void load_health_up()

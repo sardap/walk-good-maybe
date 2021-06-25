@@ -122,7 +122,8 @@
 		"cerrno": "cpp",
 		"cstdarg": "cpp",
 		"mgportal00.h": "c",
-		"ent.h": "c"
+		"ent.h": "c",
+		"szgrid01.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

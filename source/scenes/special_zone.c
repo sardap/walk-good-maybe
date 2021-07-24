@@ -540,15 +540,15 @@ static void update_ui_border()
 	FIXED current_green = int2fx(GET_GREEN(_data->border_colour_current));
 	FIXED current_blue = int2fx(GET_BLUE(_data->border_colour_current));
 
-	FIXED next_red = int2fx(GET_RED(_data->border_colour_current));
-	FIXED next_geen = int2fx(GET_GREEN(_data->border_colour_next));
-	FIXED next_blue = int2fx(GET_BLUE(_data->border_colour_next));
+	FIXED target_red = int2fx(GET_RED(_data->border_colour_current));
+	FIXED target_green = int2fx(GET_GREEN(_data->border_colour_next));
+	FIXED target_blue = int2fx(GET_BLUE(_data->border_colour_next));
 
-	int result_red = fx2int(current_red + fxmul(_data->colour_dist, next_red - current_red));
-	int result_green = fx2int(current_green + fxmul(_data->colour_dist, next_geen - current_green));
-	int result_blue = fx2int(current_blue + fxmul(_data->colour_dist, next_blue - current_blue));
+	int next_red = fx2int(current_red + fxmul(_data->colour_dist, target_red - current_red));
+	int next_green = fx2int(current_green + fxmul(_data->colour_dist, target_green - current_green));
+	int next_blue = fx2int(current_blue + fxmul(_data->colour_dist, target_blue - current_blue));
 
-	u16 next_colour = CREATE_COLOUR(result_red, result_green, result_blue);
+	u16 next_colour = CREATE_COLOUR(next_red, next_green, next_blue);
 
 	pal_bg_mem[SZ_BORDER_PAL_IDX] = next_colour;
 }

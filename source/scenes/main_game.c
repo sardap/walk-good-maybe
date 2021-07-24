@@ -529,13 +529,9 @@ static void update(void)
 		for (int y = 0; y < LEVEL_HEIGHT; y++)
 		{
 			if (x < 32)
-			{
 				se_plot(se_mem[MG_PLATFROM_SB], x, y, at_level(x, y));
-			}
 			else
-			{
 				se_plot(se_mem[MG_PLATFROM_SB + 1], x - 32, y, at_level(x, y));
-			}
 		}
 	}
 

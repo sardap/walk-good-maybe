@@ -44,7 +44,7 @@ static gi_data_t *_data = &_shared_data.gi;
 // offset * (zoom * rotation)
 // Mixed fixed point: lam, lxr, lyr use .12
 // lxr and lyr have different calculation methods
-//Not going to pretend that I understand this
+// Not going to pretend that I understand this
 static void m7_hbl()
 {
 	FIXED lam, lcf, lsf, lxr, lyr;
@@ -131,7 +131,7 @@ static void show(gi_mode_t mode)
 
 	// Setup cam
 	_data->cam_pos.x = gba_rand(); // 257.89f * FIX_SCALEF
-	_data->cam_pos.y = 200.0f * FIX_SCALEF;
+	_data->cam_pos.y = 600.0f * FIX_SCALEF;
 	_data->cam_pos.z = gba_rand();
 	_data->cam_phi = gba_rand();
 	_data->g_cosf = lu_cos(_data->cam_phi) >> 4;
@@ -167,7 +167,7 @@ static void update(void)
 	--_data->countdown;
 	// This is a magic number that makes it roate fast
 	_data->whale_rotate -= 128 * 5;
-	_data->cam_pos.y -= 1.8f * FIX_SCALE;
+	_data->cam_pos.y -= 5.5f * FIX_SCALE;
 	_data->whale_scale -= fxdiv(GI_WHALE_START_SCALE, GI_STARTING_COUNTDOWN * FIX_SCALE);
 
 	obj_aff_rotscale(
@@ -214,7 +214,7 @@ static void update(void)
 		break;
 	}
 	case GI_S_GO:
-		if (_data->countdown <= 0)
+		if (_data->cam_pos.y <= 50 * FIX_SCALE)
 		{
 			switch (_data->mode)
 			{

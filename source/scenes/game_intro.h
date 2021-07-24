@@ -8,7 +8,7 @@
 #define GI_TEXT_SSB 24
 #define GI_SKY_SSB 26
 #define GI_M7_D 128
-#define GI_STARTING_COUNTDOWN 1.65 * 60
+#define GI_STARTING_COUNTDOWN 2.25 * 60
 //1.65 seconds 60 frames per second
 #define GI_WHALE_START_SCALE 512 * FIX_SCALE
 

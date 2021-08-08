@@ -40,6 +40,8 @@ CFLAGS  :=  -g -Wall -O3\
         -mcpu=arm7tdmi -mtune=arm7tdmi\
         -fomit-frame-pointer\
         -ffast-math \
+		-DDEBUG=1 \
+		-DSHOW_WARNING=1 \
         $(ARCH)
 
 CFLAGS  +=  $(INCLUDE)

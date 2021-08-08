@@ -349,3 +349,22 @@ files=[
     "sound_test/stArrow",
     "sound_test/stArrowRed"
 ]
+
+[[Targets]]
+name="speical zone background"
+options=[
+    "-ftc",					# Create C file
+    "-gT ff00f7",			# RGB 24 BIT
+    "-gB8",					# Bit depth 8
+    "-gu8",					# export as bytes
+    "-m",					# Export map
+    "-mR8",					# Create MapszBanditFace00
+    "-mLs",					# Map 16 Bit
+    "-pS",					# Share pallet
+    "-gS",					# Share tiles
+    "-O wrSharedBackground",# Shared pallet name
+]
+files=[
+    "warning/wrMain",
+    "warning/wrButton",
+]

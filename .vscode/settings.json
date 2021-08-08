@@ -123,7 +123,8 @@
 		"cstdarg": "cpp",
 		"mgportal00.h": "c",
 		"ent.h": "c",
-		"szgrid01.h": "c"
+		"szgrid01.h": "c",
+		"warning.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

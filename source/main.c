@@ -7,6 +7,7 @@
 #include "graphics.h"
 #include "ent.h"
 #include "scenes/title_screen.h"
+#include "scenes/warning.h"
 
 void game_loop()
 {
@@ -40,6 +41,11 @@ int main()
 #ifdef DEBUG
 	init_debug();
 #endif
+
+#ifdef SHOW_WARNING
+	show_warning();
+#endif
+
 	init_all_ents();
 
 	init_graphics();

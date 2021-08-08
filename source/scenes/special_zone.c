@@ -615,7 +615,6 @@ static void show(void)
 	GRIT_CPY(&tile8_mem[SZ_SHARED_CB][_bg_mouth_tile], szMouth00ClosedTiles);
 
 	// Map
-
 	memset16(&se_mem[SZ_GRID_SBB], _bg_grid_tile, SB_SIZE);
 	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
 	memset16(&se_mem[SZ_TEXT_SBB], 0, SB_SIZE);

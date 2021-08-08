@@ -94,6 +94,8 @@ inline int gba_rand_range(int min, int max)
 	return (gba_rand() % (max - min + 1)) + min;
 }
 
+void load_blank();
+
 void init_score();
 void clear_score();
 

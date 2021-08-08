@@ -7,6 +7,7 @@
 #include "soundbank_bin.h"
 
 #include "title_screen.h"
+#include "game_over.h"
 #include "scene_shared.h"
 #include "special_zone.h"
 #include "../ent.h"
@@ -22,6 +23,7 @@
 #include "../obstacles.h"
 #include "../effect.h"
 #include "../anime.h"
+#include "../sound.h"
 
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
@@ -239,6 +241,8 @@ static void show(void)
 		}
 	}
 
+	load_blank();
+
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
@@ -248,17 +252,6 @@ static void show(void)
 		init_gen();
 		init_level();
 		init_player();
-	}
-
-	// Load palettes
-	switch (_data->mode)
-	{
-	case MG_MODE_CITY:
-		GRIT_CPY(pal_bg_mem, mainGameCitySharedPal);
-		break;
-	case MG_MODE_BEACH:
-		GRIT_CPY(pal_bg_mem, mainGameBeachSharedPal);
-		break;
 	}
 
 	_obj_pal_idx = allocate_obj_pal_idx(spriteSharedPalLen);
@@ -357,6 +350,17 @@ static void show(void)
 	REG_BG2CNT = BG_PRIO(bg_2_prio) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_PAUSE_SBB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
+	// Load palettes
+	switch (_data->mode)
+	{
+	case MG_MODE_CITY:
+		GRIT_CPY(pal_bg_mem, mainGameCitySharedPal);
+		break;
+	case MG_MODE_BEACH:
+		GRIT_CPY(pal_bg_mem, mainGameBeachSharedPal);
+		break;
+	}
+
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
 	switch (_data->mode)
@@ -408,11 +412,44 @@ static void show(void)
 
 static bool check_game_over()
 {
-#ifdef DEBUG
-	return false;
-#elif
 	return fx2int(_player.x) < 0;
-#endif
+}
+
+static void game_over()
+{
+	if (_data->mode == MG_MODE_CITY)
+	{
+		REG_DISPCNT ^= DCNT_BG2;
+	}
+
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG0 | BLD_BG1 | BLD_BG2 | BLD_OBJ, // Top layers
+		0,									   // Bottom layers
+		3									   // Mode
+	);
+	int blend = 0;
+	int timer = 0;
+	REG_BLDY = BLDY_BUILD(blend);
+
+	mmStop();
+
+	mmEffectEx(&_player_death_sound);
+
+	while (blend <= 17 || mmEffectActive(PLAYER_ACTION_SOUND_HANDLER))
+	{
+		VBlankIntrWait();
+		mmFrame();
+		key_poll();
+		timer++;
+		if (timer % 8 == 0)
+		{
+			blend++;
+			REG_BLDY = BLDY_BUILD(blend);
+		}
+	}
+
+	write_to_log(LOG_LEVEL_DEBUG, "GAME OVER");
+	scene_set(game_over_scene);
 }
 
 static void update(void)
@@ -490,11 +527,13 @@ static void update(void)
 		return;
 	}
 
+#ifdef GAME_OVER_ENABLED
 	if (check_game_over())
 	{
-		scene_set(title_screen);
+		game_over();
 		return;
 	}
+#endif
 
 	_scroll_x = clamp(_scroll_x, 0, MG_MAX_SCROLL_SPEED);
 	_bg_pos_x += _scroll_x;

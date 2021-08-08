@@ -203,4 +203,5 @@ static void hide(void)
 const scene_t title_screen = {
 	.show = show,
 	.update = update,
-	.hide = hide};
+	.hide = hide,
+};

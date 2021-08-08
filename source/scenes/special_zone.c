@@ -555,6 +555,8 @@ static void update_ui_border()
 
 static void show(void)
 {
+	load_blank();
+
 	_data->obs_count = _in_data.obs_count;
 	_data->bg0_x = 0 / FIX_SCALE;
 	_data->bg0_y = 0 / FIX_SCALE;
@@ -587,7 +589,6 @@ static void show(void)
 	REG_BG3VOFS = fx2int(_data->bg0_y);
 
 	// Load palettes
-	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	GRIT_CPY(pal_obj_mem, szSharedSpritePal);
 
 	pal_bg_mem[1] = (u16)gba_rand();
@@ -765,6 +766,7 @@ static void show(void)
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
 
+	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	REG_DISPCNT = DCNT_MODE0 | DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
 }
 

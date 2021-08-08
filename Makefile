@@ -40,11 +40,15 @@ CFLAGS  :=  -g -Wall -O3\
         -mcpu=arm7tdmi -mtune=arm7tdmi\
         -fomit-frame-pointer\
         -ffast-math \
-		-DDEBUG=1 \
-		-DSHOW_WARNING=1 \
         $(ARCH)
 
 CFLAGS  +=  $(INCLUDE)
+
+ifdef WALK_GOOD_MAYBE_RELEASE
+    CFLAGS += -DSHOW_WARNING=1 -DGAME_OVER_ENABLED=1
+else
+    CFLAGS += -DDEBUG=1 -DGAME_OVER_ENABLED=1
+endif
 
 CXXFLAGS    :=  $(CFLAGS) -fno-rtti -fno-exceptions
 

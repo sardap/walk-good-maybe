@@ -86,3 +86,11 @@ int get_score()
 {
 	return _score;
 }
+
+void load_blank()
+{
+	memset16(pal_bg_mem, 0, PAL_BG_SIZE / 2);
+	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(24) | BG_CBB(0) | BG_REG_32x32;
+	REG_DISPCNT = DCNT_BG0;
+	VBlankIntrWait();
+}

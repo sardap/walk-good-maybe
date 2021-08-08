@@ -19,7 +19,7 @@
 #include "../assets/stArrow.h"
 #include "../assets/stArrowRed.h"
 
-st_data_t *_data = &_shared_data.st;
+static st_data_t *_data = &_shared_data.st;
 
 static void show(void)
 {

@@ -229,11 +229,11 @@ static void show(void)
 				write_to_log(LOG_LEVEL_DEBUG, "Lucky");
 				if (gba_rand() % 2 == 0)
 				{
-					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 6));
+					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2.5f * FIX_SCALEF));
 				}
 				else
 				{
-					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 6));
+					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 2.5f * FIX_SCALEF));
 				}
 			}
 		}

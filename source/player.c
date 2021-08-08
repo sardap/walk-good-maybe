@@ -99,7 +99,7 @@ void free_player_tiles()
 
 FIXED get_player_jump()
 {
-	return _player_jump_power;
+	return fxdiv(_player_jump_power, 6 * FIX_SCALE);
 }
 
 void add_player_jump(FIXED amount)
@@ -112,12 +112,12 @@ void add_player_jump(FIXED amount)
 	sprintf(str, "JUMP:%2.f AMT:%2.f", fx2float(_player_jump_power), fx2float(amount));
 	write_to_log(LOG_LEVEL_DEBUG, str);
 
-	update_jump_level_display(_player_jump_power);
+	update_jump_level_display(get_player_jump());
 }
 
 FIXED get_player_speed()
 {
-	return _player_air_slowdown;
+	return fxdiv(_player_air_slowdown, 6 * FIX_SCALE);
 }
 
 void add_player_speed(FIXED amount)
@@ -127,10 +127,10 @@ void add_player_speed(FIXED amount)
 		PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
 
 	char str[50];
-	sprintf(str, "SPEED:%2.f AMT:%2.f", fx2float(_player_jump_power), fx2float(amount));
+	sprintf(str, "SPEED:%2.f AMT:%2.f", fx2float(_player_air_slowdown), fx2float(amount));
 	write_to_log(LOG_LEVEL_DEBUG, str);
 
-	update_speed_level_display(_player_air_slowdown);
+	update_speed_level_display(get_player_speed());
 }
 
 void free_player()
@@ -243,7 +243,7 @@ void update_player()
 	switch (_move_state)
 	{
 	case MOVEMENT_AIR:
-		_player.vx = fxdiv(_player.vx, _player_air_slowdown);
+		_player.vx = fxdiv(_player.vx, get_player_speed());
 		break;
 	case MOVEMENT_JUMPING:
 	case MOVEMENT_LANDED:
@@ -397,7 +397,7 @@ void update_player()
 		}
 		else if (_player_anime_cycle <= 0)
 		{
-			_player.vy = -_player_jump_power;
+			_player.vy = -get_player_jump();
 			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
 			_move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);

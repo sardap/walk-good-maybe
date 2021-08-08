@@ -89,11 +89,13 @@ void load_speed_level_display(FIXED speed)
 
 void update_speed_level_display(FIXED speed)
 {
-	FIXED inc = fxdiv(PLAYER_AIR_START_SLOWDOWN - PLAYER_AIR_SLOWDOWN_MIN, int2fx(_speed_level_tiles_length));
+	FIXED inc = fxdiv(
+		fxdiv(PLAYER_AIR_START_SLOWDOWN, 6 * FIX_SCALE) - fxdiv(PLAYER_AIR_SLOWDOWN_MIN, 6 * FIX_SCALE),
+		int2fx(_speed_level_tiles_length));
 
 	for (int i = 0; i < _speed_level_tiles_length; i++)
 	{
-		if (speed <= PLAYER_AIR_SLOWDOWN_MIN + inc * i)
+		if (speed <= fxdiv(PLAYER_AIR_SLOWDOWN_MIN, 6 * FIX_SCALE) + inc * i)
 		{
 			dma3_cpy(&tile_mem[4][_speed_level_tile_idx], _speed_level_tiles[i], speedLevel0TilesLen);
 			return;
@@ -129,11 +131,13 @@ void load_jump_level_display(FIXED jump)
 
 void update_jump_level_display(FIXED jump)
 {
-	FIXED inc = fxdiv(PLAYER_MAX_JUMP_POWER - PLAYER_START_JUMP_POWER, 4 * FIX_SCALE);
+	FIXED inc = fxdiv(
+		fxdiv(PLAYER_MAX_JUMP_POWER, 6 * FIX_SCALE) - fxdiv(PLAYER_START_JUMP_POWER, 6 * FIX_SCALE),
+		4 * FIX_SCALE);
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (jump <= PLAYER_START_JUMP_POWER + inc * i)
+		if (jump <= fxdiv(PLAYER_START_JUMP_POWER, 6 * FIX_SCALE) + inc * i)
 		{
 			dma3_cpy(&tile_mem[4][_jump_level_tile_idx], jumpLevel0Tiles + i * 64, jumpLevel0TilesLen / 4);
 			return;

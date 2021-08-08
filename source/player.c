@@ -108,6 +108,10 @@ void add_player_jump(FIXED amount)
 		_player_jump_power + amount,
 		PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
 
+	char str[50];
+	sprintf(str, "JUMP:%2.f AMT:%2.f", fx2float(_player_jump_power), fx2float(amount));
+	write_to_log(LOG_LEVEL_DEBUG, str);
+
 	update_jump_level_display(_player_jump_power);
 }
 
@@ -121,6 +125,10 @@ void add_player_speed(FIXED amount)
 	_player_air_slowdown = clamp(
 		_player_air_slowdown - amount,
 		PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
+
+	char str[50];
+	sprintf(str, "SPEED:%2.f AMT:%2.f", fx2float(_player_jump_power), fx2float(amount));
+	write_to_log(LOG_LEVEL_DEBUG, str);
 
 	update_speed_level_display(_player_air_slowdown);
 }
@@ -264,9 +272,6 @@ void update_player()
 		//Flapping sound
 		if (!hit_y)
 		{
-			char str[50];
-			sprintf(str, "%.2f", fx2float(_player.vy));
-			write_to_log(LOG_LEVEL_DEBUG, str);
 			mmEffectEx(&_player_flap_sound);
 		}
 		//Walking sound

@@ -7,6 +7,7 @@
 #include "ent.h"
 #include "enemy.h"
 #include "obstacles.h"
+#include "player.h"
 
 #include "assets/lava0TileSet.h"
 #include "assets/building0TileSet.h"
@@ -199,7 +200,7 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	}
 	else if (gba_rand_range(1, 100) > 100 - info->token_chance)
 	{
-		switch (gba_rand_range(1, 4))
+		switch (gba_rand_range(1, 3))
 		{
 		case 1:
 			spawn_jump_up_token(start_x, width, y);
@@ -208,7 +209,14 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 			spawn_speed_up_token(start_x, width, y);
 			break;
 		case 3:
-			spawn_health_up_token(start_x, width, y);
+			if (get_player_life() >= PLAYER_LIFE_START)
+			{
+				spawn_obstacles(start_x, width, y, info);
+			}
+			else
+			{
+				spawn_health_up_token(start_x, width, y);
+			}
 			break;
 		case 4:
 			spawn_shrink_token(start_x, width, y);

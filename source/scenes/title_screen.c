@@ -23,13 +23,12 @@
 #include "../assets/tsBeachGameText.h"
 #include "../assets/tsCityGameText.h"
 
-static const int _options_length = 5;
+static const int _options_length = 4;
 static const ts_menu_options_t _options[] = {
 	{TS_MENU_CITY, tsCityGameTextMap, tsCityGameTextMapLen, 51, 160},
 	{TS_MENU_BEACH, tsBeachGameTextMap, tsBeachGameTextMapLen, 43, 167},
 	{TS_MENU_CREDITS, tsCreditsMap, tsCreditsMapLen, 23, 185},
-	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175},
-	{TS_SPECIAL_ZONE, tsSoundTestTextMap, tsSoundTestTextMapLen, 0, 175}};
+	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175}};
 
 static const u16 lava_cycle[] = {0x11D9, 0x1E3C, 0x20FF};
 
@@ -172,16 +171,6 @@ static void update(void)
 			break;
 		case TS_MENU_SOUND_TEST:
 			scene_set(sound_test_scene);
-			break;
-		case TS_SPECIAL_ZONE:
-			sz_transfer_in_t data;
-			data.max_velocity = SZ_MAX_VELOCITY;
-			data.turing_speed = SZ_TURNING_SPEED;
-			data.timer_start = SZ_TIMER_SEC_END;
-			data.obs_count = SZ_OBS_MAX_COUNT;
-			data.entered_via_debug = TRUE;
-			set_sz_in(data);
-			scene_set(special_zone_scene);
 			break;
 		}
 	}

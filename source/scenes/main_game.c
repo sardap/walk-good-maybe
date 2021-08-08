@@ -98,7 +98,7 @@ static FIXED wrap_x(FIXED x)
 
 static inline int offset_x_bg(int n)
 {
-	//What the fuck is nfx
+	// What the fuck is nfx
 	int nfx = (n * TILE_WIDTH) * FIX_SCALE;
 	return fx2int(wrap_x(_bg_pos_x + nfx)) / TILE_WIDTH;
 }
@@ -226,15 +226,14 @@ static void show(void)
 		{
 			if (gba_rand_range(0, 100) >= 80)
 			{
-				switch (gba_rand_range(0, 2))
+				write_to_log(LOG_LEVEL_DEBUG, "Lucky");
+				if (gba_rand() % 2 == 0)
 				{
-				case 1:
-					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2));
-					break;
-
-				case 2:
-					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 2));
-					break;
+					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 6));
+				}
+				else
+				{
+					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 6));
 				}
 			}
 		}
@@ -320,7 +319,8 @@ static void show(void)
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
 	}
-	//TODO: stop this double iteration bullshit
+
+	// Can't be bothered using char blocks
 	for (int i = 0; i < mgBeachWaterFog00MapLen; i++)
 		se_mem[MG_CLOUD_SB][i] += _data->fog_tiles_idx / 2;
 

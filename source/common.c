@@ -94,3 +94,9 @@ void load_blank()
 	REG_DISPCNT = DCNT_BG0;
 	VBlankIntrWait();
 }
+
+void hide_all_objects()
+{
+	obj_hide_multi(_obj_buffer, 128);
+	obj_copy(oam_mem, _obj_buffer, 128);
+}

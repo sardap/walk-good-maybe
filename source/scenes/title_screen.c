@@ -43,6 +43,9 @@ static int _pal_change_countdown;
 
 static void show(void)
 {
+	load_blank();
+	hide_all_objects();
+
 	// Load palette
 	GRIT_CPY(pal_bg_mem, titleScreenSharedPal);
 	GRIT_CPY(pal_obj_mem, tsSpirteSharedPal);
@@ -196,7 +199,7 @@ static void update(void)
 
 static void hide(void)
 {
-	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0;
+	load_blank();
 	OAM_CLEAR();
 }
 

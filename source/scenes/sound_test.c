@@ -165,7 +165,7 @@ static void update(void)
 		_data->arrow_countdown = 10;
 	}
 
-	//Underflow fuck it
+	// Underflow fuck it
 	_data->arrow_countdown--;
 	if (_data->arrow_countdown < 0)
 	{

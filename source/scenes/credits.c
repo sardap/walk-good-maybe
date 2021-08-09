@@ -150,26 +150,26 @@ static const cr_credit_t _credits[] = {
 
 };
 
-static cr_data_t *data = &_shared_data.cr;
+static cr_data_t *_data = &_shared_data.cr;
 
 static void load_next_credit()
 {
-	data->eva = 0 * FIX_SCALE;
-	data->evb = 128 * FIX_SCALE;
+	_data->eva = 0 * FIX_SCALE;
+	_data->evb = 128 * FIX_SCALE;
 
-	data->active.crd = &_credits[data->active_idx];
-	data->active.x = 50 * FIX_SCALE;
-	data->active.y = GBA_HEIGHT * FIX_SCALE;
-	data->state = CR_STATE_SCROLLING_UP;
+	_data->active.crd = &_credits[_data->active_idx];
+	_data->active.x = 50 * FIX_SCALE;
+	_data->active.y = GBA_HEIGHT * FIX_SCALE;
+	_data->state = CR_STATE_SCROLLING_UP;
 
 	//Load pal
-	LZ77UnCompVram(data->active.crd->pal, pal_bg_mem);
+	LZ77UnCompVram(_data->active.crd->pal, pal_bg_mem);
 	//Face background
-	LZ77UnCompVram(data->active.crd->tiles, &tile8_mem[CR_SHARED_CB]);
+	LZ77UnCompVram(_data->active.crd->tiles, &tile8_mem[CR_SHARED_CB]);
 	//Map
-	LZ77UnCompVram(data->active.crd->map, &se_mem[CR_IMAGE_SBB]);
+	LZ77UnCompVram(_data->active.crd->map, &se_mem[CR_IMAGE_SBB]);
 
-	data->active_idx++;
+	_data->active_idx++;
 }
 
 static void show(void)
@@ -224,29 +224,29 @@ static void show(void)
 	gptxt->dx = 7;
 	gptxt->dy = 10;
 
-	data->active_idx = 0;
+	_data->active_idx = 0;
 
 	load_next_credit();
 
 	//init objects
-	obj_hide_multi(data->text_objs, CR_OBJ_COUNT);
+	obj_hide_multi(_data->text_objs, CR_OBJ_COUNT);
 
-	data->player = &data->text_objs[CR_OBJ_COUNT - 1];
+	_data->player = &_data->text_objs[CR_OBJ_COUNT - 1];
 
 	GRIT_CPY(pal_obj_mem, spriteSharedPal);
 	GRIT_CPY(tile_mem[4], whale_air_0Tiles);
 	obj_set_attr(
-		data->player,
+		_data->player,
 		ATTR0_SQUARE | ATTR0_8BPP,
 		ATTR1_SIZE_16,
 		ATTR2_ID(0) | ATTR2_PRIO(0));
-	data->player_x = (GBA_WIDTH / 2 - 8) * FIX_SCALE;
-	data->player_y = (GBA_HEIGHT / 2 - 8) * FIX_SCALE;
-	obj_set_pos(data->player, fx2int(data->player_x), fx2int(data->player_y));
+	_data->player_x = (GBA_WIDTH / 2 - 8) * FIX_SCALE;
+	_data->player_y = (GBA_HEIGHT / 2 - 8) * FIX_SCALE;
+	obj_set_pos(_data->player, fx2int(_data->player_x), fx2int(_data->player_y));
 
 	//Setup blending
-	data->eva = 3 * FIX_SCALE;
-	data->evb = 124 * FIX_SCALE;
+	_data->eva = 3 * FIX_SCALE;
+	_data->evb = 124 * FIX_SCALE;
 
 	mmStart(MOD_PD_ROCK_BACKGROUND, MM_PLAY_LOOP);
 }
@@ -278,64 +278,64 @@ static int longest_word_in_sentance(const char *str)
 
 static void update(void)
 {
-	REG_BLDALPHA = BLDA_BUILD(fx2int(data->eva) / 8, fx2int(data->evb) / 8);
+	REG_BLDALPHA = BLDA_BUILD(fx2int(_data->eva) / 8, fx2int(_data->evb) / 8);
 	REG_BLDY = BLDY_BUILD(0);
 
 	if (key_hit(KEY_START) || key_hit(KEY_B))
 		scene_set(title_screen);
 
 	FIXED step;
-	switch (data->state)
+	switch (_data->state)
 	{
 	case CR_STATE_SCROLLING_UP:
-		data->active.y -= CR_TEXT_SCROLL_SPEED;
+		_data->active.y -= CR_TEXT_SCROLL_SPEED;
 
 		step = fxdiv(130, CR_FADE_TIME);
-		data->evb = clamp(data->evb - step, 0, 124 * FIX_SCALE);
+		_data->evb = clamp(_data->evb - step, 0, 124 * FIX_SCALE);
 
-		if (fx2int(data->active.y) < GBA_HEIGHT / 4)
+		if (fx2int(_data->active.y) < GBA_HEIGHT / 4)
 		{
-			data->state = CR_STATE_PAUSE;
-			data->countdown = CR_PAUSE_TIME;
+			_data->state = CR_STATE_PAUSE;
+			_data->countdown = CR_PAUSE_TIME;
 		}
 		break;
 	case CR_STATE_PAUSE:
-		--data->countdown;
+		--_data->countdown;
 		step = fxdiv(130, CR_PAUSE_TIME);
-		data->eva = clamp(data->eva + step, 0, 124 * FIX_SCALE);
+		_data->eva = clamp(_data->eva + step, 0, 124 * FIX_SCALE);
 
-		if (data->countdown <= 0)
+		if (_data->countdown <= 0)
 		{
-			data->state = CR_STATE_LEAVE;
-			data->countdown = 60;
+			_data->state = CR_STATE_LEAVE;
+			_data->countdown = 60;
 		}
 		break;
 	case CR_STATE_LEAVE:
 	{
-		data->countdown--;
+		_data->countdown--;
 		int compelte;
-		if (data->active_idx % 2 == 0)
+		if (_data->active_idx % 2 == 0)
 		{
-			data->active.x -= CR_TEXT_SCROLL_SPEED * 2;
-			compelte = fx2int(data->active.x) + 12 * longest_word_in_sentance(data->active.crd->str) <= 0;
+			_data->active.x -= CR_TEXT_SCROLL_SPEED * 2;
+			compelte = fx2int(_data->active.x) + 12 * longest_word_in_sentance(_data->active.crd->str) <= 0;
 		}
 		else
 		{
-			data->active.x += CR_TEXT_SCROLL_SPEED * 2;
-			compelte = fx2int(data->active.x) >= GBA_WIDTH;
+			_data->active.x += CR_TEXT_SCROLL_SPEED * 2;
+			compelte = fx2int(_data->active.x) >= GBA_WIDTH;
 		}
 
-		if (data->countdown < 0)
+		if (_data->countdown < 0)
 		{
 			step = fxdiv(130, CR_FADE_TIME);
-			data->evb = clamp(data->evb + step, 0, 124 * FIX_SCALE);
+			_data->evb = clamp(_data->evb + step, 0, 124 * FIX_SCALE);
 			step = fxdiv(130, CR_FADE_TIME);
-			data->eva = clamp(data->eva - step, 0, 124 * FIX_SCALE);
+			_data->eva = clamp(_data->eva - step, 0, 124 * FIX_SCALE);
 		}
 
 		if (compelte)
 		{
-			if (data->active_idx < _credits_count)
+			if (_data->active_idx < _credits_count)
 				load_next_credit();
 			else
 				scene_set(title_screen);
@@ -350,32 +350,32 @@ static void update(void)
 		cycle_palate(
 			pal_bg_mem,
 			CR_SKY_START_PAL + 2, star_pal_cycle,
-			&data->star_pal_idx, star_pal_cycle_length);
+			&_data->star_pal_idx, star_pal_cycle_length);
 	}
 
 	//Player movement
 	if (frame_count() % 4 == 0)
 	{
 		step_anime(
-			&data->player_anime_cycle, whale_air_anime,
+			&_data->player_anime_cycle, whale_air_anime,
 			whale_air_anime_count,
 			0, whale_air_0TilesLen);
 	}
 
 	if (key_hit(KEY_LEFT))
-		data->player->attr1 = ATTR1_SIZE_16 | ATTR1_HFLIP;
+		_data->player->attr1 = ATTR1_SIZE_16 | ATTR1_HFLIP;
 	else if (key_hit(KEY_RIGHT))
-		data->player->attr1 = ATTR1_SIZE_16;
+		_data->player->attr1 = ATTR1_SIZE_16;
 
-	data->player_x = wrap(data->player_x + int2fx(key_tri_horz()), -16 * FIX_SCALE, GBA_WIDTH * FIX_SCALE);
-	data->player_y = wrap(data->player_y + int2fx(key_tri_vert()), -16 * FIX_SCALE, GBA_HEIGHT * FIX_SCALE);
-	obj_set_pos(data->player, fx2int(data->player_x), fx2int(data->player_y));
+	_data->player_x = wrap(_data->player_x + int2fx(key_tri_horz()), -16 * FIX_SCALE, GBA_WIDTH * FIX_SCALE);
+	_data->player_y = wrap(_data->player_y + int2fx(key_tri_vert()), -16 * FIX_SCALE, GBA_HEIGHT * FIX_SCALE);
+	obj_set_pos(_data->player, fx2int(_data->player_x), fx2int(_data->player_y));
 
 	//Draws text
 	obj_puts2(
-		fx2int(data->active.x), fx2int(data->active.y),
-		data->active.crd->str, 0xF200, data->text_objs);
-	oam_copy(oam_mem, data->text_objs, CR_OBJ_COUNT);
+		fx2int(_data->active.x), fx2int(_data->active.y),
+		_data->active.crd->str, 0xF200, _data->text_objs);
+	oam_copy(oam_mem, _data->text_objs, CR_OBJ_COUNT);
 }
 
 static void hide(void)
@@ -385,8 +385,8 @@ static void hide(void)
 	mmStop();
 
 	//init objects
-	obj_hide_multi(data->text_objs, CR_OBJ_COUNT);
-	oam_copy(oam_mem, data->text_objs, CR_OBJ_COUNT);
+	obj_hide_multi(_data->text_objs, CR_OBJ_COUNT);
+	oam_copy(oam_mem, _data->text_objs, CR_OBJ_COUNT);
 }
 
 const scene_t credits_screen = {

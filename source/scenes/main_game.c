@@ -412,7 +412,8 @@ static void show(void)
 
 static bool check_game_over()
 {
-	return fx2int(_player.x) < 0;
+	return fx2int(_player.x + int2fx(_player.w)) < 0 ||
+		   get_player_life() <= 0;
 }
 
 static void game_over()
@@ -449,6 +450,9 @@ static void game_over()
 	}
 
 	write_to_log(LOG_LEVEL_DEBUG, "GAME OVER");
+	go_transfer_in_t in;
+	in.score = get_score();
+	set_go_in(in);
 	scene_set(game_over_scene);
 }
 
@@ -640,7 +644,7 @@ static void hide(void)
 	_data->starting_scroll_x = _scroll_x;
 	_out_data.last_data = *_data;
 
-	REG_DISPCNT = 0;
+	load_blank();
 	dma3_fill(se_mem[MG_CLOUD_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_FAR_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_PLATFROM_SB], 0x0, SB_SIZE);

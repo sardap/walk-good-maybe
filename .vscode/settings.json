@@ -128,7 +128,8 @@
 		"game_over.h": "c",
 		"gotext.h": "c",
 		"gomainbackground.h": "c",
-		"sound.h": "c"
+		"sound.h": "c",
+		"vector": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

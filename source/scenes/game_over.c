@@ -43,18 +43,32 @@ static void show(void)
 	REG_BG2HOFS = 0;
 	REG_BG2VOFS = 0;
 
-	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(GO_MAIN_SBB) | BG_CBB(GO_SHARED_CB) | BG_REG_32x32;
-	REG_BG1CNT = BG_PRIO(1) | BG_8BPP | BG_SBB(GO_TEXT_SBB) | BG_CBB(GO_SHARED_CB) | BG_REG_32x32;
+	REG_BG0CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(GO_TEXT_SBB) | BG_CBB(GO_SHARED_CB) | BG_REG_32x32;
+	REG_BG1CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(GO_MAIN_SBB) | BG_CBB(GO_SHARED_CB) | BG_REG_32x32;
+
+	// init map text
+	txt_init_std();
+	txt_init_obj(oam_mem, 0xF200, CLR_WHITE, 0x0E);
+	// 12 px between letters
+	gptxt->dx = 10;
+	gptxt->dy = 10;
+
+	char str[50];
+	sprintf(str, "SCORE: %d", _data->score);
+	obj_puts2(
+		75, 120, str,
+		0xF200, _data->text_objs);
+	oam_copy(oam_mem, _data->text_objs, CR_OBJ_COUNT);
 
 	GRIT_CPY(pal_bg_mem, goSharedBackgroundPal);
 
 	// Update blend weights
-	REG_DISPCNT = DCNT_MODE1 | DCNT_BG0 | DCNT_BG1;
+	REG_DISPCNT = DCNT_MODE1 | DCNT_BG0 | DCNT_BG1 | DCNT_OBJ;
 
 	REG_BLDCNT = BLD_BUILD(
-		BLD_BG0 | BLD_BG1, // Top layers
-		0,				   // Bottom layers
-		3				   // Mode
+		BLD_BG0 | BLD_BG1 | BLD_OBJ, // Top layers
+		0,							 // Bottom layers
+		3							 // Mode
 	);
 
 	REG_BLDY = BLDY_BUILD(_data->bld_y);
@@ -99,8 +113,9 @@ static void update(void)
 
 static void hide(void)
 {
-	REG_DISPCNT = 0;
+	load_blank();
 	REG_BLDCNT = 0;
+	OAM_CLEAR();
 	mmStop();
 }
 

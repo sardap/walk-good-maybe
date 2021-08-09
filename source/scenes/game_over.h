@@ -24,6 +24,7 @@ void set_go_in(go_transfer_in_t data);
 
 typedef struct go_data_t
 {
+	OBJ_ATTR text_objs[128];
 	go_states_e state;
 	int score;
 	int timer;

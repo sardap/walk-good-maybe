@@ -386,9 +386,10 @@ static void update_score_display(int score)
 	}
 }
 
-static void update_timer_display(FIXED time)
+// This is complety wrong
+static void update_timer_display(int time)
 {
-	int w_time = CLAMP(fx2int(time), 0, 99);
+	int w_time = CLAMP(time, 0, 99);
 
 	//Count number of digits
 	int digit_count = 0;
@@ -398,7 +399,7 @@ static void update_timer_display(FIXED time)
 		w_time /= 10;
 	}
 
-	w_time = CLAMP(fx2int(time), 0, 99);
+	w_time = CLAMP(time, 0, 99);
 	for (int i = SZ_TIMER_DIGIT_COUNT - 1; i >= 0; i--)
 	{
 		int offset;
@@ -567,7 +568,7 @@ static void show(void)
 	_data->grid_toggle = FALSE;
 	_data->eyes_looking = FALSE;
 	_data->mouth_open_countdown = 0;
-	_data->timer = _in_data.timer_start;
+	_data->timer = 26 * 60;
 
 	// Set direction
 	_data->bg0_dir_x = float2fx(RAND_FLOAT(0.75f)) + 0.25f * FIX_SCALEF;
@@ -735,7 +736,7 @@ static void show(void)
 		obj_set_pos(&_obj_buffer[_data->ui.timer_number_offset + i], 100 + (i * 20), 140);
 	}
 	top_obj += SZ_TIMER_DIGIT_COUNT;
-	update_timer_display(_data->timer + 1 * FIX_SCALE);
+	update_timer_display((_data->timer + 1) / 60);
 
 	_data->obj_count = top_obj;
 
@@ -762,10 +763,6 @@ static void show(void)
 
 	update_text_fade(1);
 
-	// enable hblank register and set the mode7 type
-	irq_init(NULL);
-	irq_add(II_VBLANK, mmVBlank);
-
 	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	REG_DISPCNT = DCNT_MODE0 | DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
 }
@@ -773,7 +770,7 @@ static void show(void)
 static void update(void)
 {
 	// increment timer
-	_data->timer -= fxdiv(1, 60);
+	_data->timer--;
 
 	if (frame_count() % 15 == 0)
 		update_ui_border();
@@ -815,7 +812,7 @@ static void update(void)
 	REG_BG2VOFS = 0;
 
 	update_text_fade(max);
-	update_timer_display(_data->timer + 1 * FIX_SCALE);
+	update_timer_display((_data->timer + 1) / 60);
 
 	// Objs
 

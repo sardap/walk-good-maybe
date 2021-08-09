@@ -30,8 +30,8 @@ static t_spawn_info _building_3 = {70, 20, 60, 20};
 static t_spawn_info _building_4 = {70, 20, 60, 20};
 static t_spawn_info _building_5 = {0, 0, 50, 100};
 
-static t_spawn_info _island_00 = {80, 0, 70, 0};
-static t_spawn_info _island_01 = {80, 0, 90, 0};
+static t_spawn_info _island_00 = {80, 0, 60, 20};
+static t_spawn_info _island_01 = {80, 0, 70, 20};
 
 static int _lava_0_idx;
 static int _building_0_idx;

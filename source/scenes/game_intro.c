@@ -150,6 +150,9 @@ static void show(gi_mode_t mode)
 	// start sound
 	_data->state = GI_S_READY;
 
+	if (_data->mode == GI_MODE_SPEICAL_ZONE)
+		mmStart(MOD_PD_SPECIAL_ZONE, MM_PLAY_LOOP);
+
 	mmEffectEx(&_ready_sound);
 
 	_data->countdown = GI_STARTING_COUNTDOWN;
@@ -207,7 +210,6 @@ static void update(void)
 			mmStart(MOD_INTRO, MM_PLAY_ONCE);
 			break;
 		case GI_MODE_SPEICAL_ZONE:
-			mmStart(MOD_PD_ROCK_BACKGROUND, MM_PLAY_ONCE);
 			break;
 		}
 		_data->state = GI_S_GO;

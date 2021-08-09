@@ -2,7 +2,10 @@
 
 #include <tonc.h>
 #include <string.h>
+
 #include <maxmod.h>
+#include "soundbank.h"
+#include "soundbank_bin.h"
 
 #include "scene_shared.h"
 #include "title_screen.h"
@@ -25,10 +28,14 @@ static void show(void)
 {
 	load_blank();
 
+	irq_add(II_VBLANK, mmVBlank);
+	mmInitDefault((mm_addr)soundbank_bin, 8);
+
 	_data->score = _in_data.score;
 	_data->timer = 0;
 	_data->state = GO_STATES_BLACK;
 	_data->bld_y = 16;
+	_data->volume = (mm_word)1024;
 
 	GRIT_CPY(&tile8_mem[GO_SHARED_CB], goSharedBackgroundTiles);
 	GRIT_CPY(&se_mem[GO_MAIN_SBB], goMainBackgroundMap);
@@ -72,6 +79,8 @@ static void show(void)
 	);
 
 	REG_BLDY = BLDY_BUILD(_data->bld_y);
+
+	mmStart(MOD_PD_END, MM_PLAY_ONCE);
 }
 
 static void update(void)
@@ -81,15 +90,12 @@ static void update(void)
 	switch (_data->state)
 	{
 	case GO_STATES_BLACK:
-
 		if (_data->timer > 2 * 60)
 		{
-			_data->timer = 0;
 			_data->state = GO_STATES_FADING_IN;
 		}
 		break;
 	case GO_STATES_FADING_IN:
-
 		if (frame_count() % 8 == 0)
 		{
 			_data->bld_y = CLAMP(_data->bld_y - 1, 0, 17);
@@ -102,13 +108,31 @@ static void update(void)
 		}
 		break;
 	case GO_STATES_SOLID:
-
-		if (key_hit(KEY_A))
+		if (key_hit(KEY_A) && _data->timer > 300)
 		{
 			scene_set(title_screen);
 		}
 		break;
 	}
+
+	int vol_dec = 0;
+
+	if (_data->timer > 270)
+	{
+		vol_dec = 5;
+	}
+	else if (_data->state == GO_STATES_FADING_IN)
+	{
+		vol_dec = 1;
+	}
+
+	_data->volume = CLAMP(_data->volume - vol_dec, 0, 1024);
+	mmSetModuleVolume((mm_word)_data->volume);
+#ifdef DEBUG
+	char str[50];
+	sprintf(str, "%d %d", _data->volume, _data->timer);
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 }
 
 static void hide(void)
@@ -116,7 +140,7 @@ static void hide(void)
 	load_blank();
 	REG_BLDCNT = 0;
 	OAM_CLEAR();
-	mmStop();
+	mmSetModuleVolume((mm_word)1024);
 }
 
 const scene_t game_over_scene = {

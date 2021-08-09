@@ -1,6 +1,8 @@
 #ifndef GAME_OVER_H
 #define GAME_OVER_H
 
+#include <mm_types.h>
+
 #include "../common.h"
 
 #define GO_SHARED_CB 0
@@ -29,6 +31,7 @@ typedef struct go_data_t
 	int score;
 	int timer;
 	int bld_y;
+	int volume;
 } go_data_t;
 
 extern const scene_t game_over_scene;

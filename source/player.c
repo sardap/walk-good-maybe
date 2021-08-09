@@ -142,8 +142,8 @@ static void apply_player_damage(int ammount)
 {
 	_player_life -= ammount;
 
-	//Play sound
-	mmEffectEx(&_player_damage);
+	if (_player_life > 0)
+		mmEffectEx(&_player_damage);
 
 	//Setup moasic effect
 	_player_mos.x = 32;
@@ -439,12 +439,13 @@ void update_player()
 	}
 
 	_player.vx = 0;
-	//if the player y wraps everything just fucks up
+#ifndef GAME_OVER_ENABLED
+	// if the player y wraps everything just fucks up
 	if (_player.y > 160 * FIX_SCALE)
 	{
 		_player.y = PLAYER_SPAWN_Y;
 	}
-
+#endif
 	int sx = _facing == FACING_RIGHT ? _sx : -_sx;
 	obj_aff_rotscale(
 		&_player.aff,

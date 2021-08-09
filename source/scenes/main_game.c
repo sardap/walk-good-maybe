@@ -171,7 +171,7 @@ static void clear_offscreen_level()
 
 static void load_foreground_tiles()
 {
-	//Order doesn't matter but all buildings / islands need to be loaded in a single chunk
+	// Order doesn't matter but all buildings / islands need to be loaded in a single chunk
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
@@ -283,31 +283,30 @@ static void show(void)
 		break;
 	}
 
-	//Maps
+	// Maps
 
 	load_foreground_tiles();
 
-	//Pause screen
+	// Pause screen
 	GRIT_CPY(&se_mem[MG_PAUSE_SBB], mgPauseCityMap);
 	for (int i = 0; i < mgPauseCityMapLen; i++)
 	{
 		se_mem[MG_PAUSE_SBB][i] += pause_tile_offset / 2;
 	}
 
-	//Fill Cloud
+	// Fill Cloud
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
-		//City BG
+		// City BG
 		GRIT_CPY(se_mem[MG_FAR_SB], backgroundCityMap);
 
-		//Fog
+		// Fog
 		GRIT_CPY(se_mem[MG_CLOUD_SB], fogMap);
 		break;
 	case MG_MODE_BEACH:
 		GRIT_CPY(se_mem[MG_FAR_SB], mgBeachMap);
-
-		//Fog
+		// Fog
 		GRIT_CPY(se_mem[MG_CLOUD_SB], mgBeachWaterFog00Map);
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
@@ -374,9 +373,8 @@ static void show(void)
 		);
 
 		// Update blend weights
-		//Left EVA: Top weight max of 15 (4 bits)
-		//Right EVB: Bottom wieght max of 15 (4 bits)
-		// REG_BLDALPHA = BLDA_BUILD(3, 5);
+		// Left EVA: Top weight max of 15 (4 bits)
+		// Right EVB: Bottom wieght max of 15 (4 bits)
 		REG_BLDALPHA = BLDA_BUILD(8, 6);
 		REG_BLDY = BLDY_BUILD(0);
 		break;
@@ -412,7 +410,8 @@ static void show(void)
 
 static bool check_game_over()
 {
-	return fx2int(_player.x + int2fx(_player.w)) < 0 ||
+	return _player.x + int2fx(_player.w) < 0 ||
+		   _player.y > 165 * FIX_SCALE ||
 		   get_player_life() <= 0;
 }
 

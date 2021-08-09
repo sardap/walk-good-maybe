@@ -212,53 +212,24 @@ bool did_hit_x(ent_t *e, FIXED dx)
 	return flags & (LEVEL_COL_GROUND);
 }
 
-// STOLEN from https://github.com/exelotl/goodboy-advance
 bool ent_move_x(ent_t *e, FIXED dx)
 {
 	if (did_hit_x(e, dx))
 	{
-		int sign = dx >= 0 ? 1 : -1;
-		while (fx2int(dx) != 0 && !did_hit_x(e, sign))
-		{
-			e->x += sign;
-			dx -= sign;
-		}
 
-		//NOT STOLEN MY OWN SHIT CODE
-		//Failed to push out
-		if (did_hit_x(e, 0))
+		if (dx > 0)
 		{
-			int start = (translate_x(e) / FIX_SCALE) / TILE_WIDTH;
-			int y = (translate_y(e) / FIX_SCALE) / TILE_WIDTH;
-
-			//Failed to push out but will only check all tiles
-			for (int i = 0; i < 32; i++)
+			while (dx > 0 && !did_hit_x(e, -(1 * FIX_SCALE)))
 			{
-				//Left
-				if (!tile_to_collision(at_level(level_wrap_x(start - i), y)))
-				{
-					while (did_hit_x(e, 0))
-					{
-						e->x--;
-					}
-					break;
-				}
-
-				//Right
-				if (!tile_to_collision(at_level(level_wrap_x(start + i), y)))
-				{
-					while (did_hit_x(e, 0))
-					{
-						e->x++;
-					}
-					break;
-				}
+				e->x -= 1 * FIX_SCALE;
+				dx -= 1 * FIX_SCALE;
 			}
 		}
+
 		return true;
 	}
-
 	e->x += e->vx;
+
 	return false;
 }
 
@@ -279,8 +250,8 @@ bool ent_move_y(ent_t *e, FIXED dy)
 {
 	if (did_hit_y(e, dy))
 	{
-		int sign = dy >= 0 ? 1 : -1;
-		while (fx2int(dy) != 0 && !did_hit_y(e, sign))
+		int sign = dy >= 0 ? 1 * FIX_SCALE : -1 * FIX_SCALE;
+		while (dy != 0 && !did_hit_y(e, sign))
 		{
 			e->y += sign;
 			dy -= sign;

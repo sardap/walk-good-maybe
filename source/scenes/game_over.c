@@ -49,7 +49,7 @@ static void show(void)
 	// init map text
 	txt_init_std();
 	txt_init_obj(oam_mem, 0xF200, CLR_WHITE, 0x0E);
-	// 12 px between letters
+	// px between letters
 	gptxt->dx = 10;
 	gptxt->dy = 10;
 

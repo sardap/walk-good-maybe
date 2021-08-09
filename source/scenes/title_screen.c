@@ -1,6 +1,9 @@
 #include "title_screen.h"
 
 #include <stdlib.h>
+#include <maxmod.h>
+#include "soundbank.h"
+#include "soundbank_bin.h"
 
 #include "game_intro.h"
 #include "credits.h"
@@ -45,6 +48,9 @@ static void show(void)
 {
 	load_blank();
 	hide_all_objects();
+
+	irq_init(NULL);
+	irq_add(II_VBLANK, mmVBlank);
 
 	// Load palette
 	GRIT_CPY(pal_bg_mem, titleScreenSharedPal);
@@ -116,6 +122,8 @@ static void show(void)
 		ATTR1_SIZE_32x32,
 		ATTR2_ID(0) | ATTR2_PRIO(0));
 	obj_set_pos(_right_arrow, _options[_active_opt_idx].rx, TS_ARROW_Y);
+
+	mmStart(MOD_PD_TITLE_SCREEN, MM_PLAY_LOOP);
 }
 
 static void update(void)
@@ -199,6 +207,7 @@ static void update(void)
 
 static void hide(void)
 {
+	mmStop();
 	load_blank();
 	OAM_CLEAR();
 }

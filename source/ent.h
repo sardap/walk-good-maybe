@@ -155,9 +155,11 @@ void init_all_ents();
 
 ent_t *allocate_ent();
 void free_ent(ent_t *ent);
+void complete_free_ent(ent_t *ent);
 
 visual_ent_t *allocate_visual_ent();
 void free_visual_ent(visual_ent_t *ent);
+void complete_free_visual_ent(visual_ent_t *ent);
 
 void free_all_ents();
 

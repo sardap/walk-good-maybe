@@ -2,6 +2,7 @@
 
 #include <tonc.h>
 #include <string.h>
+#include <limits.h>
 
 #include "common.h"
 #include "debug.h"
@@ -46,6 +47,7 @@ static int allocate_idx(byte *allc, int len, int size)
 			{
 				allc[i + j] = 1;
 			}
+
 			return i * 2;
 		}
 		i += size;
@@ -71,8 +73,8 @@ static int allocate_idx(byte *allc, int len, int size)
 
 void free_idx(byte *allc, int len, int idx, int size)
 {
-	//remeber that the idx returned from alloc is x2
-	idx /= 2;
+	// remeber that the idx returned from alloc is x2
+	idx = CLAMP(idx / 2, 0, INT_MAX);
 	for (int i = idx; i < idx + size; i++)
 	{
 		allc[i] = 0;
@@ -81,7 +83,16 @@ void free_idx(byte *allc, int len, int idx, int size)
 
 int allocate_obj_tile_idx(int size)
 {
-	return allocate_idx(_obj_tile_allc, OBJ_TILE_ALLC_SIZE, size);
+	int result = allocate_idx(_obj_tile_allc, OBJ_TILE_ALLC_SIZE, size);
+#ifdef DEBUG
+	if (result < 0)
+	{
+		char str[50];
+		sprintf(str, "FAILLED TO ALLOCATE OBJ TILE %d", size);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+	}
+#endif
+	return result;
 }
 
 void free_obj_tile_idx(int idx, int size)
@@ -91,7 +102,16 @@ void free_obj_tile_idx(int idx, int size)
 
 int allocate_bg_tile_idx(int size)
 {
-	return allocate_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, size);
+	int result = allocate_idx(_bg_tile_allc, BG_TILE_ALLC_SIZE, size);
+#ifdef DEBUG
+	if (result < 0)
+	{
+		char str[50];
+		sprintf(str, "FAILLED TO ALLOCATE BG TILE %d", size);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+	}
+#endif
+	return result;
 }
 
 void free_bg_tile_idx(int idx, int size)
@@ -101,7 +121,16 @@ void free_bg_tile_idx(int idx, int size)
 
 int allocate_obj_pal_idx(int size)
 {
-	return allocate_idx(_obj_pal_allc, OBJ_PAL_ALLC_SIZE, size) / 2;
+	int result = allocate_idx(_obj_pal_allc, OBJ_PAL_ALLC_SIZE, size) / 2;
+#ifdef DEBUG
+	if (result < 0)
+	{
+		char str[50];
+		sprintf(str, "FAILLED TO ALLOCATE OBJ TILE %d", size);
+		write_to_log(LOG_LEVEL_DEBUG, str);
+	}
+#endif
+	return result;
 }
 
 void free_obj_pal_idx(int idx, int size)

@@ -4,7 +4,7 @@
 #include <tonc_types.h>
 #include <tonc_math.h>
 
-#define OBJ_TILE_ALLC_SIZE 127
+#define OBJ_TILE_ALLC_SIZE 64
 #define BG_TILE_ALLC_SIZE 1024
 #define OBJ_PAL_ALLC_SIZE 250
 #define BG_PAL_ALLC_SIZE 250

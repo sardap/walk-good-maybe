@@ -20,15 +20,19 @@ void free_enemy_bullets_tiles();
 
 void create_enemy_biscut(ent_t *ent, FIXED x, FIXED y);
 void update_enemy_biscut(ent_t *ent);
+void free_enemy_biscut(ent_t *ent);
 
 void create_enemy_biscut_death(visual_ent_t *ent, FIXED x, FIXED y);
-void update_enemy_biscut_death(visual_ent_t *ent);
+void update_enemy_biscut_death(visual_ent_t *v_ent);
+void free_enemy_biscut_death(visual_ent_t *v_ent);
 
 void create_enemy_ufo_bisuct(ent_t *ent, FIXED x, FIXED y);
 void update_enemy_ufo_bisuct(ent_t *ent);
+void free_enemy_ufo_bisuct(ent_t *ent);
 
 void create_enemy_ufo_biscut_death(visual_ent_t *ent, FIXED x, FIXED y);
 void update_enemy_ufo_biscut_death(visual_ent_t *ent);
+void free_enemy_ufo_biscut_death(visual_ent_t *v_ent);
 
 void create_enemy_bullet(ent_t *ent, FIXED x, FIXED y, FIXED vx, FIXED vy);
 void update_enemy_bullet(ent_t *ent);

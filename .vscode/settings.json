@@ -129,7 +129,8 @@
 		"gotext.h": "c",
 		"gomainbackground.h": "c",
 		"sound.h": "c",
-		"vector": "c"
+		"vector": "c",
+		"limits.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

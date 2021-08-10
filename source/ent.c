@@ -95,6 +95,33 @@ void free_ent(ent_t *ent)
 	ent->ent_type = TYPE_NONE;
 }
 
+void complete_free_ent(ent_t *e)
+{
+	switch (e->ent_type)
+	{
+	case TYPE_NONE:
+	case TYPE_PLAYER:
+		break;
+	case TYPE_BULLET:
+	case TYPE_SPEED_UP:
+	case TYPE_HEALTH_UP:
+	case TYPE_SHRINK_TOKEN:
+	case TYPE_ENEMY_BULLET:
+	case TYPE_JUMP_UP:
+		free_ent(e);
+		break;
+	case TYPE_ENEMY_BISCUT:
+		free_enemy_biscut(e);
+		break;
+	case TYPE_ENEMY_BISCUT_UFO:
+		free_enemy_ufo_bisuct(e);
+		break;
+	case TYPE_SPEICAL_ZONE_PORTAL:
+		free_speical_zone_portal(e);
+		break;
+	}
+}
+
 visual_ent_t *allocate_visual_ent()
 {
 	int idx = allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, 1);
@@ -109,32 +136,43 @@ void free_visual_ent(visual_ent_t *ent)
 	ent->type = TYPE_VISUAL_NONE;
 }
 
+void complete_free_visual_ent(visual_ent_t *v_ent)
+{
+	switch (v_ent->type)
+	{
+	case TYPE_NONE:
+		break;
+	case TYPE_VISUAL_LIFE:
+	case TYPE_VISUAL_SPEED_LINE:
+	case TYPE_VISUAL_SPEED_LEVEL:
+	case TYPE_VISUAL_SCORE:
+	case TYPE_VISUAL_JUMP_LEVEL:
+		free_visual_ent(v_ent);
+		break;
+	case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
+		free_enemy_biscut_death(v_ent);
+		break;
+	case TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH:
+		free_enemy_ufo_biscut_death(v_ent);
+		break;
+	case TYPE_VISUAL_SPLASH:
+		free_splash_effect(v_ent);
+		break;
+	}
+}
+
 void free_all_ents()
 {
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		ent_t *ent = &_ents[i];
-
-		switch (ent->ent_type)
-		{
-		default:
-			break;
-		}
-
-		free_ent(ent);
+		complete_free_ent(ent);
 	}
 
 	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
 	{
 		visual_ent_t *ent = &_visual_ents[i];
-
-		switch (ent->type)
-		{
-		default:
-			break;
-		}
-
-		free_visual_ent(ent);
+		complete_free_visual_ent(ent);
 	}
 }
 

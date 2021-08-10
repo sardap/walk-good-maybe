@@ -295,8 +295,7 @@ void update_speical_zone_portal(ent_t *ent)
 
 	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
 	{
-		free_obj_tile_idx(ent->szp_tile_idx, 4);
-		free_ent(ent);
+		free_speical_zone_portal(ent);
 		return;
 	}
 
@@ -306,4 +305,10 @@ void update_speical_zone_portal(ent_t *ent)
 	ent->vx += _scroll_x;
 
 	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
+}
+
+void free_speical_zone_portal(ent_t *ent)
+{
+	free_obj_tile_idx(ent->szp_tile_idx, 4);
+	free_ent(ent);
 }

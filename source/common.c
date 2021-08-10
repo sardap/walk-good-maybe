@@ -67,8 +67,6 @@ int gba_rand()
 void init_score()
 {
 	_score = 0;
-
-	init_score_display();
 }
 
 void add_score(int x)

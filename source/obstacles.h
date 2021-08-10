@@ -34,4 +34,8 @@ void create_speical_zone_portal(ent_t *ent, FIXED x, FIXED y);
 void update_speical_zone_portal(ent_t *ent);
 void free_speical_zone_portal(ent_t *ent);
 
+void create_idol(ent_t *ent, FIXED x, FIXED y);
+void update_idol(ent_t *ent);
+void free_idol(ent_t *ent);
+
 #endif

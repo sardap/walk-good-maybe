@@ -123,6 +123,7 @@ static void show(void)
 		ATTR2_ID(0) | ATTR2_PRIO(0));
 	obj_set_pos(_right_arrow, _options[_active_opt_idx].rx, TS_ARROW_Y);
 
+	mmSetModuleVolume((mm_word)300);
 	mmStart(MOD_PD_TITLE_SCREEN, MM_PLAY_LOOP);
 }
 
@@ -207,6 +208,7 @@ static void update(void)
 
 static void hide(void)
 {
+	mmSetModuleVolume((mm_word)1024);
 	mmStop();
 	load_blank();
 	OAM_CLEAR();

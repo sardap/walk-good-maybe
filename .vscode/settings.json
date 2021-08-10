@@ -131,7 +131,11 @@
 		"sound.h": "c",
 		"vector": "c",
 		"limits.h": "c",
-		"whale_walk_4.h": "c"
+		"whale_walk_4.h": "c",
+		"game_win.h": "c",
+		"gwsharedbackground.h": "c",
+		"credits.h": "c",
+		"gwbandit.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [

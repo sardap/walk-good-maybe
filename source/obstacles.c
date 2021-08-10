@@ -26,6 +26,7 @@
 #include "assets/mgPortal05.h"
 #include "assets/mgPortal06.h"
 #include "assets/mgPortal07.h"
+#include "assets/mgIdol.h"
 
 static int _speed_up_tile_idx;
 static int _speed_lines_idx;
@@ -310,5 +311,47 @@ void update_speical_zone_portal(ent_t *ent)
 void free_speical_zone_portal(ent_t *ent)
 {
 	free_obj_tile_idx(ent->szp_tile_idx, 4);
+	free_ent(ent);
+}
+
+void create_idol(ent_t *ent, FIXED x, FIXED y)
+{
+	ent->ent_type = TYPE_IDOL;
+
+	ent->x = x;
+	ent->w = 8;
+	ent->y = y - int2fx(4);
+	ent->h = 8;
+	ent->vx = 0;
+	ent->vy = 0;
+
+	// allocate
+	ent->idol_tile_idx = allocate_obj_tile_idx(1);
+	GRIT_CPY(&tile_mem[4][ent->idol_tile_idx], mgIdolTiles);
+
+	ent->att.attr0 = ATTR0_SQUARE | ATTR0_8BPP;
+	ent->att.attr1 = ATTR1_SIZE_8;
+	ent->att.attr2 = ATTR2_PRIO(0) | ATTR2_ID(ent->idol_tile_idx);
+}
+
+void update_idol(ent_t *ent)
+{
+	if (ent->x + ent->w < 0 || ent->ent_cols & (TYPE_PLAYER))
+	{
+		free_idol(ent);
+		return;
+	}
+
+	ent->vx += -_scroll_x;
+	ent_move_x_dirty(ent);
+	// Take back scroll for next loop
+	ent->vx += _scroll_x;
+
+	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
+}
+
+void free_idol(ent_t *ent)
+{
+	free_obj_tile_idx(ent->szp_tile_idx, 1);
 	free_ent(ent);
 }

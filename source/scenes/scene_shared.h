@@ -6,6 +6,7 @@
 #include "credits.h"
 #include "sound_test.h"
 #include "game_over.h"
+#include "game_win.h"
 
 typedef union shared_data_t
 {
@@ -14,6 +15,7 @@ typedef union shared_data_t
 	cr_data_t cr;
 	st_data_t st;
 	go_data_t go;
+	gw_data_t gw;
 } shared_data_t;
 
 extern shared_data_t _shared_data;

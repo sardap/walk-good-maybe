@@ -388,3 +388,22 @@ files=[
     "game_over/goMainBackground",
     "game_over/goBlackSqaure",
 ]
+
+[[Targets]]
+name="game win background"
+options=[
+    "-ftc",					# Create C file
+    "-gT ff00f7",			# RGB 24 BIT
+    "-gB8",					# Bit depth 8
+    "-gu8",					# export as bytes
+    "-m",					# Export map
+    "-mR8",					# Create MapszBanditFace00
+    "-mLs",					# Map 16 Bit
+    "-pS",					# Share pallet
+    "-gS",					# Share tiles
+    "-O gwSharedBackground",# Shared pallet name
+]
+files=[
+    "game_win/gwVictory",
+    "game_win/gwBandit",
+]

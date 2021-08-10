@@ -20,6 +20,8 @@
 #define SCROLL_X_MAX (FIXED)(2.5f * FIX_SCALEF)
 #define SCROLL_X_RATE 120
 
+#define WIN_SCORE_THREASHOLD 2000
+
 // Stolen https://stackoverflow.com/questions/2422712/rounding-integer-division-instead-of-truncating
 #define INT_DIV_CEIL(x, y) (x + y - 1) / y
 

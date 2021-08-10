@@ -181,13 +181,26 @@ static bool spawn_speical_zone_portal(int start_x, int width, int y)
 	return true;
 }
 
+static bool spawn_idol(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
+
+	create_idol(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 6));
+
+	return true;
+}
+
 static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 {
 	//early return to avoid that awesome wraping bug
 	if (level_to_screen(start_x + width) < 0)
 		return;
 
-	if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
+	if (get_score() > WIN_SCORE_THREASHOLD && gba_rand_range(1, 100) > 80)
+	{
+		spawn_idol(start_x, width, y);
+	}
+	else if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
 	{
 		spawn_lava(width, start_x, y);
 	}

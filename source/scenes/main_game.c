@@ -10,6 +10,7 @@
 #include "game_over.h"
 #include "scene_shared.h"
 #include "special_zone.h"
+#include "game_win.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -245,6 +246,8 @@ static void show(void)
 
 		for (int i = 0; i < sz_out.good_collected - sz_out.bad_collected; i++)
 		{
+			add_score(gba_rand_range(1, 10));
+
 			if (gba_rand_range(0, 100) >= 80)
 			{
 #ifdef DEBUG
@@ -405,6 +408,11 @@ static void show(void)
 
 	set_scroll_x(_data->starting_scroll_x);
 
+	if (_data->fresh_game)
+	{
+		init_score();
+	}
+
 	// Tiles!
 	load_player_tiles();
 	load_health_up();
@@ -418,14 +426,16 @@ static void show(void)
 	load_speed_level_display(get_player_speed());
 	load_jump_level_display(get_player_jump());
 
-	init_score();
+	init_score_display();
 
 	if (_data->fresh_game)
 	{
 		obj_hide_multi(oam_mem, 128);
-
-		while (_data->building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
-			spawn_buildings();
+		spawn_buildings();
+	}
+	else
+	{
+		update_score_display(get_score());
 	}
 }
 
@@ -541,7 +551,7 @@ static void update(void)
 	// Back to title screen
 	if (key_held(KEY_SELECT) && key_hit(KEY_START))
 	{
-		scene_set(title_screen);
+		scene_set(game_win_scene);
 		return;
 	}
 
@@ -622,7 +632,7 @@ static void update(void)
 		_data->splash_active = 60;
 	}
 
-	if ((key_held(KEY_SELECT) && key_held(KEY_A) && key_hit(KEY_START)) || _player.ent_cols & (TYPE_SPEICAL_ZONE_PORTAL))
+	if (_player.ent_cols & TYPE_SPEICAL_ZONE_PORTAL)
 	{
 		sz_transfer_in_t data;
 		data.max_velocity = SZ_MAX_VELOCITY;
@@ -632,6 +642,12 @@ static void update(void)
 		data.entered_via_debug = FALSE;
 		set_sz_in(data);
 		scene_set(_speical_zone_intro_scene);
+		return;
+	}
+
+	if (_player.ent_cols & TYPE_IDOL)
+	{
+		scene_set(game_win_scene);
 		return;
 	}
 

@@ -119,6 +119,9 @@ void complete_free_ent(ent_t *e)
 	case TYPE_SPEICAL_ZONE_PORTAL:
 		free_speical_zone_portal(e);
 		break;
+	case TYPE_IDOL:
+		free_idol(e);
+		break;
 	}
 }
 
@@ -375,6 +378,9 @@ void update_ents()
 			break;
 		case TYPE_SPEICAL_ZONE_PORTAL:
 			update_speical_zone_portal(&_ents[i]);
+			break;
+		case TYPE_IDOL:
+			update_idol(&_ents[i]);
 			break;
 		}
 	}

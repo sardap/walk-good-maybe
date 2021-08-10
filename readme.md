@@ -1,4 +1,4 @@
-# Walk good Maybe
+# Walk Good Maybe
 
 ## Music
 All music prefixed by pd is by Patrick Dyett

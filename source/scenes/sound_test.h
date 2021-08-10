@@ -27,6 +27,6 @@ typedef struct st_data_t
 	st_slection_t fx_mode;
 } st_data_t;
 
-extern const scene_t sound_test_scene;
+extern const scene_t _sound_test_scene;
 
 #endif

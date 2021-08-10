@@ -1,6 +1,9 @@
 #include "title_screen.h"
 
 #include <stdlib.h>
+#include <maxmod.h>
+#include "soundbank.h"
+#include "soundbank_bin.h"
 
 #include "game_intro.h"
 #include "credits.h"
@@ -23,13 +26,12 @@
 #include "../assets/tsBeachGameText.h"
 #include "../assets/tsCityGameText.h"
 
-static const int _options_length = 5;
+static const int _options_length = 4;
 static const ts_menu_options_t _options[] = {
 	{TS_MENU_CITY, tsCityGameTextMap, tsCityGameTextMapLen, 51, 160},
 	{TS_MENU_BEACH, tsBeachGameTextMap, tsBeachGameTextMapLen, 43, 167},
 	{TS_MENU_CREDITS, tsCreditsMap, tsCreditsMapLen, 23, 185},
-	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175},
-	{TS_SPECIAL_ZONE, tsSoundTestTextMap, tsSoundTestTextMapLen, 0, 175}};
+	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175}};
 
 static const u16 lava_cycle[] = {0x11D9, 0x1E3C, 0x20FF};
 
@@ -44,6 +46,12 @@ static int _pal_change_countdown;
 
 static void show(void)
 {
+	load_blank();
+	hide_all_objects();
+
+	irq_init(NULL);
+	irq_add(II_VBLANK, mmVBlank);
+
 	// Load palette
 	GRIT_CPY(pal_bg_mem, titleScreenSharedPal);
 	GRIT_CPY(pal_obj_mem, tsSpirteSharedPal);
@@ -114,6 +122,9 @@ static void show(void)
 		ATTR1_SIZE_32x32,
 		ATTR2_ID(0) | ATTR2_PRIO(0));
 	obj_set_pos(_right_arrow, _options[_active_opt_idx].rx, TS_ARROW_Y);
+
+	mmSetModuleVolume((mm_word)300);
+	mmStart(MOD_PD_TITLE_SCREEN, MM_PLAY_LOOP);
 }
 
 static void update(void)
@@ -161,27 +172,17 @@ static void update(void)
 		{
 		case TS_MENU_CITY:
 			set_mg_in(defualt_mg_data(MG_MODE_CITY));
-			scene_set(city_game_intro);
+			scene_set(_city_game_intro_scene);
 			break;
 		case TS_MENU_BEACH:
 			set_mg_in(defualt_mg_data(MG_MODE_BEACH));
-			scene_set(beach_game_intro);
+			scene_set(_beach_game_intro_scene);
 			break;
 		case TS_MENU_CREDITS:
-			scene_set(credits_screen);
+			scene_set(_credits_scene);
 			break;
 		case TS_MENU_SOUND_TEST:
-			scene_set(sound_test_scene);
-			break;
-		case TS_SPECIAL_ZONE:
-			sz_transfer_in_t data;
-			data.max_velocity = SZ_MAX_VELOCITY;
-			data.turing_speed = SZ_TURNING_SPEED;
-			data.timer_start = SZ_TIMER_SEC_END;
-			data.obs_count = SZ_OBS_MAX_COUNT;
-			data.entered_via_debug = TRUE;
-			set_sz_in(data);
-			scene_set(special_zone_scene);
+			scene_set(_sound_test_scene);
 			break;
 		}
 	}
@@ -207,11 +208,14 @@ static void update(void)
 
 static void hide(void)
 {
-	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0;
+	mmSetModuleVolume((mm_word)1024);
+	mmStop();
+	load_blank();
 	OAM_CLEAR();
 }
 
-const scene_t title_screen = {
+const scene_t _title_scene = {
 	.show = show,
 	.update = update,
-	.hide = hide};
+	.hide = hide,
+};

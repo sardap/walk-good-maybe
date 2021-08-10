@@ -117,7 +117,7 @@ void update_enemy_biscut(ent_t *ent)
 		{
 			add_score(ENEMY_BISCUT_SCORE);
 
-			//Play sound
+			// Play sound
 			mmEffectEx(&_enemy_biscut_damage);
 
 			visual_ent_t *visual_ent = allocate_visual_ent();
@@ -126,8 +126,8 @@ void update_enemy_biscut(ent_t *ent)
 				ent->x, ent->y);
 		}
 
-		free_obj_tile_idx(ent->eb_tile_idx, 2);
-		free_ent(ent);
+		free_enemy_biscut(ent);
+
 		return;
 	}
 
@@ -159,6 +159,12 @@ void update_enemy_biscut(ent_t *ent)
 	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
 }
 
+void free_enemy_biscut(ent_t *ent)
+{
+	free_obj_tile_idx(ent->eb_tile_idx, 2);
+	free_ent(ent);
+}
+
 void create_enemy_biscut_death(visual_ent_t *v_ent, FIXED x, FIXED y)
 {
 	v_ent->type = TYPE_VISUAL_ENEMY_BISUCT_DEATH;
@@ -188,13 +194,18 @@ void update_enemy_biscut_death(visual_ent_t *v_ent)
 
 		if (anime_complete)
 		{
-			free_obj_tile_idx(v_ent->eb_tile_idx, 2);
-			free_visual_ent(v_ent);
+			free_enemy_biscut_death(v_ent);
 			return;
 		}
 	}
 
 	v_ent->x += -_scroll_x;
+}
+
+void free_enemy_biscut_death(visual_ent_t *v_ent)
+{
+	free_obj_tile_idx(v_ent->eb_tile_idx, 2);
+	free_visual_ent(v_ent);
 }
 
 void create_enemy_ufo_bisuct(ent_t *ent, FIXED x, FIXED y)
@@ -242,8 +253,7 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 		//Play death sound
 		mmEffectEx(&_enemy_ufo_damge);
 
-		free_obj_tile_idx(ent->ebu_tile_id, 4);
-		free_ent(ent);
+		free_enemy_ufo_bisuct(ent);
 
 		visual_ent_t *v_ent = allocate_visual_ent();
 		create_enemy_ufo_biscut_death(v_ent, ent->x, ent->y);
@@ -265,6 +275,12 @@ void update_enemy_ufo_bisuct(ent_t *ent)
 	}
 
 	obj_set_pos(&ent->att, fx2int(ent->x), fx2int(ent->y));
+}
+
+void free_enemy_ufo_bisuct(ent_t *ent)
+{
+	free_obj_tile_idx(ent->ebu_tile_id, 4);
+	free_ent(ent);
 }
 
 void create_enemy_ufo_biscut_death(visual_ent_t *v_ent, FIXED x, FIXED y)
@@ -295,15 +311,20 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 			enemy_biscut_ufo_death_cycle, ENEMY_BISCUT_UFO_DEATH_CYCLE,
 			v_ent->eb_tile_idx, enemyBiscutUFODeath00TilesLen);
 
-		if (anime_complete)
+		if (anime_complete || v_ent->x <= 0)
 		{
-			free_obj_tile_idx(v_ent->eb_tile_idx, 2);
-			free_visual_ent(v_ent);
+			free_enemy_ufo_biscut_death(v_ent);
 			return;
 		}
 	}
 
 	v_ent->x += -_scroll_x;
+}
+
+void free_enemy_ufo_biscut_death(visual_ent_t *v_ent)
+{
+	free_obj_tile_idx(v_ent->eb_tile_idx, 4);
+	free_visual_ent(v_ent);
 }
 
 void create_enemy_bullet(ent_t *ent, FIXED x, FIXED y, FIXED vx, FIXED vy)

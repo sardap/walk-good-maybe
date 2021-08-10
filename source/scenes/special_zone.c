@@ -386,9 +386,10 @@ static void update_score_display(int score)
 	}
 }
 
-static void update_timer_display(FIXED time)
+// This is complety wrong
+static void update_timer_display(int time)
 {
-	int w_time = CLAMP(fx2int(time), 0, 99);
+	int w_time = CLAMP(time, 0, 99);
 
 	//Count number of digits
 	int digit_count = 0;
@@ -398,7 +399,7 @@ static void update_timer_display(FIXED time)
 		w_time /= 10;
 	}
 
-	w_time = CLAMP(fx2int(time), 0, 99);
+	w_time = CLAMP(time, 0, 99);
 	for (int i = SZ_TIMER_DIGIT_COUNT - 1; i >= 0; i--)
 	{
 		int offset;
@@ -540,21 +541,23 @@ static void update_ui_border()
 	FIXED current_green = int2fx(GET_GREEN(_data->border_colour_current));
 	FIXED current_blue = int2fx(GET_BLUE(_data->border_colour_current));
 
-	FIXED next_red = int2fx(GET_RED(_data->border_colour_current));
-	FIXED next_geen = int2fx(GET_GREEN(_data->border_colour_next));
-	FIXED next_blue = int2fx(GET_BLUE(_data->border_colour_next));
+	FIXED target_red = int2fx(GET_RED(_data->border_colour_current));
+	FIXED target_green = int2fx(GET_GREEN(_data->border_colour_next));
+	FIXED target_blue = int2fx(GET_BLUE(_data->border_colour_next));
 
-	int result_red = fx2int(current_red + fxmul(_data->colour_dist, next_red - current_red));
-	int result_green = fx2int(current_green + fxmul(_data->colour_dist, next_geen - current_green));
-	int result_blue = fx2int(current_blue + fxmul(_data->colour_dist, next_blue - current_blue));
+	int next_red = fx2int(current_red + fxmul(_data->colour_dist, target_red - current_red));
+	int next_green = fx2int(current_green + fxmul(_data->colour_dist, target_green - current_green));
+	int next_blue = fx2int(current_blue + fxmul(_data->colour_dist, target_blue - current_blue));
 
-	u16 next_colour = CREATE_COLOUR(result_red, result_green, result_blue);
+	u16 next_colour = CREATE_COLOUR(next_red, next_green, next_blue);
 
 	pal_bg_mem[SZ_BORDER_PAL_IDX] = next_colour;
 }
 
 static void show(void)
 {
+	load_blank();
+
 	_data->obs_count = _in_data.obs_count;
 	_data->bg0_x = 0 / FIX_SCALE;
 	_data->bg0_y = 0 / FIX_SCALE;
@@ -565,7 +568,7 @@ static void show(void)
 	_data->grid_toggle = FALSE;
 	_data->eyes_looking = FALSE;
 	_data->mouth_open_countdown = 0;
-	_data->timer = _in_data.timer_start;
+	_data->timer = 26 * 60;
 
 	// Set direction
 	_data->bg0_dir_x = float2fx(RAND_FLOAT(0.75f)) + 0.25f * FIX_SCALEF;
@@ -587,7 +590,6 @@ static void show(void)
 	REG_BG3VOFS = fx2int(_data->bg0_y);
 
 	// Load palettes
-	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	GRIT_CPY(pal_obj_mem, szSharedSpritePal);
 
 	pal_bg_mem[1] = (u16)gba_rand();
@@ -615,7 +617,6 @@ static void show(void)
 	GRIT_CPY(&tile8_mem[SZ_SHARED_CB][_bg_mouth_tile], szMouth00ClosedTiles);
 
 	// Map
-
 	memset16(&se_mem[SZ_GRID_SBB], _bg_grid_tile, SB_SIZE);
 	memset16(&se_mem[SZ_EYE_SBB], 0, SB_SIZE);
 	memset16(&se_mem[SZ_TEXT_SBB], 0, SB_SIZE);
@@ -735,7 +736,7 @@ static void show(void)
 		obj_set_pos(&_obj_buffer[_data->ui.timer_number_offset + i], 100 + (i * 20), 140);
 	}
 	top_obj += SZ_TIMER_DIGIT_COUNT;
-	update_timer_display(_data->timer + 1 * FIX_SCALE);
+	update_timer_display((_data->timer + 1) / 60);
 
 	_data->obj_count = top_obj;
 
@@ -762,17 +763,14 @@ static void show(void)
 
 	update_text_fade(1);
 
-	// enable hblank register and set the mode7 type
-	irq_init(NULL);
-	irq_add(II_VBLANK, mmVBlank);
-
+	GRIT_CPY(pal_bg_mem, szSharedBackgroundPal);
 	REG_DISPCNT = DCNT_MODE0 | DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_BG3;
 }
 
 static void update(void)
 {
 	// increment timer
-	_data->timer -= fxdiv(1, 60);
+	_data->timer--;
 
 	if (frame_count() % 15 == 0)
 		update_ui_border();
@@ -814,7 +812,7 @@ static void update(void)
 	REG_BG2VOFS = 0;
 
 	update_text_fade(max);
-	update_timer_display(_data->timer + 1 * FIX_SCALE);
+	update_timer_display((_data->timer + 1) / 60);
 
 	// Objs
 
@@ -842,7 +840,7 @@ static void update(void)
 	{
 		if (_in_data.entered_via_debug)
 		{
-			scene_set(title_screen);
+			scene_set(_title_scene);
 		}
 		else
 		{
@@ -853,10 +851,10 @@ static void update(void)
 			switch (mg_in_data.new_data.mode)
 			{
 			case MG_MODE_BEACH:
-				scene_set(beach_game_intro);
+				scene_set(_beach_game_intro_scene);
 				break;
 			case MG_MODE_CITY:
-				scene_set(city_game_intro);
+				scene_set(_city_game_intro_scene);
 				break;
 			}
 		}
@@ -889,7 +887,7 @@ static void hide(void)
 	mmStop();
 }
 
-const scene_t special_zone_scene = {
+const scene_t _special_zone_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

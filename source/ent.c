@@ -95,6 +95,36 @@ void free_ent(ent_t *ent)
 	ent->ent_type = TYPE_NONE;
 }
 
+void complete_free_ent(ent_t *e)
+{
+	switch (e->ent_type)
+	{
+	case TYPE_NONE:
+	case TYPE_PLAYER:
+		break;
+	case TYPE_BULLET:
+	case TYPE_SPEED_UP:
+	case TYPE_HEALTH_UP:
+	case TYPE_SHRINK_TOKEN:
+	case TYPE_ENEMY_BULLET:
+	case TYPE_JUMP_UP:
+		free_ent(e);
+		break;
+	case TYPE_ENEMY_BISCUT:
+		free_enemy_biscut(e);
+		break;
+	case TYPE_ENEMY_BISCUT_UFO:
+		free_enemy_ufo_bisuct(e);
+		break;
+	case TYPE_SPEICAL_ZONE_PORTAL:
+		free_speical_zone_portal(e);
+		break;
+	case TYPE_IDOL:
+		free_idol(e);
+		break;
+	}
+}
+
 visual_ent_t *allocate_visual_ent()
 {
 	int idx = allocate(_allocated_visual_ents, ENT_VISUAL_COUNT, 1);
@@ -109,32 +139,43 @@ void free_visual_ent(visual_ent_t *ent)
 	ent->type = TYPE_VISUAL_NONE;
 }
 
+void complete_free_visual_ent(visual_ent_t *v_ent)
+{
+	switch (v_ent->type)
+	{
+	case TYPE_NONE:
+		break;
+	case TYPE_VISUAL_LIFE:
+	case TYPE_VISUAL_SPEED_LINE:
+	case TYPE_VISUAL_SPEED_LEVEL:
+	case TYPE_VISUAL_SCORE:
+	case TYPE_VISUAL_JUMP_LEVEL:
+		free_visual_ent(v_ent);
+		break;
+	case TYPE_VISUAL_ENEMY_BISUCT_DEATH:
+		free_enemy_biscut_death(v_ent);
+		break;
+	case TYPE_VISUAL_ENEMY_BISUCT_UFO_DEATH:
+		free_enemy_ufo_biscut_death(v_ent);
+		break;
+	case TYPE_VISUAL_SPLASH:
+		free_splash_effect(v_ent);
+		break;
+	}
+}
+
 void free_all_ents()
 {
 	for (int i = 0; i < ENT_COUNT; i++)
 	{
 		ent_t *ent = &_ents[i];
-
-		switch (ent->ent_type)
-		{
-		default:
-			break;
-		}
-
-		free_ent(ent);
+		complete_free_ent(ent);
 	}
 
 	for (int i = 0; i < ENT_VISUAL_COUNT; i++)
 	{
 		visual_ent_t *ent = &_visual_ents[i];
-
-		switch (ent->type)
-		{
-		default:
-			break;
-		}
-
-		free_visual_ent(ent);
+		complete_free_visual_ent(ent);
 	}
 }
 
@@ -212,53 +253,24 @@ bool did_hit_x(ent_t *e, FIXED dx)
 	return flags & (LEVEL_COL_GROUND);
 }
 
-// STOLEN from https://github.com/exelotl/goodboy-advance
 bool ent_move_x(ent_t *e, FIXED dx)
 {
 	if (did_hit_x(e, dx))
 	{
-		int sign = dx >= 0 ? 1 : -1;
-		while (fx2int(dx) != 0 && !did_hit_x(e, sign))
-		{
-			e->x += sign;
-			dx -= sign;
-		}
 
-		//NOT STOLEN MY OWN SHIT CODE
-		//Failed to push out
-		if (did_hit_x(e, 0))
+		if (dx > 0)
 		{
-			int start = (translate_x(e) / FIX_SCALE) / TILE_WIDTH;
-			int y = (translate_y(e) / FIX_SCALE) / TILE_WIDTH;
-
-			//Failed to push out but will only check all tiles
-			for (int i = 0; i < 32; i++)
+			while (dx > 0 && !did_hit_x(e, -(1 * FIX_SCALE)))
 			{
-				//Left
-				if (!tile_to_collision(at_level(level_wrap_x(start - i), y)))
-				{
-					while (did_hit_x(e, 0))
-					{
-						e->x--;
-					}
-					break;
-				}
-
-				//Right
-				if (!tile_to_collision(at_level(level_wrap_x(start + i), y)))
-				{
-					while (did_hit_x(e, 0))
-					{
-						e->x++;
-					}
-					break;
-				}
+				e->x -= 1 * FIX_SCALE;
+				dx -= 1 * FIX_SCALE;
 			}
 		}
+
 		return true;
 	}
-
 	e->x += e->vx;
+
 	return false;
 }
 
@@ -279,8 +291,8 @@ bool ent_move_y(ent_t *e, FIXED dy)
 {
 	if (did_hit_y(e, dy))
 	{
-		int sign = dy >= 0 ? 1 : -1;
-		while (fx2int(dy) != 0 && !did_hit_y(e, sign))
+		int sign = dy >= 0 ? 1 * FIX_SCALE : -1 * FIX_SCALE;
+		while (dy != 0 && !did_hit_y(e, sign))
 		{
 			e->y += sign;
 			dy -= sign;
@@ -366,6 +378,9 @@ void update_ents()
 			break;
 		case TYPE_SPEICAL_ZONE_PORTAL:
 			update_speical_zone_portal(&_ents[i]);
+			break;
+		case TYPE_IDOL:
+			update_idol(&_ents[i]);
 			break;
 		}
 	}

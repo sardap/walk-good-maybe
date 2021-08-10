@@ -99,7 +99,7 @@ void free_player_tiles()
 
 FIXED get_player_jump()
 {
-	return _player_jump_power;
+	return fxdiv(_player_jump_power, 6 * FIX_SCALE);
 }
 
 void add_player_jump(FIXED amount)
@@ -107,22 +107,30 @@ void add_player_jump(FIXED amount)
 	_player_jump_power = clamp(
 		_player_jump_power + amount,
 		PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
-
-	update_jump_level_display(_player_jump_power);
+#ifdef DEBUG
+	char str[50];
+	sprintf(str, "JUMP:%2.f AMT:%2.f", fx2float(_player_jump_power), fx2float(amount));
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
+	update_jump_level_display(get_player_jump());
 }
 
 FIXED get_player_speed()
 {
-	return _player_air_slowdown;
+	return fxdiv(_player_air_slowdown, 6 * FIX_SCALE);
 }
 
 void add_player_speed(FIXED amount)
 {
-	_player_air_slowdown = clamp(
+	_player_air_slowdown = CLAMP(
 		_player_air_slowdown - amount,
 		PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
-
-	update_speed_level_display(_player_air_slowdown);
+#ifdef DEBUG
+	char str[50];
+	sprintf(str, "SPEED:%2.f AMT:%2.f", fx2float(_player_air_slowdown), fx2float(amount));
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
+	update_speed_level_display(get_player_speed());
 }
 
 void free_player()
@@ -134,8 +142,8 @@ static void apply_player_damage(int ammount)
 {
 	_player_life -= ammount;
 
-	//Play sound
-	mmEffectEx(&_player_damage);
+	if (_player_life > 0)
+		mmEffectEx(&_player_damage);
 
 	//Setup moasic effect
 	_player_mos.x = 32;
@@ -170,20 +178,6 @@ static void player_shoot()
 
 void update_player()
 {
-	// What the fuck is this?
-	// static int scale = 1;
-	// if (key_held(KEY_L) || key_held(KEY_R))
-	// {
-	// 	if (key_held(KEY_L))
-	// 		scale += 128;
-	// 	if (key_held(KEY_R))
-	// 		scale -= 128;
-
-	// 	char str[50];
-	// 	sprintf(str, "scale:%d", scale);
-	// 	write_to_log(LOG_LEVEL_DEBUG, str);
-	// }
-
 	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
@@ -235,7 +229,7 @@ void update_player()
 	switch (_move_state)
 	{
 	case MOVEMENT_AIR:
-		_player.vx = fxdiv(_player.vx, _player_air_slowdown);
+		_player.vx = fxdiv(_player.vx, get_player_speed());
 		break;
 	case MOVEMENT_JUMPING:
 	case MOVEMENT_LANDED:
@@ -264,9 +258,6 @@ void update_player()
 		//Flapping sound
 		if (!hit_y)
 		{
-			char str[50];
-			sprintf(str, "%.2f", fx2float(_player.vy));
-			write_to_log(LOG_LEVEL_DEBUG, str);
 			mmEffectEx(&_player_flap_sound);
 		}
 		//Walking sound
@@ -302,7 +293,7 @@ void update_player()
 	if (_speed_up_active <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
 		_speed_up_active = 120;
-		_scroll_x += 0.5f * FIX_SCALEF;
+		set_scroll_x(_scroll_x + 0.5f * FIX_SCALEF);
 		// Lower air slowdown speed
 		add_player_speed(PLAYER_ADD_SPEED_STEP);
 	}
@@ -311,7 +302,7 @@ void update_player()
 		--_speed_up_active;
 		// Check ended and handle ended
 		if (_speed_up_active <= 0)
-			_scroll_x -= 0.5f * FIX_SCALEF;
+			set_scroll_x(_scroll_x - 0.5f * FIX_SCALEF);
 	}
 
 	// Health up
@@ -392,7 +383,7 @@ void update_player()
 		}
 		else if (_player_anime_cycle <= 0)
 		{
-			_player.vy = -_player_jump_power;
+			_player.vy = -get_player_jump();
 			_player_anime_cycle = PLAYER_AIR_CYCLE_COUNT;
 			_move_state = MOVEMENT_AIR;
 			dma3_cpy(&tile_mem[4][_tile_start_idx], whale_smallTiles, whale_smallTilesLen);
@@ -434,12 +425,13 @@ void update_player()
 	}
 
 	_player.vx = 0;
-	//if the player y wraps everything just fucks up
+#ifndef GAME_OVER_ENABLED
+	// if the player y wraps everything just fucks up
 	if (_player.y > 160 * FIX_SCALE)
 	{
 		_player.y = PLAYER_SPAWN_Y;
 	}
-
+#endif
 	int sx = _facing == FACING_RIGHT ? _sx : -_sx;
 	obj_aff_rotscale(
 		&_player.aff,

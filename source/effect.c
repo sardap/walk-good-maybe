@@ -51,11 +51,16 @@ void update_splash_effect(visual_ent_t *v_ent)
 
 		if (anime_complete)
 		{
-			free_obj_tile_idx(v_ent->sp_tile_idx, 4);
-			free_visual_ent(v_ent);
+			free_splash_effect(v_ent);
 			return;
 		}
 	}
 
 	v_ent->x += -_scroll_x;
+}
+
+void free_splash_effect(visual_ent_t *v_ent)
+{
+	free_obj_tile_idx(v_ent->sp_tile_idx, 4);
+	free_visual_ent(v_ent);
 }

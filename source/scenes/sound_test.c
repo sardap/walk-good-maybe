@@ -19,7 +19,7 @@
 #include "../assets/stArrow.h"
 #include "../assets/stArrowRed.h"
 
-st_data_t *_data = &_shared_data.st;
+static st_data_t *_data = &_shared_data.st;
 
 static void show(void)
 {
@@ -120,7 +120,7 @@ static void show(void)
 static void update(void)
 {
 	if (key_hit(KEY_B))
-		scene_set(title_screen);
+		scene_set(_title_scene);
 
 	if (key_hit(KEY_UP) || key_hit(KEY_DOWN))
 	{
@@ -165,7 +165,7 @@ static void update(void)
 		_data->arrow_countdown = 10;
 	}
 
-	//Underflow fuck it
+	// Underflow fuck it
 	_data->arrow_countdown--;
 	if (_data->arrow_countdown < 0)
 	{
@@ -251,7 +251,7 @@ static void hide(void)
 	mmStop();
 }
 
-const scene_t sound_test_scene = {
+const scene_t _sound_test_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

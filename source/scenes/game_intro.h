@@ -8,7 +8,7 @@
 #define GI_TEXT_SSB 24
 #define GI_SKY_SSB 26
 #define GI_M7_D 128
-#define GI_STARTING_COUNTDOWN 1.65 * 60
+#define GI_STARTING_COUNTDOWN 2.25 * 60
 //1.65 seconds 60 frames per second
 #define GI_WHALE_START_SCALE 512 * FIX_SCALE
 
@@ -40,8 +40,8 @@ typedef struct gi_data_t
 	gi_mode_t mode;
 } gi_data_t;
 
-extern const scene_t city_game_intro;
-extern const scene_t beach_game_intro;
+extern const scene_t _city_game_intro_scene;
+extern const scene_t _beach_game_intro_scene;
 extern const scene_t _speical_zone_intro_scene;
 
 #endif

@@ -68,6 +68,14 @@ mm_sound_effect _player_grow_sound = {
 	127,
 };
 
+mm_sound_effect _player_death_sound = {
+	{SFX_PLAYER_DEATH},
+	(int)(1.0f * (1 << 10)),
+	TOKEN_SOUND_HANDLER,
+	120,
+	127,
+};
+
 //Enemy
 mm_sound_effect _enemy_biscut_damage = {
 	{SFX_PD_ENEMY_0_DEATH_0},
@@ -156,7 +164,7 @@ mm_sound_effect _croc_sound = {
 	{SFX_TZ_CROC_GROAL},
 	(int)(1.0f * (1 << 10)),
 	MISC_SOUND_HANDLER,
-	120,
+	170,
 	127,
 };
 
@@ -169,6 +177,7 @@ const sound_fx_info_t _sound_fx_set[] = {
 	{&_player_flap_sound, "Player Flap"},
 	{&_player_shrink_sound, "Player Shrink"},
 	{&_player_grow_sound, "Player Grow"},
+	{&_player_death_sound, "Player Death"},
 	{&_enemy_biscut_damage, "Emy Bisc Dmg"},
 	{&_enemy_ufo_damge, "Emy UFO Bisc Dmg"},
 	{&_enemy_shoot, "Emy Shoot"},

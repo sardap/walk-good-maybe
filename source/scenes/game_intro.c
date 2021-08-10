@@ -44,7 +44,7 @@ static gi_data_t *_data = &_shared_data.gi;
 // offset * (zoom * rotation)
 // Mixed fixed point: lam, lxr, lyr use .12
 // lxr and lyr have different calculation methods
-//Not going to pretend that I understand this
+// Not going to pretend that I understand this
 static void m7_hbl()
 {
 	FIXED lam, lcf, lsf, lxr, lyr;
@@ -117,7 +117,7 @@ static void show(gi_mode_t mode)
 
 	REG_BG0CNT = BG_PRIO(2) | BG_8BPP | BG_SBB(GI_SKY_SSB) | BG_CBB(GI_SHARED_CB) | BG_REG_32x32;
 	REG_BG1CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(GI_TEXT_SSB) | BG_CBB(GI_SHARED_CB) | BG_REG_32x32;
-	REG_BG2CNT = BG_PRIO(1) | BG_SBB(GI_COOL_BACKGROUND_SSB) | BG_CBB(GI_SHARED_CB) | BG_AFF_64x64;
+	REG_BG2CNT = BG_PRIO(1) | BG_SBB(GI_COOL_BACKGROUND_SSB) | BG_CBB(GI_SHARED_CB) | BG_AFF_64x64 | BG_WRAP;
 
 	// enable hblank register and set the mode7 type
 	irq_init(NULL);
@@ -130,10 +130,10 @@ static void show(gi_mode_t mode)
 	REG_DISPCNT = DCNT_MODE1 | DCNT_BG0 | DCNT_BG1 | DCNT_BG2 | DCNT_OBJ | DCNT_OBJ_1D;
 
 	// Setup cam
-	_data->cam_pos.x = 257.89f * FIX_SCALEF;
-	_data->cam_pos.y = 200.0f * FIX_SCALEF;
-	_data->cam_pos.z = 496.38f * FIX_SCALE;
-	_data->cam_phi = 0;
+	_data->cam_pos.x = gba_rand(); // 257.89f * FIX_SCALEF
+	_data->cam_pos.y = 600.0f * FIX_SCALEF;
+	_data->cam_pos.z = gba_rand();
+	_data->cam_phi = gba_rand();
 	_data->g_cosf = lu_cos(_data->cam_phi) >> 4;
 	_data->g_sinf = lu_sin(_data->cam_phi) >> 4;
 
@@ -149,6 +149,9 @@ static void show(gi_mode_t mode)
 
 	// start sound
 	_data->state = GI_S_READY;
+
+	if (_data->mode == GI_MODE_SPEICAL_ZONE)
+		mmStart(MOD_PD_SPECIAL_ZONE, MM_PLAY_LOOP);
 
 	mmEffectEx(&_ready_sound);
 
@@ -167,7 +170,7 @@ static void update(void)
 	--_data->countdown;
 	// This is a magic number that makes it roate fast
 	_data->whale_rotate -= 128 * 5;
-	_data->cam_pos.y -= 1.8f * FIX_SCALE;
+	_data->cam_pos.y -= 5.5f * FIX_SCALE;
 	_data->whale_scale -= fxdiv(GI_WHALE_START_SCALE, GI_STARTING_COUNTDOWN * FIX_SCALE);
 
 	obj_aff_rotscale(
@@ -207,23 +210,22 @@ static void update(void)
 			mmStart(MOD_INTRO, MM_PLAY_ONCE);
 			break;
 		case GI_MODE_SPEICAL_ZONE:
-			mmStart(MOD_PD_ROCK_BACKGROUND, MM_PLAY_ONCE);
 			break;
 		}
 		_data->state = GI_S_GO;
 		break;
 	}
 	case GI_S_GO:
-		if (_data->countdown <= 0)
+		if (_data->cam_pos.y <= 50 * FIX_SCALE)
 		{
 			switch (_data->mode)
 			{
 			case GI_MODE_BEACH:
 			case GI_MODE_CITY:
-				scene_set(main_game);
+				scene_set(_main_game_scene);
 				break;
 			case GI_MODE_SPEICAL_ZONE:
-				scene_set(special_zone_scene);
+				scene_set(_special_zone_scene);
 				break;
 			}
 		}
@@ -250,12 +252,12 @@ static void show_speical_zone(void)
 	show(GI_MODE_SPEICAL_ZONE);
 }
 
-const scene_t city_game_intro = {
+const scene_t _city_game_intro_scene = {
 	.show = show_city,
 	.update = update,
 	.hide = hide};
 
-const scene_t beach_game_intro = {
+const scene_t _beach_game_intro_scene = {
 	.show = show_beach,
 	.update = update,
 	.hide = hide};

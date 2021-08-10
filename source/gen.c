@@ -7,6 +7,7 @@
 #include "ent.h"
 #include "enemy.h"
 #include "obstacles.h"
+#include "player.h"
 
 #include "assets/lava0TileSet.h"
 #include "assets/building0TileSet.h"
@@ -29,8 +30,8 @@ static t_spawn_info _building_3 = {70, 20, 60, 20};
 static t_spawn_info _building_4 = {70, 20, 60, 20};
 static t_spawn_info _building_5 = {0, 0, 50, 100};
 
-static t_spawn_info _island_00 = {80, 0, 70, 0};
-static t_spawn_info _island_01 = {80, 0, 90, 0};
+static t_spawn_info _island_00 = {80, 0, 60, 20};
+static t_spawn_info _island_01 = {80, 0, 70, 20};
 
 static int _lava_0_idx;
 static int _building_0_idx;
@@ -180,13 +181,26 @@ static bool spawn_speical_zone_portal(int start_x, int width, int y)
 	return true;
 }
 
+static bool spawn_idol(int start_x, int width, int y)
+{
+	FIXED att_x = level_to_screen(start_x) + gba_rand_range(0, width * 8);
+
+	create_idol(allocate_ent(), int2fx(att_x), int2fx(y * 8 - 6));
+
+	return true;
+}
+
 static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 {
 	//early return to avoid that awesome wraping bug
 	if (level_to_screen(start_x + width) < 0)
 		return;
 
-	if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
+	if (get_score() > WIN_SCORE_THREASHOLD && gba_rand_range(1, 100) > 80)
+	{
+		spawn_idol(start_x, width, y);
+	}
+	else if (width > 3 && gba_rand_range(1, 100) > 100 - info->lava_chance)
 	{
 		spawn_lava(width, start_x, y);
 	}
@@ -199,7 +213,7 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 	}
 	else if (gba_rand_range(1, 100) > 100 - info->token_chance)
 	{
-		switch (gba_rand_range(1, 4))
+		switch (gba_rand_range(1, 3))
 		{
 		case 1:
 			spawn_jump_up_token(start_x, width, y);
@@ -208,7 +222,14 @@ static void spawn_obstacles(int start_x, int width, int y, t_spawn_info *info)
 			spawn_speed_up_token(start_x, width, y);
 			break;
 		case 3:
-			spawn_health_up_token(start_x, width, y);
+			if (get_player_life() >= PLAYER_LIFE_START)
+			{
+				spawn_obstacles(start_x, width, y, info);
+			}
+			else
+			{
+				spawn_health_up_token(start_x, width, y);
+			}
 			break;
 		case 4:
 			spawn_shrink_token(start_x, width, y);
@@ -225,19 +246,25 @@ static void update_high_low_tile(int x, int count)
 {
 	x /= 2;
 
+#ifdef DEBUG
 	char str[50];
+#endif
 	if (x < _lowest_tile_idx)
 	{
 		_lowest_tile_idx = x;
+#ifdef DEBUG
 		sprintf(str, "NL:%d", x);
 		write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	}
 
 	if (x + count > _highest_tile_idx)
 	{
 		_highest_tile_idx = x + count;
+#ifdef DEBUG
 		sprintf(str, "NM:%d", x);
 		write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	}
 }
 

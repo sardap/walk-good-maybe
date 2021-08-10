@@ -113,7 +113,7 @@ typedef struct sz_data_t
 	FIXED colour_dist;
 	u16 border_colour_current;
 	u16 border_colour_next;
-	FIXED timer;
+	int timer;
 } sz_data_t;
 
 void set_sz_in(sz_transfer_in_t data);
@@ -122,6 +122,6 @@ sz_transfer_out_t get_sz_out();
 
 void sz_out_clear_dirty();
 
-extern const scene_t special_zone_scene;
+extern const scene_t _special_zone_scene;
 
 #endif

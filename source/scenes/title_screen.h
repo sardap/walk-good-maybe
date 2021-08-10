@@ -20,8 +20,7 @@ typedef enum ts_menu_enum
 	TS_MENU_CITY,
 	TS_MENU_BEACH,
 	TS_MENU_CREDITS,
-	TS_MENU_SOUND_TEST,
-		TS_SPECIAL_ZONE
+	TS_MENU_SOUND_TEST
 } ts_menu_enum;
 
 typedef struct ts_menu_options_t
@@ -33,6 +32,6 @@ typedef struct ts_menu_options_t
 	//Bad but cbf
 } ts_menu_options_t;
 
-extern const scene_t title_screen;
+extern const scene_t _title_scene;
 
 #endif

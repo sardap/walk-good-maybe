@@ -5,5 +5,6 @@
 
 void create_splash_effect(visual_ent_t *v_ent, FIXED x, FIXED y);
 void update_splash_effect(visual_ent_t *v_ent);
+void free_splash_effect(visual_ent_t *v_ent);
 
 #endif

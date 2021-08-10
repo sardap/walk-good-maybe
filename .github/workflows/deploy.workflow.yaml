@@ -15,7 +15,7 @@ jobs:
       - name: Build conatiner
         run: docker build . -t gba_build:latest
       - name: Build Rom
-        run: docker run -v ${PWD}:/app gba_build:latest
+        run: docker run -v ${PWD}:/app -e WALK_GOOD_MAYBE_RELEASE=true gba_build:latest
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

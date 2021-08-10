@@ -44,6 +44,12 @@ CFLAGS  :=  -g -Wall -O3\
 
 CFLAGS  +=  $(INCLUDE)
 
+ifdef WALK_GOOD_MAYBE_RELEASE
+    CFLAGS += -DSHOW_WARNING=1 -DGAME_OVER_ENABLED=1
+else
+    CFLAGS += -DDEBUG=1
+endif
+
 CXXFLAGS    :=  $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS :=  $(ARCH)

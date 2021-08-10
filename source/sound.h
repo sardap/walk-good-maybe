@@ -25,6 +25,7 @@ extern mm_sound_effect _player_walk_sound;
 extern mm_sound_effect _player_flap_sound;
 extern mm_sound_effect _player_shrink_sound;
 extern mm_sound_effect _player_grow_sound;
+extern mm_sound_effect _player_death_sound;
 
 //Enemy
 extern mm_sound_effect _enemy_biscut_damage;
@@ -45,7 +46,7 @@ extern mm_sound_effect _always_backwards_sound;
 // Animal noises
 extern mm_sound_effect _croc_sound;
 
-#define SOUND_SET_LENGTH 19
+#define SOUND_SET_LENGTH 20
 extern const sound_fx_info_t _sound_fx_set[SOUND_SET_LENGTH];
 
 #endif

@@ -38,6 +38,7 @@ typedef enum ent_types_t
 	TYPE_JUMP_UP = (1 << 8),
 	TYPE_SHRINK_TOKEN = (1 << 9),
 	TYPE_SPEICAL_ZONE_PORTAL = (1 << 10),
+	TYPE_IDOL = (1 << 11),
 } ent_types_t;
 
 //These don't need to be bit alligend since we never do cols with them
@@ -90,6 +91,11 @@ typedef struct ent_t
 	//Ent speifc vars
 	union
 	{
+		// idol
+		struct
+		{
+			int idol_tile_idx;
+		};
 		// Sepical zone portal
 		struct
 		{
@@ -155,9 +161,11 @@ void init_all_ents();
 
 ent_t *allocate_ent();
 void free_ent(ent_t *ent);
+void complete_free_ent(ent_t *ent);
 
 visual_ent_t *allocate_visual_ent();
 void free_visual_ent(visual_ent_t *ent);
+void complete_free_visual_ent(visual_ent_t *ent);
 
 void free_all_ents();
 

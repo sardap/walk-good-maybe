@@ -7,8 +7,10 @@
 #include "soundbank_bin.h"
 
 #include "title_screen.h"
+#include "game_over.h"
 #include "scene_shared.h"
 #include "special_zone.h"
+#include "game_win.h"
 #include "../ent.h"
 #include "../player.h"
 #include "../graphics.h"
@@ -22,6 +24,7 @@
 #include "../obstacles.h"
 #include "../effect.h"
 #include "../anime.h"
+#include "../sound.h"
 
 #include "../assets/backgroundCity.h"
 #include "../assets/fog.h"
@@ -98,7 +101,7 @@ static FIXED wrap_x(FIXED x)
 
 static inline int offset_x_bg(int n)
 {
-	//What the fuck is nfx
+	// What the fuck is nfx
 	int nfx = (n * TILE_WIDTH) * FIX_SCALE;
 	return fx2int(wrap_x(_bg_pos_x + nfx)) / TILE_WIDTH;
 }
@@ -111,6 +114,14 @@ static void wrap_bkg()
 static void spawn_buildings()
 {
 	int start_x = _data->building_spawn_x;
+
+	// Calcautes how much spare space there is
+	int space = 0;
+	// Yeah that's right you can hire me after reading this shit show
+	while (tile_to_collision(at_level(level_wrap_x(start_x + space), BEACH_ISLAND_Y_TILE_SPAWN)) == LEVEL_COL_EMPTY && space < 40)
+	{
+		space++;
+	}
 
 	int width = 0;
 	switch (_data->mode)
@@ -158,7 +169,18 @@ static void spawn_buildings()
 	width += gba_rand_range(MIN_JUMP_WIDTH_TILES, MAX_JUMP_WIDTH_TILES);
 
 	_data->building_spawn_x = level_wrap_x(start_x + width);
-	_data->next_building_spawn = ((width * 8) * (FIX_SCALE));
+	_data->next_building_spawn = int2fx(width * 8);
+
+	space -= width;
+	if (space > 12)
+	{
+		spawn_buildings();
+	}
+#ifdef DEBUG
+	char str[50];
+	sprintf(str, "Next building spawn %d spawn x %d", fx2int(_data->next_building_spawn), _data->building_spawn_x);
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 }
 
 static void clear_offscreen_level()
@@ -169,7 +191,7 @@ static void clear_offscreen_level()
 
 static void load_foreground_tiles()
 {
-	//Order doesn't matter but all buildings / islands need to be loaded in a single chunk
+	// Order doesn't matter but all buildings / islands need to be loaded in a single chunk
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
@@ -216,6 +238,9 @@ static void show(void)
 {
 	*_data = _in_data.new_data;
 
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "starting main game");
+#endif
 	// Apply speical zone bonuses
 	sz_transfer_out_t sz_out = get_sz_out();
 	if (sz_out.dirty)
@@ -224,21 +249,26 @@ static void show(void)
 
 		for (int i = 0; i < sz_out.good_collected - sz_out.bad_collected; i++)
 		{
+			add_score(gba_rand_range(1, 10));
+
 			if (gba_rand_range(0, 100) >= 80)
 			{
-				switch (gba_rand_range(0, 2))
+#ifdef DEBUG
+				write_to_log(LOG_LEVEL_DEBUG, "Lucky");
+#endif
+				if (gba_rand() % 2 == 0)
 				{
-				case 1:
-					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2));
-					break;
-
-				case 2:
-					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 2));
-					break;
+					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2.5f * FIX_SCALEF));
+				}
+				else
+				{
+					add_player_speed(fxdiv(PLAYER_ADD_SPEED_STEP, 2.5f * FIX_SCALEF));
 				}
 			}
 		}
 	}
+
+	load_blank();
 
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
@@ -249,17 +279,9 @@ static void show(void)
 		init_gen();
 		init_level();
 		init_player();
-	}
-
-	// Load palettes
-	switch (_data->mode)
-	{
-	case MG_MODE_CITY:
-		GRIT_CPY(pal_bg_mem, mainGameCitySharedPal);
-		break;
-	case MG_MODE_BEACH:
-		GRIT_CPY(pal_bg_mem, mainGameBeachSharedPal);
-		break;
+#ifdef DEBUG
+		write_to_log(LOG_LEVEL_DEBUG, "init everything");
+#endif
 	}
 
 	_obj_pal_idx = allocate_obj_pal_idx(spriteSharedPalLen);
@@ -291,36 +313,43 @@ static void show(void)
 		break;
 	}
 
-	//Maps
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "graphics started");
+#endif
 
+	// Maps
 	load_foreground_tiles();
 
-	//Pause screen
+	// Pause screen
 	GRIT_CPY(&se_mem[MG_PAUSE_SBB], mgPauseCityMap);
 	for (int i = 0; i < mgPauseCityMapLen; i++)
 	{
 		se_mem[MG_PAUSE_SBB][i] += pause_tile_offset / 2;
 	}
 
-	//Fill Cloud
+	// Fill Cloud
 	switch (_data->mode)
 	{
 	case MG_MODE_CITY:
-		//City BG
+		// City BG
 		GRIT_CPY(se_mem[MG_FAR_SB], backgroundCityMap);
 
-		//Fog
+		// Fog
 		GRIT_CPY(se_mem[MG_CLOUD_SB], fogMap);
 		break;
 	case MG_MODE_BEACH:
 		GRIT_CPY(se_mem[MG_FAR_SB], mgBeachMap);
-
-		//Fog
+		// Fog
 		GRIT_CPY(se_mem[MG_CLOUD_SB], mgBeachWaterFog00Map);
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
 	}
-	//TODO: stop this double iteration bullshit
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "loadded background tiles");
+#endif
+
+	// Can't be bothered using char blocks
 	for (int i = 0; i < mgBeachWaterFog00MapLen; i++)
 		se_mem[MG_CLOUD_SB][i] += _data->fog_tiles_idx / 2;
 
@@ -357,6 +386,25 @@ static void show(void)
 	REG_BG2CNT = BG_PRIO(bg_2_prio) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_PAUSE_SBB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "display reg init");
+#endif
+
+	// Load palettes
+	switch (_data->mode)
+	{
+	case MG_MODE_CITY:
+		GRIT_CPY(pal_bg_mem, mainGameCitySharedPal);
+		break;
+	case MG_MODE_BEACH:
+		GRIT_CPY(pal_bg_mem, mainGameBeachSharedPal);
+		break;
+	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "loaded palette");
+#endif
+
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
 	switch (_data->mode)
@@ -370,9 +418,8 @@ static void show(void)
 		);
 
 		// Update blend weights
-		//Left EVA: Top weight max of 15 (4 bits)
-		//Right EVB: Bottom wieght max of 15 (4 bits)
-		// REG_BLDALPHA = BLDA_BUILD(3, 5);
+		// Left EVA: Top weight max of 15 (4 bits)
+		// Right EVB: Bottom wieght max of 15 (4 bits)
 		REG_BLDALPHA = BLDA_BUILD(8, 6);
 		REG_BLDY = BLDY_BUILD(0);
 		break;
@@ -380,7 +427,16 @@ static void show(void)
 		break;
 	}
 
-	_scroll_x = _data->starting_scroll_x;
+	set_scroll_x(_data->starting_scroll_x);
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "set scrolling x blending");
+#endif
+
+	if (_data->fresh_game)
+	{
+		init_score();
+	}
 
 	// Tiles!
 	load_player_tiles();
@@ -395,24 +451,109 @@ static void show(void)
 	load_speed_level_display(get_player_speed());
 	load_jump_level_display(get_player_jump());
 
-	init_score();
+	init_score_display();
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "loaded tiles");
+#endif
 
 	if (_data->fresh_game)
 	{
 		obj_hide_multi(oam_mem, 128);
-
-		while (_data->building_spawn_x < LEVEL_WIDTH / 2 + LEVEL_WIDTH / 5)
-			spawn_buildings();
+		spawn_buildings();
 	}
+	else
+	{
+		update_score_display(get_score());
+	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "complete init");
+#endif
 }
 
 static bool check_game_over()
 {
+	return _player.x + int2fx(_player.w) < 0 ||
+		   _player.y > 165 * FIX_SCALE ||
+		   get_player_life() <= 0;
+}
+
+static void game_over()
+{
+	if (_data->mode == MG_MODE_CITY)
+	{
+		REG_DISPCNT ^= DCNT_BG2;
+	}
+
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG0 | BLD_BG1 | BLD_BG2 | BLD_OBJ, // Top layers
+		0,									   // Bottom layers
+		3									   // Mode
+	);
+	int blend = 0;
+	int timer = 0;
+	REG_BLDY = BLDY_BUILD(blend);
+
+	mmStop();
+
+	mmEffectEx(&_player_death_sound);
+
+	while (blend <= 17 || mmEffectActive(PLAYER_ACTION_SOUND_HANDLER))
+	{
+		VBlankIntrWait();
+		mmFrame();
+		key_poll();
+		timer++;
+		if (timer % 8 == 0)
+		{
+			blend++;
+			REG_BLDY = BLDY_BUILD(blend);
+		}
+	}
 #ifdef DEBUG
-	return false;
-#elif
-	return fx2int(_player.x) < 0;
+	write_to_log(LOG_LEVEL_DEBUG, "GAME OVER");
 #endif
+	go_transfer_in_t in;
+	in.score = get_score();
+	set_go_in(in);
+	scene_set(_game_over_scene);
+}
+
+static void game_win()
+{
+	if (_data->mode == MG_MODE_CITY)
+	{
+		REG_DISPCNT ^= DCNT_BG2;
+	}
+
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG0 | BLD_BG1 | BLD_BG2 | BLD_OBJ, // Top layers
+		0,									   // Bottom layers
+		2									   // Mode
+	);
+	int blend = 0;
+	int timer = 0;
+	REG_BLDY = BLDY_BUILD(blend);
+	mmStop();
+
+	while (blend <= 17)
+	{
+		VBlankIntrWait();
+		mmFrame();
+		key_poll();
+		timer++;
+		if (timer % 8 == 0)
+		{
+			blend++;
+			REG_BLDY = BLDY_BUILD(blend);
+		}
+	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "game win");
+#endif
+	scene_set(_game_win_scene);
 }
 
 static void update(void)
@@ -468,35 +609,47 @@ static void update(void)
 		if (key_hit(KEY_START))
 		{
 			REG_DISPCNT ^= DCNT_BG3;
+#ifdef DEBUG
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
+#endif
 			_data->state = _data->old_state;
 		}
 		return;
 	}
 
 	// Back to title screen
+	if (key_held(KEY_SELECT) && key_held(KEY_L) && key_hit(KEY_START))
+	{
+		game_win();
+		return;
+	}
+
+	// Back to title screen
 	if (key_held(KEY_SELECT) && key_hit(KEY_START))
 	{
-		scene_set(title_screen);
+		scene_set(_title_scene);
 		return;
 	}
 
 	if (key_hit(KEY_START))
 	{
+#ifdef DEBUG
 		write_to_log(LOG_LEVEL_INFO, "PAUSING");
+#endif
 		_data->old_state = _data->state;
 		_data->state = MG_S_PAUSED;
 		REG_DISPCNT |= DCNT_BG3;
 		return;
 	}
 
+#ifdef GAME_OVER_ENABLED
 	if (check_game_over())
 	{
-		scene_set(title_screen);
+		game_over();
 		return;
 	}
+#endif
 
-	_scroll_x = clamp(_scroll_x, 0, MG_MAX_SCROLL_SPEED);
 	_bg_pos_x += _scroll_x;
 	_data->bg_0_scroll += _scroll_x;
 	_data->bg_2_scroll += _scroll_x;
@@ -529,13 +682,9 @@ static void update(void)
 		for (int y = 0; y < LEVEL_HEIGHT; y++)
 		{
 			if (x < 32)
-			{
 				se_plot(se_mem[MG_PLATFROM_SB], x, y, at_level(x, y));
-			}
 			else
-			{
 				se_plot(se_mem[MG_PLATFROM_SB + 1], x - 32, y, at_level(x, y));
-			}
 		}
 	}
 
@@ -559,7 +708,7 @@ static void update(void)
 		_data->splash_active = 60;
 	}
 
-	if ((key_held(KEY_SELECT) && key_held(KEY_A) && key_hit(KEY_START)) || _player.ent_cols & (TYPE_SPEICAL_ZONE_PORTAL))
+	if (_player.ent_cols & TYPE_SPEICAL_ZONE_PORTAL)
 	{
 		sz_transfer_in_t data;
 		data.max_velocity = SZ_MAX_VELOCITY;
@@ -572,26 +721,25 @@ static void update(void)
 		return;
 	}
 
+	if (_player.ent_cols & TYPE_IDOL)
+	{
+		game_win();
+		return;
+	}
+
 	switch (_data->state)
 	{
 	case MG_S_STARTING:
 		if (key_hit(KEY_RIGHT))
 		{
-			_scroll_x = (int)(0.25f * FIX_SCALE);
+			set_scroll_x(0.25f * FIX_SCALE);
 			_data->state = MG_S_SCROLLING;
 		}
 		break;
 	case MG_S_SCROLLING:
-		if (frame_count() % X_SCROLL_RATE == 0)
+		if (frame_count() % SCROLL_X_RATE == 0)
 		{
-			_scroll_x += X_SCROLL_GAIN;
-			//This is better than checking if it's greater prior to adding
-			//Because it handles the edge case where the gain will put it much
-			//over the limit
-			if (_scroll_x > X_SCROLL_MAX)
-			{
-				_scroll_x = X_SCROLL_MAX;
-			}
+			set_scroll_x(_scroll_x + SCROLL_X_GAIN);
 		}
 		break;
 	case MG_S_PAUSED:
@@ -605,7 +753,7 @@ static void hide(void)
 	_data->starting_scroll_x = _scroll_x;
 	_out_data.last_data = *_data;
 
-	REG_DISPCNT = 0;
+	load_blank();
 	dma3_fill(se_mem[MG_CLOUD_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_FAR_SB], 0x0, SB_SIZE);
 	dma3_fill(se_mem[MG_PLATFROM_SB], 0x0, SB_SIZE);
@@ -628,6 +776,7 @@ static void hide(void)
 	free_speed_level_display();
 	free_jump_level_display();
 
+	mmSetModuleVolume((mm_word)1024);
 	mmStop();
 
 	OAM_CLEAR();
@@ -643,7 +792,7 @@ static void hide(void)
 	REG_BLDCNT = 0;
 }
 
-const scene_t main_game = {
+const scene_t _main_game_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

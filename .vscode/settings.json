@@ -122,11 +122,33 @@
 		"cerrno": "cpp",
 		"cstdarg": "cpp",
 		"mgportal00.h": "c",
-		"ent.h": "c"
+		"ent.h": "c",
+		"szgrid01.h": "c",
+		"warning.h": "c",
+		"game_over.h": "c",
+		"gotext.h": "c",
+		"gomainbackground.h": "c",
+		"sound.h": "c",
+		"vector": "c",
+		"limits.h": "c",
+		"whale_walk_4.h": "c",
+		"game_win.h": "c",
+		"gwsharedbackground.h": "c",
+		"credits.h": "c",
+		"gwbandit.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Disabled",
 	"cSpell.words": [
 		"allc",
 		"ents"
-	]
+	],
+	"files.watcherExclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/bin/**": true,
+		"**/build/**": true,
+		"**/act/**": true,
+		"**/log/**": true,
+		"source/assets/**": true,
+	}
 }

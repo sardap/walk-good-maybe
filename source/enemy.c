@@ -311,7 +311,7 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 			enemy_biscut_ufo_death_cycle, ENEMY_BISCUT_UFO_DEATH_CYCLE,
 			v_ent->eb_tile_idx, enemyBiscutUFODeath00TilesLen);
 
-		if (anime_complete)
+		if (anime_complete || v_ent->x <= 0)
 		{
 			free_enemy_ufo_biscut_death(v_ent);
 			return;
@@ -323,7 +323,7 @@ void update_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 
 void free_enemy_ufo_biscut_death(visual_ent_t *v_ent)
 {
-	free_obj_tile_idx(v_ent->eb_tile_idx, 2);
+	free_obj_tile_idx(v_ent->eb_tile_idx, 4);
 	free_visual_ent(v_ent);
 }
 

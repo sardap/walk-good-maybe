@@ -25,11 +25,13 @@ void init_debug();
 
 inline static void write_to_log(log_level_e level, const char *ptr, ...)
 {
+#ifdef DEBUG
 	va_list args;
 	va_start(args, ptr);
 	vsnprintf(REG_DEBUG_STRING, 0x100, ptr, args);
 	va_end(args);
 	*REG_DEBUG_FLAGS = (u16)level | 0x100;
+#endif
 }
 
 #endif

@@ -114,6 +114,14 @@ static void spawn_buildings()
 {
 	int start_x = _data->building_spawn_x;
 
+	// Calcautes how much spare space there is
+	int space = 0;
+	// Yeah that's right you can hire me after reading this shit show
+	while (tile_to_collision(at_level(level_wrap_x(start_x + space), SCREEN_HEIGHT / 8)) == LEVEL_COL_EMPTY)
+	{
+		space++;
+	}
+
 	int width = 0;
 	switch (_data->mode)
 	{
@@ -160,7 +168,18 @@ static void spawn_buildings()
 	width += gba_rand_range(MIN_JUMP_WIDTH_TILES, MAX_JUMP_WIDTH_TILES);
 
 	_data->building_spawn_x = level_wrap_x(start_x + width);
-	_data->next_building_spawn = ((width * 8) * (FIX_SCALE));
+	_data->next_building_spawn = int2fx(width * 8);
+
+	space -= width;
+	if (space > MAX_JUMP_WIDTH_TILES)
+	{
+		spawn_buildings();
+	}
+#ifdef DEBUG
+	char str[50];
+	sprintf(str, "Next building spawn %d spawn x %d", fx2int(_data->next_building_spawn), _data->building_spawn_x);
+	write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 }
 
 static void clear_offscreen_level()
@@ -228,7 +247,9 @@ static void show(void)
 		{
 			if (gba_rand_range(0, 100) >= 80)
 			{
+#ifdef DEBUG
 				write_to_log(LOG_LEVEL_DEBUG, "Lucky");
+#endif
 				if (gba_rand() % 2 == 0)
 				{
 					add_player_jump(fxdiv(PLAYER_ADD_JUMP_STEP, 2.5f * FIX_SCALEF));
@@ -382,7 +403,7 @@ static void show(void)
 		break;
 	}
 
-	_scroll_x = _data->starting_scroll_x;
+	set_scroll_x(_data->starting_scroll_x);
 
 	// Tiles!
 	load_player_tiles();
@@ -447,8 +468,9 @@ static void game_over()
 			REG_BLDY = BLDY_BUILD(blend);
 		}
 	}
-
+#ifdef DEBUG
 	write_to_log(LOG_LEVEL_DEBUG, "GAME OVER");
+#endif
 	go_transfer_in_t in;
 	in.score = get_score();
 	set_go_in(in);
@@ -508,7 +530,9 @@ static void update(void)
 		if (key_hit(KEY_START))
 		{
 			REG_DISPCNT ^= DCNT_BG3;
+#ifdef DEBUG
 			write_to_log(LOG_LEVEL_INFO, "UNPAUSE");
+#endif
 			_data->state = _data->old_state;
 		}
 		return;
@@ -523,7 +547,9 @@ static void update(void)
 
 	if (key_hit(KEY_START))
 	{
+#ifdef DEBUG
 		write_to_log(LOG_LEVEL_INFO, "PAUSING");
+#endif
 		_data->old_state = _data->state;
 		_data->state = MG_S_PAUSED;
 		REG_DISPCNT |= DCNT_BG3;
@@ -538,7 +564,6 @@ static void update(void)
 	}
 #endif
 
-	_scroll_x = clamp(_scroll_x, 0, MG_MAX_SCROLL_SPEED);
 	_bg_pos_x += _scroll_x;
 	_data->bg_0_scroll += _scroll_x;
 	_data->bg_2_scroll += _scroll_x;
@@ -615,21 +640,14 @@ static void update(void)
 	case MG_S_STARTING:
 		if (key_hit(KEY_RIGHT))
 		{
-			_scroll_x = (int)(0.25f * FIX_SCALE);
+			set_scroll_x(0.25f * FIX_SCALE);
 			_data->state = MG_S_SCROLLING;
 		}
 		break;
 	case MG_S_SCROLLING:
-		if (frame_count() % X_SCROLL_RATE == 0)
+		if (frame_count() % SCROLL_X_RATE == 0)
 		{
-			_scroll_x += X_SCROLL_GAIN;
-			//This is better than checking if it's greater prior to adding
-			//Because it handles the edge case where the gain will put it much
-			//over the limit
-			if (_scroll_x > X_SCROLL_MAX)
-			{
-				_scroll_x = X_SCROLL_MAX;
-			}
+			set_scroll_x(_scroll_x + SCROLL_X_GAIN);
 		}
 		break;
 	case MG_S_PAUSED:

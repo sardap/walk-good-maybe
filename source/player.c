@@ -107,11 +107,11 @@ void add_player_jump(FIXED amount)
 	_player_jump_power = clamp(
 		_player_jump_power + amount,
 		PLAYER_START_JUMP_POWER, PLAYER_MAX_JUMP_POWER);
-
+#ifdef DEBUG
 	char str[50];
 	sprintf(str, "JUMP:%2.f AMT:%2.f", fx2float(_player_jump_power), fx2float(amount));
 	write_to_log(LOG_LEVEL_DEBUG, str);
-
+#endif
 	update_jump_level_display(get_player_jump());
 }
 
@@ -122,14 +122,14 @@ FIXED get_player_speed()
 
 void add_player_speed(FIXED amount)
 {
-	_player_air_slowdown = clamp(
+	_player_air_slowdown = CLAMP(
 		_player_air_slowdown - amount,
 		PLAYER_AIR_SLOWDOWN_MIN, PLAYER_AIR_START_SLOWDOWN);
-
+#ifdef DEBUG
 	char str[50];
 	sprintf(str, "SPEED:%2.f AMT:%2.f", fx2float(_player_air_slowdown), fx2float(amount));
 	write_to_log(LOG_LEVEL_DEBUG, str);
-
+#endif
 	update_speed_level_display(get_player_speed());
 }
 
@@ -178,20 +178,6 @@ static void player_shoot()
 
 void update_player()
 {
-	// What the fuck is this?
-	// static int scale = 1;
-	// if (key_held(KEY_L) || key_held(KEY_R))
-	// {
-	// 	if (key_held(KEY_L))
-	// 		scale += 128;
-	// 	if (key_held(KEY_R))
-	// 		scale -= 128;
-
-	// 	char str[50];
-	// 	sprintf(str, "scale:%d", scale);
-	// 	write_to_log(LOG_LEVEL_DEBUG, str);
-	// }
-
 	//Handles damage moasic effect
 	if (frame_count() % 3 == 0 && _player_mos.x > 0)
 	{
@@ -307,7 +293,7 @@ void update_player()
 	if (_speed_up_active <= 0 && _player.ent_cols & (TYPE_SPEED_UP) && _scroll_x > 0)
 	{
 		_speed_up_active = 120;
-		_scroll_x += 0.5f * FIX_SCALEF;
+		set_scroll_x(_scroll_x + 0.5f * FIX_SCALEF);
 		// Lower air slowdown speed
 		add_player_speed(PLAYER_ADD_SPEED_STEP);
 	}
@@ -316,7 +302,7 @@ void update_player()
 		--_speed_up_active;
 		// Check ended and handle ended
 		if (_speed_up_active <= 0)
-			_scroll_x -= 0.5f * FIX_SCALEF;
+			set_scroll_x(_scroll_x - 0.5f * FIX_SCALEF);
 	}
 
 	// Health up

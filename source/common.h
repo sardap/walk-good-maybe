@@ -3,6 +3,8 @@
 
 #include <tonc.h>
 
+#include "debug.h"
+
 #define SB_SIZE sizeof(SCREENBLOCK)
 #define TILE_WIDTH 8
 #define TILE_HEIGHT TILE_WIDTH
@@ -14,11 +16,11 @@
 #define GBA_WIDTH 240
 #define GBA_HEIGHT 160
 
-#define X_SCROLL_GAIN (FIXED)(0.01f * (FIX_SCALEF))
-#define X_SCROLL_MAX (FIXED)(3.5f * (FIX_SCALEF))
-#define X_SCROLL_RATE 120
+#define SCROLL_X_GAIN (FIXED)(0.01f * FIX_SCALEF)
+#define SCROLL_X_MAX (FIXED)(2.5f * FIX_SCALEF)
+#define SCROLL_X_RATE 120
 
-//Stolen https://stackoverflow.com/questions/2422712/rounding-integer-division-instead-of-truncating
+// Stolen https://stackoverflow.com/questions/2422712/rounding-integer-division-instead-of-truncating
 #define INT_DIV_CEIL(x, y) (x + y - 1) / y
 
 #define RAND_FLOAT(max) ((float)gba_rand_range(0, 8000) / (float)(8000) * max)
@@ -70,6 +72,8 @@
 	SET_BIT(0, GET_BIT(r, 3), 13) | \
 	SET_BIT(0, GET_BIT(r, 4), 14))
 
+// #define MAX_SCROLL_X_SPEED ((FIXED))
+
 typedef struct scene_t
 {
 	void (*show)(void);
@@ -78,6 +82,11 @@ typedef struct scene_t
 } scene_t;
 
 extern FIXED _scroll_x;
+
+inline void set_scroll_x(FIXED value)
+{
+	_scroll_x = CLAMP(value, 0, SCROLL_X_MAX);
+}
 
 void scene_set(scene_t scene);
 void scene_update();

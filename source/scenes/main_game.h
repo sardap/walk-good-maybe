@@ -14,8 +14,6 @@
 #define MG_BG_X 64
 #define MG_BG_X_PIX (int)(MG_BG_X * 8 * (FIX_SCALE))
 
-#define MG_MAX_SCROLL_SPEED (int)(10 * FIX_SCALE)
-
 typedef enum mg_mode_t
 {
 	MG_MODE_CITY,

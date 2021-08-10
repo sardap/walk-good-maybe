@@ -233,19 +233,25 @@ static void update_high_low_tile(int x, int count)
 {
 	x /= 2;
 
+#ifdef DEBUG
 	char str[50];
+#endif
 	if (x < _lowest_tile_idx)
 	{
 		_lowest_tile_idx = x;
+#ifdef DEBUG
 		sprintf(str, "NL:%d", x);
 		write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	}
 
 	if (x + count > _highest_tile_idx)
 	{
 		_highest_tile_idx = x + count;
+#ifdef DEBUG
 		sprintf(str, "NM:%d", x);
 		write_to_log(LOG_LEVEL_DEBUG, str);
+#endif
 	}
 }
 

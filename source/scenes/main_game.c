@@ -118,7 +118,7 @@ static void spawn_buildings()
 	// Calcautes how much spare space there is
 	int space = 0;
 	// Yeah that's right you can hire me after reading this shit show
-	while (tile_to_collision(at_level(level_wrap_x(start_x + space), SCREEN_HEIGHT / 8)) == LEVEL_COL_EMPTY)
+	while (tile_to_collision(at_level(level_wrap_x(start_x + space), BEACH_ISLAND_Y_TILE_SPAWN)) == LEVEL_COL_EMPTY && space < 40)
 	{
 		space++;
 	}
@@ -172,7 +172,7 @@ static void spawn_buildings()
 	_data->next_building_spawn = int2fx(width * 8);
 
 	space -= width;
-	if (space > MAX_JUMP_WIDTH_TILES)
+	if (space > 12)
 	{
 		spawn_buildings();
 	}
@@ -238,6 +238,9 @@ static void show(void)
 {
 	*_data = _in_data.new_data;
 
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "starting main game");
+#endif
 	// Apply speical zone bonuses
 	sz_transfer_out_t sz_out = get_sz_out();
 	if (sz_out.dirty)
@@ -276,6 +279,9 @@ static void show(void)
 		init_gen();
 		init_level();
 		init_player();
+#ifdef DEBUG
+		write_to_log(LOG_LEVEL_DEBUG, "init everything");
+#endif
 	}
 
 	_obj_pal_idx = allocate_obj_pal_idx(spriteSharedPalLen);
@@ -307,8 +313,11 @@ static void show(void)
 		break;
 	}
 
-	// Maps
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "graphics started");
+#endif
 
+	// Maps
 	load_foreground_tiles();
 
 	// Pause screen
@@ -335,6 +344,10 @@ static void show(void)
 		se_fill(se_mem[MG_PLATFROM_SB], 0);
 		break;
 	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "loadded background tiles");
+#endif
 
 	// Can't be bothered using char blocks
 	for (int i = 0; i < mgBeachWaterFog00MapLen; i++)
@@ -373,6 +386,10 @@ static void show(void)
 	REG_BG2CNT = BG_PRIO(bg_2_prio) | BG_8BPP | BG_SBB(MG_CLOUD_SB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 	REG_BG3CNT = BG_PRIO(0) | BG_8BPP | BG_SBB(MG_PAUSE_SBB) | BG_CBB(MG_SHARED_CB) | BG_REG_32x32;
 
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "display reg init");
+#endif
+
 	// Load palettes
 	switch (_data->mode)
 	{
@@ -383,6 +400,10 @@ static void show(void)
 		GRIT_CPY(pal_bg_mem, mainGameBeachSharedPal);
 		break;
 	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "loaded palette");
+#endif
 
 	REG_DISPCNT = DCNT_OBJ | DCNT_OBJ_1D | DCNT_BG0 | DCNT_BG1 | DCNT_BG2;
 
@@ -408,6 +429,10 @@ static void show(void)
 
 	set_scroll_x(_data->starting_scroll_x);
 
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "set scrolling x blending");
+#endif
+
 	if (_data->fresh_game)
 	{
 		init_score();
@@ -428,6 +453,10 @@ static void show(void)
 
 	init_score_display();
 
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "loaded tiles");
+#endif
+
 	if (_data->fresh_game)
 	{
 		obj_hide_multi(oam_mem, 128);
@@ -437,6 +466,10 @@ static void show(void)
 	{
 		update_score_display(get_score());
 	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "complete init");
+#endif
 }
 
 static bool check_game_over()
@@ -484,7 +517,43 @@ static void game_over()
 	go_transfer_in_t in;
 	in.score = get_score();
 	set_go_in(in);
-	scene_set(game_over_scene);
+	scene_set(_game_over_scene);
+}
+
+static void game_win()
+{
+	if (_data->mode == MG_MODE_CITY)
+	{
+		REG_DISPCNT ^= DCNT_BG2;
+	}
+
+	REG_BLDCNT = BLD_BUILD(
+		BLD_BG0 | BLD_BG1 | BLD_BG2 | BLD_OBJ, // Top layers
+		0,									   // Bottom layers
+		2									   // Mode
+	);
+	int blend = 0;
+	int timer = 0;
+	REG_BLDY = BLDY_BUILD(blend);
+	mmStop();
+
+	while (blend <= 17)
+	{
+		VBlankIntrWait();
+		mmFrame();
+		key_poll();
+		timer++;
+		if (timer % 8 == 0)
+		{
+			blend++;
+			REG_BLDY = BLDY_BUILD(blend);
+		}
+	}
+
+#ifdef DEBUG
+	write_to_log(LOG_LEVEL_DEBUG, "game win");
+#endif
+	scene_set(_game_win_scene);
 }
 
 static void update(void)
@@ -549,9 +618,16 @@ static void update(void)
 	}
 
 	// Back to title screen
+	if (key_held(KEY_SELECT) && key_held(KEY_L) && key_hit(KEY_START))
+	{
+		game_win();
+		return;
+	}
+
+	// Back to title screen
 	if (key_held(KEY_SELECT) && key_hit(KEY_START))
 	{
-		scene_set(game_win_scene);
+		scene_set(_title_scene);
 		return;
 	}
 
@@ -647,7 +723,7 @@ static void update(void)
 
 	if (_player.ent_cols & TYPE_IDOL)
 	{
-		scene_set(game_win_scene);
+		game_win();
 		return;
 	}
 
@@ -700,6 +776,7 @@ static void hide(void)
 	free_speed_level_display();
 	free_jump_level_display();
 
+	mmSetModuleVolume((mm_word)1024);
 	mmStop();
 
 	OAM_CLEAR();
@@ -715,7 +792,7 @@ static void hide(void)
 	REG_BLDCNT = 0;
 }
 
-const scene_t main_game = {
+const scene_t _main_game_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

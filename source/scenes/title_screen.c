@@ -172,17 +172,17 @@ static void update(void)
 		{
 		case TS_MENU_CITY:
 			set_mg_in(defualt_mg_data(MG_MODE_CITY));
-			scene_set(city_game_intro);
+			scene_set(_city_game_intro_scene);
 			break;
 		case TS_MENU_BEACH:
 			set_mg_in(defualt_mg_data(MG_MODE_BEACH));
-			scene_set(beach_game_intro);
+			scene_set(_beach_game_intro_scene);
 			break;
 		case TS_MENU_CREDITS:
-			scene_set(credits_screen);
+			scene_set(_credits_scene);
 			break;
 		case TS_MENU_SOUND_TEST:
-			scene_set(sound_test_scene);
+			scene_set(_sound_test_scene);
 			break;
 		}
 	}
@@ -214,7 +214,7 @@ static void hide(void)
 	OAM_CLEAR();
 }
 
-const scene_t title_screen = {
+const scene_t _title_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide,

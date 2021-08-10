@@ -32,6 +32,6 @@ typedef struct ts_menu_options_t
 	//Bad but cbf
 } ts_menu_options_t;
 
-extern const scene_t title_screen;
+extern const scene_t _title_scene;
 
 #endif

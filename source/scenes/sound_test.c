@@ -120,7 +120,7 @@ static void show(void)
 static void update(void)
 {
 	if (key_hit(KEY_B))
-		scene_set(title_screen);
+		scene_set(_title_scene);
 
 	if (key_hit(KEY_UP) || key_hit(KEY_DOWN))
 	{
@@ -251,7 +251,7 @@ static void hide(void)
 	mmStop();
 }
 
-const scene_t sound_test_scene = {
+const scene_t _sound_test_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

@@ -67,6 +67,6 @@ void set_mg_in(mg_data_in_t data);
 
 mg_data_out_t get_mg_out();
 
-extern const scene_t main_game;
+extern const scene_t _main_game_scene;
 
 #endif

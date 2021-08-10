@@ -18,7 +18,7 @@
 
 #define CR_SKY_START_PAL 120
 
-extern const scene_t credits_screen;
+extern const scene_t _credits_scene;
 
 typedef struct cr_credit_t
 {

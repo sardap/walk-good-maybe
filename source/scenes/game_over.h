@@ -34,6 +34,6 @@ typedef struct go_data_t
 	int volume;
 } go_data_t;
 
-extern const scene_t game_over_scene;
+extern const scene_t _game_over_scene;
 
 #endif

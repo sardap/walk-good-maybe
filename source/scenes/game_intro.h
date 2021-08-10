@@ -40,8 +40,8 @@ typedef struct gi_data_t
 	gi_mode_t mode;
 } gi_data_t;
 
-extern const scene_t city_game_intro;
-extern const scene_t beach_game_intro;
+extern const scene_t _city_game_intro_scene;
+extern const scene_t _beach_game_intro_scene;
 extern const scene_t _speical_zone_intro_scene;
 
 #endif

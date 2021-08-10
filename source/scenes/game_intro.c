@@ -222,10 +222,10 @@ static void update(void)
 			{
 			case GI_MODE_BEACH:
 			case GI_MODE_CITY:
-				scene_set(main_game);
+				scene_set(_main_game_scene);
 				break;
 			case GI_MODE_SPEICAL_ZONE:
-				scene_set(special_zone_scene);
+				scene_set(_special_zone_scene);
 				break;
 			}
 		}
@@ -252,12 +252,12 @@ static void show_speical_zone(void)
 	show(GI_MODE_SPEICAL_ZONE);
 }
 
-const scene_t city_game_intro = {
+const scene_t _city_game_intro_scene = {
 	.show = show_city,
 	.update = update,
 	.hide = hide};
 
-const scene_t beach_game_intro = {
+const scene_t _beach_game_intro_scene = {
 	.show = show_beach,
 	.update = update,
 	.hide = hide};

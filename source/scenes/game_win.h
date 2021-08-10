@@ -25,6 +25,6 @@ typedef struct gw_data_t
 	FIXED vict_x;
 } gw_data_t;
 
-extern const scene_t game_win_scene;
+extern const scene_t _game_win_scene;
 
 #endif

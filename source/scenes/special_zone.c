@@ -840,7 +840,7 @@ static void update(void)
 	{
 		if (_in_data.entered_via_debug)
 		{
-			scene_set(title_screen);
+			scene_set(_title_scene);
 		}
 		else
 		{
@@ -851,10 +851,10 @@ static void update(void)
 			switch (mg_in_data.new_data.mode)
 			{
 			case MG_MODE_BEACH:
-				scene_set(beach_game_intro);
+				scene_set(_beach_game_intro_scene);
 				break;
 			case MG_MODE_CITY:
-				scene_set(city_game_intro);
+				scene_set(_city_game_intro_scene);
 				break;
 			}
 		}
@@ -887,7 +887,7 @@ static void hide(void)
 	mmStop();
 }
 
-const scene_t special_zone_scene = {
+const scene_t _special_zone_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

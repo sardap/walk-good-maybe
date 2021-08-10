@@ -32,7 +32,7 @@ void game_loop()
 
 void start_game()
 {
-	scene_set(title_screen);
+	scene_set(_title_scene);
 	game_loop();
 }
 

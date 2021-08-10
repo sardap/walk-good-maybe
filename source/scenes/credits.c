@@ -283,7 +283,7 @@ static void update(void)
 	REG_BLDY = BLDY_BUILD(0);
 
 	if (key_hit(KEY_START) || key_hit(KEY_B))
-		scene_set(title_screen);
+		scene_set(_title_scene);
 
 	FIXED step;
 	switch (_data->state)
@@ -339,7 +339,7 @@ static void update(void)
 			if (_data->active_idx < _credits_count)
 				load_next_credit();
 			else
-				scene_set(title_screen);
+				scene_set(_title_scene);
 		}
 		break;
 	}
@@ -391,7 +391,7 @@ static void hide(void)
 	oam_copy(oam_mem, _data->text_objs, CR_OBJ_COUNT);
 }
 
-const scene_t credits_screen = {
+const scene_t _credits_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide};

@@ -110,7 +110,7 @@ static void update(void)
 	case GO_STATES_SOLID:
 		if (key_hit(KEY_A) && _data->timer > 300)
 		{
-			scene_set(title_screen);
+			scene_set(_title_scene);
 		}
 		break;
 	}
@@ -143,7 +143,7 @@ static void hide(void)
 	mmSetModuleVolume((mm_word)1024);
 }
 
-const scene_t game_over_scene = {
+const scene_t _game_over_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide,

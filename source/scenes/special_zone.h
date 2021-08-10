@@ -122,6 +122,6 @@ sz_transfer_out_t get_sz_out();
 
 void sz_out_clear_dirty();
 
-extern const scene_t special_zone_scene;
+extern const scene_t _special_zone_scene;
 
 #endif

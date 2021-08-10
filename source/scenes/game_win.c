@@ -104,7 +104,7 @@ static void update(void)
 	case GW_STATES_COMPLETE:
 		if (key_hit(KEY_A) && !mmActive())
 		{
-			scene_set(credits_screen);
+			scene_set(_credits_scene);
 		}
 		break;
 	}
@@ -118,7 +118,7 @@ static void hide(void)
 	mmSetModuleVolume((mm_word)1024);
 }
 
-const scene_t game_win_scene = {
+const scene_t _game_win_scene = {
 	.show = show,
 	.update = update,
 	.hide = hide,

@@ -1,4 +1,4 @@
-# ECS GBA
+# Walk good Maybe
 
 ## Music
 All music prefixed by pd is by Patrick Dyett

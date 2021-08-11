@@ -47,7 +47,7 @@ CFLAGS  +=  $(INCLUDE)
 ifdef WALK_GOOD_MAYBE_RELEASE
     CFLAGS += -DSHOW_WARNING=1 -DGAME_OVER_ENABLED=1
 else
-    CFLAGS += -DDEBUG=1
+    CFLAGS += -DDEBUG=1 -DGAME_OVER_ENABLED=1
 endif
 
 CXXFLAGS    :=  $(CFLAGS) -fno-rtti -fno-exceptions

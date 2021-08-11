@@ -97,6 +97,8 @@ files=[
     "title_screen/tsCityGameText",
     "title_screen/tsTitleText",
     "title_screen/tsCredits",
+    "title_screen/tsControls",
+    "title_screen/tsTextBox",
     "title_screen/tsSoundTestText",
 ]
 

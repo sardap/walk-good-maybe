@@ -25,13 +25,16 @@
 #include "../assets/tsSoundTestText.h"
 #include "../assets/tsBeachGameText.h"
 #include "../assets/tsCityGameText.h"
+#include "../assets/tsControls.h"
+#include "../assets/tsTextBox.h"
 
-static const int _options_length = 4;
+static const int _options_length = 5;
 static const ts_menu_options_t _options[] = {
 	{TS_MENU_CITY, tsCityGameTextMap, tsCityGameTextMapLen, 51, 160},
 	{TS_MENU_BEACH, tsBeachGameTextMap, tsBeachGameTextMapLen, 43, 167},
 	{TS_MENU_CREDITS, tsCreditsMap, tsCreditsMapLen, 23, 185},
-	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175}};
+	{TS_MENU_SOUND_TEST, tsSoundTestTextMap, tsSoundTestTextMapLen, 35, 175},
+	{TS_MENU_CONTROLS, tsControlsMap, tsControlsMapLen, 17, 198}};
 
 static const u16 lava_cycle[] = {0x11D9, 0x1E3C, 0x20FF};
 
@@ -39,15 +42,32 @@ static FIXED _bkg_x;
 static int _water_pal_idx;
 static int _lava_pal_idx;
 static int _active_opt_idx;
-static OBJ_ATTR _arrow_objs[2];
-static OBJ_ATTR *_left_arrow = &_arrow_objs[0];
-static OBJ_ATTR *_right_arrow = &_arrow_objs[1];
+static OBJ_ATTR _ts_objs[128];
+static OBJ_ATTR *_left_arrow = &_ts_objs[0];
+static OBJ_ATTR *_right_arrow = &_ts_objs[1];
+static OBJ_ATTR *_text_objets = &_ts_objs[2];
 static int _pal_change_countdown;
+static BOOL _showing_menu;
+
+static const char *_controls_str =
+	"Main Game:"
+	"\n\tGet as far as you can!"
+	"\n\tMove : D-Pad"
+	"\n\tJump : A"
+	"\n\tShoot: B"
+	"\n\tQuit : Start + Select"
+	"\n\n"
+	"Special Zone:"
+	"\n\tTurn Left : L"
+	"\n\tTurn Right: R"
+	"\n\tAccelerate: A";
 
 static void show(void)
 {
 	load_blank();
 	hide_all_objects();
+
+	_showing_menu = TRUE;
 
 	irq_init(NULL);
 	irq_add(II_VBLANK, mmVBlank);
@@ -123,8 +143,43 @@ static void show(void)
 		ATTR2_ID(0) | ATTR2_PRIO(0));
 	obj_set_pos(_right_arrow, _options[_active_opt_idx].rx, TS_ARROW_Y);
 
+	txt_init_std();
+	txt_init_obj(oam_mem, 0xF200, CLR_BLACK, 0x0E);
+
+	gptxt->dx = 8;
+	gptxt->dy = 10;
+
+	obj_puts2(
+		25, 25, _controls_str,
+		0xF200, _text_objets);
+	obj_hide_multi(_text_objets, 126);
+
 	mmSetModuleVolume((mm_word)300);
 	mmStart(MOD_PD_TITLE_SCREEN, MM_PLAY_LOOP);
+}
+
+static void show_controls_popup()
+{
+	_showing_menu = FALSE;
+
+	GRIT_CPY(&se_mem[TS_TEXT_SSB], tsTextBoxMap);
+	REG_DISPCNT ^= DCNT_BG3;
+
+	obj_hide(_left_arrow);
+	obj_hide(_right_arrow);
+	obj_unhide_multi(_text_objets, 0, 119);
+}
+
+static void hide_controls_popup()
+{
+	_showing_menu = TRUE;
+
+	GRIT_CPY(&se_mem[TS_TEXT_SSB], tsTitleTextMap);
+	REG_DISPCNT |= DCNT_BG3;
+
+	obj_unhide(_left_arrow, 1);
+	obj_unhide(_right_arrow, 1);
+	obj_hide_multi(_text_objets, 120);
 }
 
 static void update(void)
@@ -134,27 +189,6 @@ static void update(void)
 	REG_BG0HOFS = fx2int(_bkg_x);
 	REG_BG1HOFS = fx2int(-_bkg_x);
 
-	if (key_hit(KEY_LEFT) || key_hit(KEY_RIGHT))
-	{
-		_active_opt_idx = wrap(_active_opt_idx + key_tri_horz(), 0, _options_length);
-		//Copy active menu item into OPTION SBB
-		memcpy16(
-			&se_mem[TS_OPTION_SSB],
-			_options[_active_opt_idx].map,
-			_options[_active_opt_idx].mapLen);
-
-		obj_set_pos(_left_arrow, _options[_active_opt_idx].lx, TS_ARROW_Y);
-		obj_set_pos(_right_arrow, _options[_active_opt_idx].rx, TS_ARROW_Y);
-
-		//Now you can't do pallte stuff here since they both use the same colour in the pallte
-		if (key_hit(KEY_LEFT))
-			_left_arrow->attr2 = ATTR2_ID(tsArrowTilesLen / 32);
-		else
-			_right_arrow->attr2 = ATTR2_ID(tsArrowTilesLen / 32);
-
-		_pal_change_countdown = 5;
-	}
-
 	_pal_change_countdown = clamp(_pal_change_countdown - 1, 0, 100);
 	//change back to ogrinal arrow
 	if (_pal_change_countdown <= 0)
@@ -163,29 +197,7 @@ static void update(void)
 		_right_arrow->attr2 = ATTR2_ID(0);
 	}
 
-	if (key_hit(KEY_A))
-	{
-		for (int i = 0; i < frame_count(); i++)
-			qran();
-
-		switch (_options[_active_opt_idx].type)
-		{
-		case TS_MENU_CITY:
-			set_mg_in(defualt_mg_data(MG_MODE_CITY));
-			scene_set(_city_game_intro_scene);
-			break;
-		case TS_MENU_BEACH:
-			set_mg_in(defualt_mg_data(MG_MODE_BEACH));
-			scene_set(_beach_game_intro_scene);
-			break;
-		case TS_MENU_CREDITS:
-			scene_set(_credits_scene);
-			break;
-		case TS_MENU_SOUND_TEST:
-			scene_set(_sound_test_scene);
-			break;
-		}
-	}
+	qran();
 
 	if (frame_count() % 25 == 0)
 	{
@@ -203,7 +215,62 @@ static void update(void)
 			&_lava_pal_idx, TS_PAL_LAVA_LENGTH);
 	}
 
-	obj_copy(oam_mem, _arrow_objs, 2);
+	oam_copy(oam_mem, _ts_objs, 128);
+
+	if (_showing_menu)
+	{
+		if (key_hit(KEY_LEFT) || key_hit(KEY_RIGHT))
+		{
+			_active_opt_idx = wrap(_active_opt_idx + key_tri_horz(), 0, _options_length);
+			//Copy active menu item into OPTION SBB
+			memcpy16(
+				&se_mem[TS_OPTION_SSB],
+				_options[_active_opt_idx].map,
+				_options[_active_opt_idx].mapLen);
+
+			obj_set_pos(_left_arrow, _options[_active_opt_idx].lx, TS_ARROW_Y);
+			obj_set_pos(_right_arrow, _options[_active_opt_idx].rx, TS_ARROW_Y);
+
+			//Now you can't do pallte stuff here since they both use the same colour in the pallte
+			if (key_hit(KEY_LEFT))
+				_left_arrow->attr2 = ATTR2_ID(tsArrowTilesLen / 32);
+			else
+				_right_arrow->attr2 = ATTR2_ID(tsArrowTilesLen / 32);
+
+			_pal_change_countdown = 5;
+		}
+
+		if (key_hit(KEY_A))
+		{
+			switch (_options[_active_opt_idx].type)
+			{
+			case TS_MENU_CITY:
+				set_mg_in(defualt_mg_data(MG_MODE_CITY));
+				scene_set(_city_game_intro_scene);
+				break;
+			case TS_MENU_BEACH:
+				set_mg_in(defualt_mg_data(MG_MODE_BEACH));
+				scene_set(_beach_game_intro_scene);
+				break;
+			case TS_MENU_CREDITS:
+				scene_set(_credits_scene);
+				break;
+			case TS_MENU_SOUND_TEST:
+				scene_set(_sound_test_scene);
+				break;
+			case TS_MENU_CONTROLS:
+				show_controls_popup();
+				break;
+			}
+		}
+	}
+	else
+	{
+		if (key_hit(KEY_B))
+		{
+			hide_controls_popup();
+		}
+	}
 }
 
 static void hide(void)

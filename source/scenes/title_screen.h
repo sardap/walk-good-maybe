@@ -20,7 +20,8 @@ typedef enum ts_menu_enum
 	TS_MENU_CITY,
 	TS_MENU_BEACH,
 	TS_MENU_CREDITS,
-	TS_MENU_SOUND_TEST
+	TS_MENU_SOUND_TEST,
+	TS_MENU_CONTROLS
 } ts_menu_enum;
 
 typedef struct ts_menu_options_t

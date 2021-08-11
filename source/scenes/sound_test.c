@@ -246,8 +246,9 @@ static void update(void)
 
 static void hide(void)
 {
-	REG_DISPCNT = 0;
-	obj_hide_multi(oam_mem, 128);
+	load_blank();
+	obj_hide_multi(_data->objs, ST_OBJ_COUNT);
+	OAM_CLEAR();
 	mmStop();
 }
 

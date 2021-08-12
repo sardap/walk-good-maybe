@@ -75,7 +75,7 @@ func main() {
 		return
 	}
 
-	//Hacked makefile lamo
+	// Hacked makefile lamo
 	if files, _ := ioutil.ReadDir("source/assets"); cmd != "clean" &&
 		(len(files) == 0 || latestModify("assets").After(latestModify("source/assets"))) {
 		assets.Make(buildFilePath, assetsPath, targetPath)

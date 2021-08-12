@@ -3,6 +3,8 @@ package assets
 import (
 	"builder/gbacolour"
 	"image"
+	"image/color"
+	"image/draw"
 	"image/png"
 
 	"bytes"
@@ -17,13 +19,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pbnjay/pixfont"
+
 	_ "github.com/oov/psd"
 
 	"github.com/pelletier/go-toml"
 )
 
 var (
-	//Grit Really doens't like async shit
+	// Grit Really doens't like async shit
 	gritMutex = &sync.Mutex{}
 )
 
@@ -219,6 +223,10 @@ func toPng(ctx context.Context, filename string) {
 			panic(err)
 		}
 
+		if strings.Contains(filename, "tsTitleText") {
+			img = overlayVersion(img)
+		}
+
 		img = gbacolour.ConvertImg(img)
 
 		os.Remove(toPngFileName(filename))
@@ -243,6 +251,43 @@ func getGenratedAsset(generatedAssetsPath, filename string) string {
 	baseFile = baseFile[:len(baseFile)-4]
 
 	return filepath.Join(generatedAssetsPath, fmt.Sprintf("%s.h", baseFile))
+}
+
+func getVersion() string {
+	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		tag := os.Getenv("GIT_TAG")
+		if tag == "" {
+			fmt.Printf("out %s and env empty", out)
+			os.Exit(2)
+		}
+
+		return tag
+	}
+
+	return string(out)
+}
+
+func overlayVersion(inImg image.Image) image.Image {
+	textImg := image.NewRGBA(image.Rect(0, 0, 64, 16))
+
+	pixfont.DrawString(textImg, 0, 0, getVersion(), color.White)
+
+	for y := 0; y < textImg.Rect.Max.Y; y++ {
+		for x := 0; x < textImg.Rect.Max.X; x++ {
+			if textImg.RGBAAt(x, y).A == 0 {
+				textImg.Set(x, y, color.RGBA{R: 255, G: 0, B: 246, A: 255})
+			}
+		}
+	}
+
+	b := inImg.Bounds()
+	dst := image.NewRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
+	draw.Draw(dst, dst.Bounds(), inImg, b.Min, draw.Src)
+	draw.Draw(dst, textImg.Bounds().Add(image.Point{X: 0, Y: 160 - 8}), textImg, image.Point{}, draw.Over)
+
+	return dst
 }
 
 func genPngs(ctx context.Context, generatedAssetsPath, targetDir string) map[string]bool {

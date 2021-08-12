@@ -12,6 +12,7 @@
 #include "special_zone.h"
 #include "../debug.h"
 #include "../graphics.h"
+#include "../sound.h"
 
 #include "../assets/titleScreenShared.h"
 #include "../assets/tsCity.h"
@@ -154,7 +155,7 @@ static void show(void)
 		0xF200, _text_objets);
 	obj_hide_multi(_text_objets, 126);
 
-	mmSetModuleVolume((mm_word)300);
+	setModuleVolume((mm_word)300);
 	mmStart(MOD_PD_TITLE_SCREEN, MM_PLAY_LOOP);
 }
 
@@ -275,7 +276,7 @@ static void update(void)
 
 static void hide(void)
 {
-	mmSetModuleVolume((mm_word)1024);
+	setModuleVolume(MUSIC_MAX_VOLUME);
 	mmStop();
 	load_blank();
 	OAM_CLEAR();

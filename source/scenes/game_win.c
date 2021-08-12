@@ -10,6 +10,7 @@
 
 #include "scene_shared.h"
 #include "credits.h"
+#include "../sound.h"
 #include "../debug.h"
 
 #include "../assets/gwSharedBackground.h"
@@ -115,7 +116,7 @@ static void hide(void)
 	load_blank();
 	REG_BLDCNT = 0;
 	OAM_CLEAR();
-	mmSetModuleVolume((mm_word)1024);
+	setModuleVolume(MUSIC_MAX_VOLUME);
 }
 
 const scene_t _game_win_scene = {

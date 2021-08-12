@@ -185,6 +185,11 @@ inline int ent_level_collision(ent_t *e)
 
 inline int ent_level_collision_at(ent_t *e, FIXED vx, FIXED vy)
 {
+	if (e->y < 8 * FIX_SCALE)
+	{
+		return LEVEL_COL_EMPTY;
+	}
+
 	return level_collision_rect(
 		(translate_x(e) + vx) / FIX_SCALE,
 		(translate_y(e) + vy) / FIX_SCALE,

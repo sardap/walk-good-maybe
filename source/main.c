@@ -2,6 +2,7 @@
 #include <maxmod.h>
 #include "soundbank_bin.h"
 
+#include "sound.h"
 #include "debug.h"
 #include "common.h"
 #include "graphics.h"
@@ -16,6 +17,8 @@ void game_loop()
 
 	irq_add(II_VBLANK, mmVBlank);
 	mmInitDefault((mm_addr)soundbank_bin, 8);
+
+	setModuleVolume(MUSIC_MAX_VOLUME);
 
 	while (1)
 	{

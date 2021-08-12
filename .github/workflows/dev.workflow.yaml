@@ -17,4 +17,4 @@ jobs:
       - name: Build conatiner
         run: docker build . -t gba_build:latest
       - name: Build Rom
-        run: docker run -v ${PWD}:/app gba_build:latest
+        run: docker run -v ${PWD}:/app -e GIT_TAG=${{ github.ref }} gba_build:latest

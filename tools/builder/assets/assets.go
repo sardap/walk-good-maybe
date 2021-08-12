@@ -257,8 +257,13 @@ func getVersion() string {
 	cmd := exec.Command("git", "describe", "--tags", "--abbrev=0")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("out %s", out)
-		os.Exit(2)
+		tag := os.Getenv("GIT_TAG")
+		if tag == "" {
+			fmt.Printf("out %s and env empty", out)
+			os.Exit(2)
+		}
+
+		return tag
 	}
 
 	return string(out)

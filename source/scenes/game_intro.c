@@ -151,7 +151,10 @@ static void show(gi_mode_t mode)
 	_data->state = GI_S_READY;
 
 	if (_data->mode == GI_MODE_SPEICAL_ZONE)
+	{
+		setModuleVolume(350);
 		mmStart(MOD_PD_SPECIAL_ZONE, MM_PLAY_LOOP);
+	}
 
 	mmEffectEx(&_ready_sound);
 
@@ -202,11 +205,11 @@ static void update(void)
 
 		GRIT_CPY(&se_mem[GI_TEXT_SSB], goMap);
 		mmEffectEx(&_go_sound);
-		mmSetModuleVolume(300);
 		switch (_data->mode)
 		{
 		case GI_MODE_BEACH:
 		case GI_MODE_CITY:
+			setModuleVolume(200);
 			mmStart(MOD_INTRO, MM_PLAY_ONCE);
 			break;
 		case GI_MODE_SPEICAL_ZONE:

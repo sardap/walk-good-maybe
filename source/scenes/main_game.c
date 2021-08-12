@@ -776,7 +776,7 @@ static void hide(void)
 	free_speed_level_display();
 	free_jump_level_display();
 
-	mmSetModuleVolume((mm_word)1024);
+	setModuleVolume(MUSIC_MAX_VOLUME);
 	mmStop();
 
 	OAM_CLEAR();

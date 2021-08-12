@@ -10,6 +10,7 @@
 #include "scene_shared.h"
 #include "title_screen.h"
 #include "../debug.h"
+#include "../sound.h"
 
 #include "../assets/goMainBackground.h"
 #include "../assets/goSharedBackground.h"
@@ -127,7 +128,8 @@ static void update(void)
 	}
 
 	_data->volume = CLAMP(_data->volume - vol_dec, 0, 1024);
-	mmSetModuleVolume((mm_word)_data->volume);
+
+	setModuleVolume((mm_word)_data->volume);
 #ifdef DEBUG
 	char str[50];
 	sprintf(str, "%d %d", _data->volume, _data->timer);
@@ -140,7 +142,7 @@ static void hide(void)
 	load_blank();
 	REG_BLDCNT = 0;
 	OAM_CLEAR();
-	mmSetModuleVolume((mm_word)1024);
+	setModuleVolume(MUSIC_MAX_VOLUME);
 }
 
 const scene_t _game_over_scene = {

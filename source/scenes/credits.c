@@ -10,6 +10,7 @@
 #include "../debug.h"
 #include "../anime.h"
 #include "../graphics.h"
+#include "../sound.h"
 
 #include "../assets/crPaulFace.h"
 #include "../assets/crSpace.h"
@@ -248,7 +249,7 @@ static void show(void)
 	_data->eva = 3 * FIX_SCALE;
 	_data->evb = 124 * FIX_SCALE;
 
-	mmSetModuleVolume((mm_word)100);
+	setModuleVolume((mm_word)100);
 	mmStart(MOD_PD_ROCK_BACKGROUND, MM_PLAY_LOOP);
 }
 
@@ -381,7 +382,7 @@ static void update(void)
 
 static void hide(void)
 {
-	mmSetModuleVolume((mm_word)1024);
+	setModuleVolume(MUSIC_MAX_VOLUME);
 	REG_BLDCNT = 0;
 
 	mmStop();

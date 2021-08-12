@@ -185,7 +185,7 @@ static void update(void)
 			mmEffectEx(_sound_fx_set[_data->fx_idx].sound);
 			break;
 		case ST_SELECTION_MUSIC:
-			mmSetModuleVolume(300);
+			setModuleVolume(300);
 			mmStart(_data->mus_idx, MM_PLAY_ONCE);
 			break;
 

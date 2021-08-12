@@ -1,6 +1,17 @@
 #ifndef SOUND_H
 #define SOUND_H
 
+#ifndef VOLUME
+#define VOLUME 1.0f
+#endif
+
+#define MUSIC_MUTIPLER 0.8f * VOLUME
+#define SOUND_MUTIPLER 1.0f * VOLUME
+
+#define MUSIC_MAX_VOLUME ((mm_word)(1024.0f * MUSIC_MUTIPLER))
+
+#define VOLUME_SOUND_EFFECT_MODIFER(V) ((mm_byte)((float)V * SOUND_MUTIPLER))
+
 #define GI_INTRO_HANDLER (mm_sfxhand)1
 #define PLAYER_ACTION_SOUND_HANDLER (mm_sfxhand)2
 #define PLAYER_WALK_SOUND_HANDLER (mm_sfxhand)3
@@ -45,6 +56,8 @@ extern mm_sound_effect _always_backwards_sound;
 
 // Animal noises
 extern mm_sound_effect _croc_sound;
+
+void setModuleVolume(mm_word volume);
 
 #define SOUND_SET_LENGTH 20
 extern const sound_fx_info_t _sound_fx_set[SOUND_SET_LENGTH];

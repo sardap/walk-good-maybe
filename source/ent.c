@@ -257,14 +257,9 @@ bool ent_move_x(ent_t *e, FIXED dx)
 {
 	if (did_hit_x(e, dx))
 	{
-
-		if (dx > 0)
+		for (int i = 0; i < 100 && did_hit_x(e, 0); i++)
 		{
-			while (dx > 0 && !did_hit_x(e, -(1 * FIX_SCALE)))
-			{
-				e->x -= 1 * FIX_SCALE / 4;
-				dx -= 1 * FIX_SCALE / 4;
-			}
+			e->x -= FIX_SCALE / 4;
 		}
 
 		return true;

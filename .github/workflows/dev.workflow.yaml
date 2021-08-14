@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build conatiner
+      - name: Build image
         run: docker build . -t gba_build:latest
       - name: Build Rom
         run: docker run -v ${PWD}:/app -e GIT_TAG=${{ github.ref }} gba_build:latest

@@ -285,9 +285,9 @@ static void update_text_fade(FIXED max)
 static void update_player()
 {
 	// Rotation
-	if (key_tri_shoulder())
+	if (key_tri_horz())
 	{
-		int change = fx2int(fxmul(int2fx(key_tri_shoulder()), _data->player.turning_speed));
+		int change = fx2int(fxmul(int2fx(key_tri_horz()), _data->player.turning_speed));
 		_data->player.angle = WRAP(
 			_data->player.angle - change,
 			0, 0xFFFF);

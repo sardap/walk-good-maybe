@@ -59,8 +59,8 @@ static const char *_controls_str =
 	"\n\tQuit : Start + Select"
 	"\n\n"
 	"Special Zone:"
-	"\n\tTurn Left : L"
-	"\n\tTurn Right: R"
+	"\n\tTurn Left : D-Pad"
+	"\n\tTurn Right: D-Pad"
 	"\n\tAccelerate: A";
 
 static void show(void)
